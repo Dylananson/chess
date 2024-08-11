@@ -47,45 +47,6 @@ function KingDisplay(color: Color) {
     return PieceColorDisplay(color, "K")
 }
 
-const columnNumericMap = {
-    "A": 1, "B": 2, "C": 3, "D": 4, "E": 5, "F": 6, "G": 7, "H": 8
-}
-
-const numericColumnMap = {
-    1: "A", 2: "B", 3: "C", 4: "D", 5: "E", 6: "F", 7: "G", 8: "H"
-}
-
-function getNumbericOfColumn(col: number) {
-    let out = ColumnValues.A
-    switch (col) {
-        case 1:
-            out = ColumnValues.A
-            break;
-        case 2:
-            out = ColumnValues.B
-            break;
-        case 3:
-            out = ColumnValues.C
-            break;
-        case 4:
-            out = ColumnValues.D
-            break;
-        case 5:
-            out = ColumnValues.E
-            break;
-        case 6:
-            out = ColumnValues.F
-            break;
-        case 7:
-            out = ColumnValues.G
-            break;
-        case 8:
-            out = ColumnValues.H
-            break;
-    }
-    return out
-}
-
 function KingMoves(coordinates: Coordinate) {
     const dirs = [
         [1, 0],   // move right
@@ -106,6 +67,26 @@ function KingMoves(coordinates: Coordinate) {
 const filterOffBoard = (coordinate: Coordinate) => {
     return (coordinate.row <= 8 && coordinate.row >= 1 && coordinate.column >= 1 && coordinate.column <= 8)
 }
+
+
+export function BishopMoves(coordinates: Coordinate) {
+    const dirs = [[-1, -1], [1, 1], [-1, 1], [1, -1]]
+    let res: Array<Coordinate> = []
+    dirs.forEach(([r, c]) => {
+        let currentCoordinate = { row: coordinates.row, column: coordinates.column }
+        currentCoordinate.row += r
+        currentCoordinate.column += c
+
+        while (filterOffBoard(currentCoordinate)) {
+            res.push({ row: currentCoordinate.row, column: currentCoordinate.column })
+            currentCoordinate.row += r
+            currentCoordinate.column += c
+        }
+
+    })
+    return res
+}
+
 
 
 function FakeMoves(coordinates: Coordinate) {
@@ -152,7 +133,7 @@ const Bishop: Piece = {
     name: PieceName.King,
     draw: BishopDisplay,
     value: -1,
-    moves: FakeMoves
+    moves: BishopMoves
 }
 
 function RookDisplay(color: Color) {
@@ -333,6 +314,11 @@ function Board() {
     const rows = [1, 2, 3, 4, 5, 6, 7, 8]
     const columns = [1, 2, 3, 4, 5, 6, 7, 8]
 
+    console.log(selectedPiece)
+    if (selectedPiece) {
+        console.log(selectedPiece?.piece.moves(selectedPiece.curentCoordinate))
+    }
+
     const handleSelectPiece = (p: PieceCoordinates | undefined) => {
         if (!p) {
             return
@@ -350,7 +336,7 @@ function Board() {
         <>
             <div className="b-4 contents-center center justify-center justify-items-center place-items-center">
                 {rows.reverse().map((row) => (
-                    <div className="flex justify-items-center place-items-center">
+                    <div key={row} className="flex justify-items-center place-items-center">
                         {columns.map((column) => {
                             const p = AllPieces.find((piece) => piece.curentCoordinate.row === row && piece.curentCoordinate.column.valueOf() === column)
                             let validMove = false
