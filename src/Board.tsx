@@ -333,10 +333,6 @@ function Board() {
     const rows = [1, 2, 3, 4, 5, 6, 7, 8]
     const columns = [1, 2, 3, 4, 5, 6, 7, 8]
 
-    if (selectedPiece) {
-        console.log(selectedPiece.piece.moves(selectedPiece?.curentCoordinate))
-    }
-
     const handleSelectPiece = (p: PieceCoordinates | undefined) => {
         if (!p) {
             return
