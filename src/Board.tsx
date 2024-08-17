@@ -211,6 +211,10 @@ const Rook: Piece = {
 }
 
 
+export function QueenMoves(coordinates: Coordinate): Array<Coordinate> {
+    return RookMoves(coordinates).concat(BishopMoves(coordinates))
+}
+
 function QueenDisplay(color: Color): React.ReactNode {
     return color === Color.Black ? <img src={blackQueenSvg} /> : <img src={whiteQueenSvg} />
 }
@@ -219,7 +223,7 @@ const Queen: Piece = {
     name: PieceName.Queen,
     draw: QueenDisplay,
     value: -1,
-    moves: FakeMoves
+    moves: QueenMoves
 }
 
 const BlackKing: PieceCoordinates = {
