@@ -461,15 +461,15 @@ export function movePiece(gameState: GameState, newCoordinates: Coordinate): Gam
         return gameState
     }
 
-    const pieceAtCoordinates = gameState.board[newCoordinates.row-1][newCoordinates.column-1]
+    const pieceAtCoordinates = gameState.board[newCoordinates.row - 1][newCoordinates.column - 1]
 
-    if(pieceAtCoordinates && pieceAtCoordinates.color === gameState.selectedPiece.piece.color){
+    if (pieceAtCoordinates && pieceAtCoordinates.color === gameState.selectedPiece.piece.color) {
         console.log("Cannot move piece on top of piece of the same team")
         return gameState
     }
 
 
-    const gameWithoutSelectedPiece = {...gameState, selectedPiece: undefined, selectedPieceMoves: emptyBoard()} 
+    const gameWithoutSelectedPiece = { ...gameState, selectedPiece: undefined, selectedPieceMoves: emptyBoard() }
 
     const newBoard = [...gameState.board]
     newBoard[gameState.selectedPiece.coordinates?.row - 1][gameState.selectedPiece?.coordinates.column - 1] = undefined
@@ -480,7 +480,7 @@ export function movePiece(gameState: GameState, newCoordinates: Coordinate): Gam
 }
 
 export function setSelectedPieceForState(gameState: GameState, coordinate: Coordinate): GameState {
-    const selectedPiece = gameState.board[coordinate.row-1][coordinate.column-1]
+    const selectedPiece = gameState.board[coordinate.row - 1][coordinate.column - 1]
 
     if (!selectedPiece) {
         return { ...gameState, selectedPiece: undefined }
@@ -489,9 +489,9 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
 
     const pieceMoves = selectedPiece.piece.moves(coordinate)
 
-    if (gameState?.selectedPiece?.piece.id === gameState.board[coordinate.row-1][coordinate.column-1]?.id) {
+    if (gameState?.selectedPiece?.piece.id === gameState.board[coordinate.row - 1][coordinate.column - 1]?.id) {
         console.log("Piece already selected")
-        return { ...gameState, selectedPiece: undefined}
+        return { ...gameState, selectedPiece: undefined }
     }
     //TODO: can i do some type magic to avoid typing it every time
     const board: Array<Array<undefined | boolean>> = emptyBoard()
@@ -500,7 +500,7 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
         board[move.row - 1][move.column - 1] = true
     })
 
-    return { ...gameState, selectedPiece: {coordinates: coordinate, piece: selectedPiece, moves: board }}
+    return { ...gameState, selectedPiece: { coordinates: coordinate, piece: selectedPiece, moves: board } }
 }
 
 
@@ -510,6 +510,13 @@ export const initGameState = (): GameState => ({
     selectedPiece: undefined,
 })
 
+const isDarkSquare = (row:number, column: number) => {
+    if (row % 2 === 0) {
+        return column % 2 === 0
+    } else {
+        return column % 2 === 1
+    }
+}
 function Game() {
     const [gameState, setGameState] = useState<GameState>(initGameState())
     const rows = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -538,8 +545,11 @@ function Game() {
                         {columns.map((column) => {
                             const p = gameState.board[row - 1][column - 1]
                             const validMove = gameState.selectedPiece?.moves[row - 1][column - 1] ?? false
+
+                            const bgColor = isDarkSquare(row, column)? "bg-green-800" : "bg-gray-200"
                             return (
-                                <div key={`${row}${column}`} onClick={() => handleClick({ row: row, column: column })} id={`${row} ${column}`} className="bg-red-500 border-black border-2 w-16 h-16 flex items-center justify-center" >
+
+                                <div key={`${row}${column}`} onClick={() => handleClick({ row: row, column: column })} id={`${row} ${column}`} className={`${bgColor}  w-16 h-16 flex items-center justify-center`} >
                                     {p?.piece.draw(p.color)}
                                     {validMove ? <MoveMarker /> : <></>}
                                 </div>
