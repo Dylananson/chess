@@ -1,4 +1,18 @@
 import { useState } from "react"
+import blackKingSvg from './assets/Chess_kdt45.svg'
+import whiteKingSvg from './assets/Chess_klt45.svg'
+import blackBishopSvg from './assets/Chess_bdt45.svg'
+import whiteBishopSvg from './assets/Chess_blt45.svg'
+import blackKnightSvg from './assets/Chess_ndt45.svg'
+import whiteKnightSvg from './assets/Chess_nlt45.svg'
+import blackQueenSvg from './assets/Chess_qdt45.svg'
+import whiteQueenSvg from './assets/Chess_qlt45.svg'
+import blackRookSvg from './assets/Chess_rdt45.svg'
+import whiteRookSvg from './assets/Chess_rlt45.svg'
+import blackPawnSvg from './assets/Chess_pdt45.svg'
+import whitePawnSvg from './assets/Chess_plt45.svg'
+
+
 export enum PieceName {
     Pawn,
     King,
@@ -44,7 +58,7 @@ function PieceColorDisplay(color: Color, value: string): React.ReactNode {
 }
 
 function KingDisplay(color: Color) {
-    return PieceColorDisplay(color, "K")
+    return color === Color.Black ? <img src={blackKingSvg} /> : <img src={whiteKingSvg} />
 }
 
 function KingMoves(coordinates: Coordinate) {
@@ -101,7 +115,7 @@ const King: Piece = {
 }
 
 function KnightDisplay(color: Color) {
-    return PieceColorDisplay(color, "k")
+    return color === Color.Black ? <img src={blackKnightSvg} /> : <img src={whiteKnightSvg} />
 }
 
 const Knight: Piece = {
@@ -114,7 +128,7 @@ const Knight: Piece = {
 
 
 function PawnDisplay(color: Color) {
-    return PieceColorDisplay(color, "P")
+    return color === Color.Black ? <img src={blackPawnSvg} /> : <img src={whiteKingSvg} />
 }
 
 const Pawn: Piece = {
@@ -125,7 +139,7 @@ const Pawn: Piece = {
 }
 
 function BishopDisplay(color: Color) {
-    return PieceColorDisplay(color, "B")
+    return color === Color.Black ? <img src={blackBishopSvg} /> : <img src={whiteBishopSvg} />
 }
 
 
@@ -137,7 +151,7 @@ const Bishop: Piece = {
 }
 
 function RookDisplay(color: Color) {
-    return PieceColorDisplay(color, "R")
+    return color === Color.Black ? <img src={blackRookSvg} /> : <img src={whiteRookSvg} />
 }
 
 const Rook: Piece = {
@@ -149,7 +163,7 @@ const Rook: Piece = {
 
 
 function QueenDisplay(color: Color): React.ReactNode {
-    return PieceColorDisplay(color, "Q")
+    return color === Color.Black ? <img src={blackQueenSvg} /> : <img src={whiteQueenSvg} />
 }
 
 const Queen: Piece = {
