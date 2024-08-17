@@ -75,10 +75,10 @@ function KingMoves(coordinates: Coordinate) {
     return dirs.map(([r, c]) => {
         const colValue = coordinates.column + c
         return { row: coordinates.row + r, column: colValue }
-    }).filter(isInBoard)
+    }).filter(isOnBoard)
 }
 
-const isInBoard = (coordinate: Coordinate) => {
+const isOnBoard = (coordinate: Coordinate) => {
     return (coordinate.row <= 8 && coordinate.row >= 1 && coordinate.column >= 1 && coordinate.column <= 8)
 }
 
@@ -91,7 +91,7 @@ export function BishopMoves(coordinates: Coordinate) {
         currentCoordinate.row += r
         currentCoordinate.column += c
 
-        while (isInBoard(currentCoordinate)) {
+        while (isOnBoard(currentCoordinate)) {
             res.push({ row: currentCoordinate.row, column: currentCoordinate.column })
             currentCoordinate.row += r
             currentCoordinate.column += c
@@ -124,7 +124,7 @@ export function KnightMoves(coordinates: Coordinate): Array<Coordinate> {
     dirs.forEach(d => {
         const coord = { row: coordinates.row + d[0], column: coordinates.column + d[1] }
 
-        if (isInBoard(coord)) {
+        if (isOnBoard(coord)) {
             out.push(coord)
         }
     })
@@ -179,11 +179,35 @@ function RookDisplay(color: Color) {
     return color === Color.Black ? <img src={blackRookSvg} /> : <img src={whiteRookSvg} />
 }
 
+export function RookMoves(coordinates: Coordinate): Array<Coordinate> {
+    const out: Array<Coordinate> = []
+
+    const dirs = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1]
+    ]
+
+    dirs.forEach(d => {
+        let newCoord = { row: coordinates.row + d[0], column: coordinates.column + d[1] }
+
+        while (isOnBoard(newCoord)) {
+            if (!compareCoordinates(newCoord, coordinates)) {
+                out.push(newCoord)
+            }
+            newCoord = { row: newCoord.row + d[0], column: newCoord.column + d[1] }
+        }
+    })
+
+    return out
+}
+
 const Rook: Piece = {
     name: PieceName.Rook,
     draw: RookDisplay,
     value: -1,
-    moves: FakeMoves
+    moves: RookMoves
 }
 
 
@@ -371,6 +395,10 @@ type GameState = {
     selectedPieceMoves: Array<Array<undefined | boolean>>
 }
 
+export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
+    return coord1.row === coord2.row && coord1.column === coord2.column
+}
+
 export function comparePieces(piece1: PieceCoordinates, piece2?: PieceCoordinates) {
     if (!piece1 && !piece2) {
         return true
@@ -383,7 +411,7 @@ export function comparePieces(piece1: PieceCoordinates, piece2?: PieceCoordinate
     if (!piece2) {
         return false
     }
-    return piece1.curentCoordinate.row === piece2.curentCoordinate.row && piece1.curentCoordinate.column === piece2.curentCoordinate.column
+    return compareCoordinates(piece1.curentCoordinate, piece2.curentCoordinate);
 }
 
 
