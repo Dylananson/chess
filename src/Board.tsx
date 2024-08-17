@@ -461,6 +461,14 @@ export function movePiece(gameState: GameState, newCoordinates: Coordinate): Gam
         return gameState
     }
 
+    const pieceAtCoordinates = gameState.board[newCoordinates.row-1][newCoordinates.column-1]
+
+    if(pieceAtCoordinates && pieceAtCoordinates.color === gameState.selectedPiece.piece.color){
+        console.log("Cannot move piece on top of piece of the same team")
+        return gameState
+    }
+
+
     const gameWithoutSelectedPiece = {...gameState, selectedPiece: undefined, selectedPieceMoves: emptyBoard()} 
 
     const newBoard = [...gameState.board]

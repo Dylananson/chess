@@ -19,7 +19,7 @@ test("set selected piece unselects if current is selected", () => {
   expect(noSelectedState.selectedPiece).toEqual(undefined);
 });
 
-test("set selected piece works", () => {
+test("set selected happy path", () => {
   const state = initGameState();
 
   const bishop = state.board[0][6];
