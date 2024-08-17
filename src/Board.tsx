@@ -75,10 +75,10 @@ function KingMoves(coordinates: Coordinate) {
     return dirs.map(([r, c]) => {
         const colValue = coordinates.column + c
         return { row: coordinates.row + r, column: colValue }
-    }).filter(filterOffBoard)
+    }).filter(isInBoard)
 }
 
-const filterOffBoard = (coordinate: Coordinate) => {
+const isInBoard = (coordinate: Coordinate) => {
     return (coordinate.row <= 8 && coordinate.row >= 1 && coordinate.column >= 1 && coordinate.column <= 8)
 }
 
@@ -91,7 +91,7 @@ export function BishopMoves(coordinates: Coordinate) {
         currentCoordinate.row += r
         currentCoordinate.column += c
 
-        while (filterOffBoard(currentCoordinate)) {
+        while (isInBoard(currentCoordinate)) {
             res.push({ row: currentCoordinate.row, column: currentCoordinate.column })
             currentCoordinate.row += r
             currentCoordinate.column += c
@@ -105,6 +105,31 @@ export function BishopMoves(coordinates: Coordinate) {
 
 function FakeMoves(coordinates: Coordinate) {
     return []
+}
+
+export function KnightMoves(coordinates: Coordinate): Array<Coordinate> {
+    const dirs = [
+        [2, 1],
+        [2, -1],
+        [-2, 1],
+        [-2, -1],
+        [1, 2],
+        [1, -2],
+        [-1, 2],
+        [-1, -2]
+    ]
+
+    const out: Array<Coordinate> = [];
+
+    dirs.forEach(d => {
+        const coord = { row: coordinates.row + d[0], column: coordinates.column + d[1] }
+
+        if (isInBoard(coord)) {
+            out.push(coord)
+        }
+    })
+
+    return out
 }
 
 const King: Piece = {
@@ -122,7 +147,7 @@ const Knight: Piece = {
     name: PieceName.King,
     draw: KnightDisplay,
     value: - 1,
-    moves: FakeMoves
+    moves: KnightMoves
 }
 
 
