@@ -13,11 +13,10 @@ test("set selected piece unselects if current is selected", () => {
 
   expect(bishop?.piece.name).toEqual(PieceName.Bishop);
 
-  const newState = setSelectedPieceForState(state, bishop);
-  const noSelectedState = setSelectedPieceForState(newState, bishop);
+  const newState = setSelectedPieceForState(state, {row: 1, column: 2});
+  const noSelectedState = setSelectedPieceForState(newState, {row:1, column:2});
 
   expect(noSelectedState.selectedPiece).toEqual(undefined);
-  expect(noSelectedState.selectedPieceMoves).toEqual(emptyBoard());
 });
 
 test("set selected piece works", () => {
@@ -25,9 +24,9 @@ test("set selected piece works", () => {
 
   const bishop = state.board[0][6];
 
-  expect(bishop?.piece.name).toEqual(PieceName.Bishop);
+  expect(bishop?.id).toEqual("WhtGBishop");
 
-  const newState = setSelectedPieceForState(state, bishop);
+  const newState = setSelectedPieceForState(state, {row: 1, column: 7});
 
   const expectedMoves = [
     { row: 2, column: 2 },
@@ -122,5 +121,5 @@ test("set selected piece works", () => {
     ],
   ];
 
-  expect(newState.selectedPieceMoves).toEqual(expectedResult);
+  expect(newState.selectedPiece?.moves).toEqual(expectedResult);
 });

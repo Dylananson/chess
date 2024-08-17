@@ -32,6 +32,7 @@ type PieceCoordinates = {
     piece: Piece
     startingCoordinate: Coordinate
     curentCoordinate: Coordinate
+    id: string
 }
 
 type MovesFunction = (coorinates: Coordinate) => Array<Coordinate>
@@ -227,6 +228,7 @@ const Queen: Piece = {
 }
 
 const BlackKing: PieceCoordinates = {
+    id: "BlkK",
     color: Color.Black,
     piece: King,
     startingCoordinate: { row: 8, column: ColumnValues.E },
@@ -234,6 +236,7 @@ const BlackKing: PieceCoordinates = {
 }
 
 const WhiteKing: PieceCoordinates = {
+    id: "WhtK",
     color: Color.White,
     piece: King,
     startingCoordinate: { row: 1, column: ColumnValues.E },
@@ -241,6 +244,7 @@ const WhiteKing: PieceCoordinates = {
 }
 
 const WhiteQueen: PieceCoordinates = {
+    id: "WhtQ",
     color: Color.White,
     piece: Queen,
     startingCoordinate: { row: 1, column: ColumnValues.D },
@@ -248,6 +252,7 @@ const WhiteQueen: PieceCoordinates = {
 }
 
 const BlackQueen: PieceCoordinates = {
+    id: "BlkQ",
     color: Color.Black,
     piece: Queen,
     startingCoordinate: { row: 8, column: ColumnValues.D },
@@ -255,6 +260,7 @@ const BlackQueen: PieceCoordinates = {
 }
 
 const WhiteARook: PieceCoordinates = {
+    id: "WhtARook",
     color: Color.White,
     piece: Rook,
     startingCoordinate: { row: 1, column: ColumnValues.A },
@@ -262,6 +268,7 @@ const WhiteARook: PieceCoordinates = {
 }
 
 const WhiteHRook: PieceCoordinates = {
+    id: "WhtHRook",
     color: Color.White,
     piece: Rook,
     startingCoordinate: { row: 1, column: ColumnValues.H },
@@ -269,6 +276,7 @@ const WhiteHRook: PieceCoordinates = {
 }
 
 const BlackARook: PieceCoordinates = {
+    id: "BlkARook",
     color: Color.Black,
     piece: Rook,
     startingCoordinate: { row: 8, column: ColumnValues.A },
@@ -277,6 +285,7 @@ const BlackARook: PieceCoordinates = {
 
 
 const BlackHRook: PieceCoordinates = {
+    id: "BlkHRook",
     color: Color.Black,
     piece: Rook,
     startingCoordinate: { row: 8, column: ColumnValues.H },
@@ -284,6 +293,7 @@ const BlackHRook: PieceCoordinates = {
 }
 
 const WhiteBBishop: PieceCoordinates = {
+    id: "WhtBBishop",
     color: Color.White,
     piece: Bishop,
     startingCoordinate: { row: 1, column: ColumnValues.B },
@@ -292,6 +302,7 @@ const WhiteBBishop: PieceCoordinates = {
 
 
 const WhiteGBishop: PieceCoordinates = {
+    id: "WhtGBishop",
     color: Color.White,
     piece: Bishop,
     startingCoordinate: { row: 1, column: ColumnValues.G },
@@ -300,6 +311,7 @@ const WhiteGBishop: PieceCoordinates = {
 
 
 const BlackBBishop: PieceCoordinates = {
+    id: "BlkBBishop",
     color: Color.Black,
     piece: Bishop,
     startingCoordinate: { row: 8, column: ColumnValues.B },
@@ -308,6 +320,7 @@ const BlackBBishop: PieceCoordinates = {
 
 
 const BlackGBishop: PieceCoordinates = {
+    id: "BlkGBishop",
     color: Color.Black,
     piece: Bishop,
     startingCoordinate: { row: 8, column: ColumnValues.G },
@@ -315,6 +328,7 @@ const BlackGBishop: PieceCoordinates = {
 }
 
 const WhiteCKnight: PieceCoordinates = {
+    id: "WhtCKnight",
     color: Color.White,
     piece: Knight,
     startingCoordinate: { row: 1, column: ColumnValues.C },
@@ -323,6 +337,7 @@ const WhiteCKnight: PieceCoordinates = {
 
 
 const WhiteFKnight: PieceCoordinates = {
+    id: "WhtFKnight",
     color: Color.White,
     piece: Knight,
     startingCoordinate: { row: 1, column: ColumnValues.F },
@@ -330,6 +345,7 @@ const WhiteFKnight: PieceCoordinates = {
 }
 
 const BlackCKnight: PieceCoordinates = {
+    id: "BlkCKnight",
     color: Color.Black,
     piece: Knight,
     startingCoordinate: { row: 8, column: ColumnValues.C },
@@ -338,6 +354,7 @@ const BlackCKnight: PieceCoordinates = {
 
 
 const BlackFKnight: PieceCoordinates = {
+    id: "BlkFKnight",
     color: Color.Black,
     piece: Knight,
     startingCoordinate: { row: 8, column: ColumnValues.F },
@@ -393,17 +410,22 @@ export const emptyBoard = (): Array<Array<undefined>> => {
 const initBoard = () => {
     const board: Array<Array<undefined | PieceCoordinates>> = emptyBoard()
     AllPieces.forEach((piece) => {
-        board[piece.curentCoordinate.row - 1][piece.curentCoordinate.column - 1] = piece
+        board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
     })
     return board
 }
 
+type SelectedPiece = {
+    piece: PieceCoordinates,
+    coordinates: Coordinate,
+    moves: Array<Array<undefined | boolean>>
+}
+
 type GameState = {
-    board: Array<Array<PieceCoordinates | undefined>>,
-    selectedPiece: PieceCoordinates | undefined
-    playerTurn: Color,
+    board: Array<Array<PieceCoordinates | undefined>>
+    selectedPiece: SelectedPiece | undefined
+    playerTurn: Color
     //TODO: i dont like this how to fix
-    selectedPieceMoves: Array<Array<undefined | boolean>>
 }
 
 export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
@@ -426,17 +448,42 @@ export function comparePieces(piece1: PieceCoordinates, piece2?: PieceCoordinate
 }
 
 
-export function setSelectedPieceForState(gameState: GameState, selectedPiece: PieceCoordinates | undefined): GameState {
-    if (!selectedPiece) {
+export function movePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
+    if (!gameState.selectedPiece) {
+        console.log("Cannot move piece if no piece is selected");
         return gameState
+    }
+
+    console.log(`Attempting to move piece ${gameState.selectedPiece.piece.piece.name} moved from ${gameState.selectedPiece.coordinates.row} ${gameState.selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
+
+    if (!gameState.selectedPiece.moves[newCoordinates.row - 1][newCoordinates.column - 1]) {
+        console.log("Cannot move piece to invalid spot")
+        return gameState
+    }
+
+    const gameWithoutSelectedPiece = {...gameState, selectedPiece: undefined, selectedPieceMoves: emptyBoard()} 
+
+    const newBoard = [...gameState.board]
+    newBoard[gameState.selectedPiece.coordinates?.row - 1][gameState.selectedPiece?.coordinates.column - 1] = undefined
+    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = gameState.selectedPiece.piece
+
+    console.log(`Piece ${gameState.selectedPiece.piece.piece.name} moved from ${gameState.selectedPiece.coordinates.row} ${gameState.selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
+    return { ...gameWithoutSelectedPiece, board: newBoard }
+}
+
+export function setSelectedPieceForState(gameState: GameState, coordinate: Coordinate): GameState {
+    const selectedPiece = gameState.board[coordinate.row-1][coordinate.column-1]
+
+    if (!selectedPiece) {
+        return { ...gameState, selectedPiece: undefined }
     }
     console.log("Selecting piece")
 
-    const pieceMoves = selectedPiece.piece.moves(selectedPiece.curentCoordinate)
+    const pieceMoves = selectedPiece.piece.moves(coordinate)
 
-    if (comparePieces(selectedPiece, gameState.selectedPiece)) {
+    if (gameState?.selectedPiece?.piece.id === gameState.board[coordinate.row-1][coordinate.column-1]?.id) {
         console.log("Piece already selected")
-        return { ...gameState, selectedPiece: undefined, selectedPieceMoves: emptyBoard() }
+        return { ...gameState, selectedPiece: undefined}
     }
     //TODO: can i do some type magic to avoid typing it every time
     const board: Array<Array<undefined | boolean>> = emptyBoard()
@@ -445,7 +492,7 @@ export function setSelectedPieceForState(gameState: GameState, selectedPiece: Pi
         board[move.row - 1][move.column - 1] = true
     })
 
-    return { ...gameState, selectedPiece: selectedPiece, selectedPieceMoves: board }
+    return { ...gameState, selectedPiece: {coordinates: coordinate, piece: selectedPiece, moves: board }}
 }
 
 
@@ -453,7 +500,6 @@ export const initGameState = (): GameState => ({
     board: initBoard(),
     playerTurn: Color.White,
     selectedPiece: undefined,
-    selectedPieceMoves: emptyBoard()
 })
 
 function Game() {
@@ -463,11 +509,17 @@ function Game() {
 
     console.log(gameState.selectedPiece)
     if (gameState.selectedPiece) {
-        console.log(gameState.selectedPiece?.piece.moves(gameState.selectedPiece.curentCoordinate))
+        console.log(gameState.selectedPiece?.piece.piece.moves(gameState.selectedPiece.coordinates))
     }
 
-    const handleSelectPiece = (p: PieceCoordinates | undefined) => {
-        setGameState(setSelectedPieceForState(gameState, p))
+    const handleClick = (newCoordinates: Coordinate) => {
+        const selectedPiece = gameState.selectedPiece
+
+        if (!selectedPiece) {
+            setGameState(setSelectedPieceForState(gameState, newCoordinates))
+        } else {
+            setGameState(movePiece(gameState, newCoordinates))
+        }
     }
 
     return (
@@ -477,9 +529,9 @@ function Game() {
                     <div key={row} className="flex justify-items-center place-items-center">
                         {columns.map((column) => {
                             const p = gameState.board[row - 1][column - 1]
-                            const validMove = gameState.selectedPieceMoves[row - 1][column - 1] ?? false
+                            const validMove = gameState.selectedPiece?.moves[row - 1][column - 1] ?? false
                             return (
-                                <div key={`${row}${column}`} onClick={() => handleSelectPiece(p)} id={`${row} ${column}`} className="bg-red-500 border-black border-2 w-16 h-16 flex items-center justify-center" >
+                                <div key={`${row}${column}`} onClick={() => handleClick({ row: row, column: column })} id={`${row} ${column}`} className="bg-red-500 border-black border-2 w-16 h-16 flex items-center justify-center" >
                                     {p?.piece.draw(p.color)}
                                     {validMove ? <MoveMarker /> : <></>}
                                 </div>
