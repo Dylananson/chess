@@ -27,7 +27,7 @@ enum ColumnValues {
 }
 type Coordinate = { row: number, column: number }
 
-type PieceCoordinates = {
+type ActivePiece = {
     color: Color
     piece: Piece
     startingCoordinate: Coordinate
@@ -227,7 +227,7 @@ const Queen: Piece = {
     moves: QueenMoves
 }
 
-const BlackKing: PieceCoordinates = {
+const BlackKing: ActivePiece = {
     id: "BlkK",
     color: Color.Black,
     piece: King,
@@ -235,7 +235,7 @@ const BlackKing: PieceCoordinates = {
     curentCoordinate: { row: 8, column: ColumnValues.E }
 }
 
-const WhiteKing: PieceCoordinates = {
+const WhiteKing: ActivePiece = {
     id: "WhtK",
     color: Color.White,
     piece: King,
@@ -243,7 +243,7 @@ const WhiteKing: PieceCoordinates = {
     curentCoordinate: { row: 1, column: ColumnValues.E }
 }
 
-const WhiteQueen: PieceCoordinates = {
+const WhiteQueen: ActivePiece = {
     id: "WhtQ",
     color: Color.White,
     piece: Queen,
@@ -251,7 +251,7 @@ const WhiteQueen: PieceCoordinates = {
     curentCoordinate: { row: 1, column: ColumnValues.D }
 }
 
-const BlackQueen: PieceCoordinates = {
+const BlackQueen: ActivePiece = {
     id: "BlkQ",
     color: Color.Black,
     piece: Queen,
@@ -259,7 +259,7 @@ const BlackQueen: PieceCoordinates = {
     curentCoordinate: { row: 8, column: ColumnValues.D }
 }
 
-const WhiteARook: PieceCoordinates = {
+const WhiteARook: ActivePiece = {
     id: "WhtARook",
     color: Color.White,
     piece: Rook,
@@ -267,7 +267,7 @@ const WhiteARook: PieceCoordinates = {
     curentCoordinate: { row: 1, column: ColumnValues.A }
 }
 
-const WhiteHRook: PieceCoordinates = {
+const WhiteHRook: ActivePiece = {
     id: "WhtHRook",
     color: Color.White,
     piece: Rook,
@@ -275,7 +275,7 @@ const WhiteHRook: PieceCoordinates = {
     curentCoordinate: { row: 1, column: ColumnValues.H }
 }
 
-const BlackARook: PieceCoordinates = {
+const BlackARook: ActivePiece = {
     id: "BlkARook",
     color: Color.Black,
     piece: Rook,
@@ -284,7 +284,7 @@ const BlackARook: PieceCoordinates = {
 }
 
 
-const BlackHRook: PieceCoordinates = {
+const BlackHRook: ActivePiece = {
     id: "BlkHRook",
     color: Color.Black,
     piece: Rook,
@@ -292,7 +292,7 @@ const BlackHRook: PieceCoordinates = {
     curentCoordinate: { row: 8, column: ColumnValues.H },
 }
 
-const WhiteBBishop: PieceCoordinates = {
+const WhiteBBishop: ActivePiece = {
     id: "WhtBBishop",
     color: Color.White,
     piece: Bishop,
@@ -301,7 +301,7 @@ const WhiteBBishop: PieceCoordinates = {
 }
 
 
-const WhiteGBishop: PieceCoordinates = {
+const WhiteGBishop: ActivePiece = {
     id: "WhtGBishop",
     color: Color.White,
     piece: Bishop,
@@ -310,7 +310,7 @@ const WhiteGBishop: PieceCoordinates = {
 }
 
 
-const BlackBBishop: PieceCoordinates = {
+const BlackBBishop: ActivePiece = {
     id: "BlkBBishop",
     color: Color.Black,
     piece: Bishop,
@@ -319,7 +319,7 @@ const BlackBBishop: PieceCoordinates = {
 }
 
 
-const BlackGBishop: PieceCoordinates = {
+const BlackGBishop: ActivePiece = {
     id: "BlkGBishop",
     color: Color.Black,
     piece: Bishop,
@@ -327,7 +327,7 @@ const BlackGBishop: PieceCoordinates = {
     curentCoordinate: { row: 8, column: ColumnValues.G },
 }
 
-const WhiteCKnight: PieceCoordinates = {
+const WhiteCKnight: ActivePiece = {
     id: "WhtCKnight",
     color: Color.White,
     piece: Knight,
@@ -336,7 +336,7 @@ const WhiteCKnight: PieceCoordinates = {
 }
 
 
-const WhiteFKnight: PieceCoordinates = {
+const WhiteFKnight: ActivePiece = {
     id: "WhtFKnight",
     color: Color.White,
     piece: Knight,
@@ -344,7 +344,7 @@ const WhiteFKnight: PieceCoordinates = {
     curentCoordinate: { row: 1, column: ColumnValues.F },
 }
 
-const BlackCKnight: PieceCoordinates = {
+const BlackCKnight: ActivePiece = {
     id: "BlkCKnight",
     color: Color.Black,
     piece: Knight,
@@ -353,7 +353,7 @@ const BlackCKnight: PieceCoordinates = {
 }
 
 
-const BlackFKnight: PieceCoordinates = {
+const BlackFKnight: ActivePiece = {
     id: "BlkFKnight",
     color: Color.Black,
     piece: Knight,
@@ -400,15 +400,19 @@ function MoveMarker() {
     )
 }
 
-export const emptyRow = (): Array<undefined> => {
+export const emptyRow = (): Row<undefined> => {
     return Array.from(Array(8))
 }
-export const emptyBoard = (): Array<Array<undefined>> => {
+export const emptyBoard = (): Board<undefined> => {
     return Array.from(Array(8)).map(emptyRow);
 }
 
+type Row<T> = Array<T>
+
+type Board<T> = Array<Array<undefined | T>>
+
 const initBoard = () => {
-    const board: Array<Array<undefined | PieceCoordinates>> = emptyBoard()
+    const board: Board<ActivePiece>= emptyBoard()
     AllPieces.forEach((piece) => {
         board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
     })
@@ -416,13 +420,13 @@ const initBoard = () => {
 }
 
 type SelectedPiece = {
-    piece: PieceCoordinates,
+    piece: ActivePiece,
     coordinates: Coordinate,
-    moves: Array<Array<undefined | boolean>>
+    moves: Board<boolean>
 }
 
 type GameState = {
-    board: Array<Array<PieceCoordinates | undefined>>
+    board: Board<ActivePiece>
     selectedPiece: SelectedPiece | undefined
     playerTurn: Color
     //TODO: i dont like this how to fix
@@ -432,7 +436,7 @@ export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
     return coord1.row === coord2.row && coord1.column === coord2.column
 }
 
-export function comparePieces(piece1: PieceCoordinates, piece2?: PieceCoordinates) {
+export function comparePieces(piece1: ActivePiece, piece2?: ActivePiece) {
     if (!piece1 && !piece2) {
         return true
     }
@@ -494,7 +498,7 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
         return { ...gameState, selectedPiece: undefined }
     }
     //TODO: can i do some type magic to avoid typing it every time
-    const board: Array<Array<undefined | boolean>> = emptyBoard()
+    const board: Board<boolean>= emptyBoard()
 
     pieceMoves.forEach((move) => {
         board[move.row - 1][move.column - 1] = true
