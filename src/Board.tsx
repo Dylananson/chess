@@ -1,5 +1,5 @@
 import { useState } from "react"
-enum PieceName {
+export enum PieceName {
     Pawn,
     King,
     Queen,
@@ -22,7 +22,7 @@ type PieceCoordinates = {
 
 type MovesFunction = (coorinates: Coordinate) => Array<Coordinate>
 
-type Piece = {
+export type Piece = {
     name: PieceName
     value: number
     moves: MovesFunction
@@ -118,7 +118,7 @@ function PawnDisplay(color: Color) {
 }
 
 const Pawn: Piece = {
-    name: PieceName.King,
+    name: PieceName.Pawn,
     draw: PawnDisplay,
     value: -1,
     moves: FakeMoves
@@ -130,7 +130,7 @@ function BishopDisplay(color: Color) {
 
 
 const Bishop: Piece = {
-    name: PieceName.King,
+    name: PieceName.Bishop,
     draw: BishopDisplay,
     value: -1,
     moves: BishopMoves
@@ -141,7 +141,7 @@ function RookDisplay(color: Color) {
 }
 
 const Rook: Piece = {
-    name: PieceName.King,
+    name: PieceName.Rook,
     draw: RookDisplay,
     value: -1,
     moves: FakeMoves
@@ -153,7 +153,7 @@ function QueenDisplay(color: Color): React.ReactNode {
 }
 
 const Queen: Piece = {
-    name: PieceName.King,
+    name: PieceName.Queen,
     draw: QueenDisplay,
     value: -1,
     moves: FakeMoves
@@ -309,27 +309,87 @@ function ValidMove() {
 
 }
 
-function Board() {
-    const [selectedPiece, setSelectedPiece] = useState<PieceCoordinates>()
+export const emptyRow = (): Array<undefined> => {
+    return Array.from(Array(8))
+}
+export const emptyBoard = (): Array<Array<undefined>> => {
+    return Array.from(Array(8)).map(emptyRow);
+}
+
+const initBoard = () => {
+    const board: Array<Array<undefined | PieceCoordinates>> = emptyBoard()
+    AllPieces.forEach((piece) => {
+        board[piece.curentCoordinate.row - 1][piece.curentCoordinate.column - 1] = piece
+    })
+    return board
+}
+
+type GameState = {
+    board: Array<Array<PieceCoordinates | undefined>>,
+    selectedPiece: PieceCoordinates | undefined
+    playerTurn: Color,
+    //TODO: i dont like this how to fix
+    selectedPieceMoves: Array<Array<undefined | boolean>>
+}
+
+export function comparePieces(piece1: PieceCoordinates, piece2?: PieceCoordinates) {
+    if (!piece1 && !piece2) {
+        return true
+    }
+
+    if (!piece1) {
+        return false
+    }
+
+    if (!piece2) {
+        return false
+    }
+    return piece1.curentCoordinate.row === piece2.curentCoordinate.row && piece1.curentCoordinate.column === piece2.curentCoordinate.column
+}
+
+
+export function setSelectedPieceForState(gameState: GameState, selectedPiece: PieceCoordinates | undefined): GameState {
+    if (!selectedPiece) {
+        return gameState
+    }
+    console.log("Selecting piece")
+
+    const pieceMoves = selectedPiece.piece.moves(selectedPiece.curentCoordinate)
+
+    if (comparePieces(selectedPiece, gameState.selectedPiece)) {
+        console.log("Piece already selected")
+        return { ...gameState, selectedPiece: undefined, selectedPieceMoves: emptyBoard() }
+    }
+    //TODO: can i do some type magic to avoid typing it every time
+    const board: Array<Array<undefined | boolean>> = emptyBoard()
+
+    pieceMoves.forEach((move) => {
+        board[move.row - 1][move.column - 1] = true
+    })
+
+    return { ...gameState, selectedPiece: selectedPiece, selectedPieceMoves: board }
+}
+
+
+export const initGameState = (): GameState => ({
+    board: initBoard(),
+    playerTurn: Color.White,
+    selectedPiece: undefined,
+    selectedPieceMoves: emptyBoard()
+})
+
+function Game() {
+    const [gameState, setGameState] = useState<GameState>(initGameState())
     const rows = [1, 2, 3, 4, 5, 6, 7, 8]
     const columns = [1, 2, 3, 4, 5, 6, 7, 8]
 
-    console.log(selectedPiece)
-    if (selectedPiece) {
-        console.log(selectedPiece?.piece.moves(selectedPiece.curentCoordinate))
+    console.log(gameState.selectedPiece)
+    if (gameState.selectedPiece) {
+        console.log(gameState.selectedPiece?.piece.moves(gameState.selectedPiece.curentCoordinate))
     }
 
     const handleSelectPiece = (p: PieceCoordinates | undefined) => {
-        if (!p) {
-            return
-        }
-
-        if (p == selectedPiece) {
-            setSelectedPiece(undefined)
-            return
-        }
-
-        setSelectedPiece(p)
+        setGameState(setSelectedPieceForState(gameState, p))
     }
 
     return (
@@ -338,12 +398,8 @@ function Board() {
                 {rows.reverse().map((row) => (
                     <div key={row} className="flex justify-items-center place-items-center">
                         {columns.map((column) => {
-                            const p = AllPieces.find((piece) => piece.curentCoordinate.row === row && piece.curentCoordinate.column.valueOf() === column)
-                            let validMove = false
-                            if (selectedPiece) {
-                                const found = selectedPiece.piece.moves(selectedPiece.curentCoordinate).find(coordinate => coordinate.row === row && coordinate.column === column)
-                                validMove = found ? true : false
-                            }
+                            const p = gameState.board[row - 1][column - 1]
+                            const validMove = gameState.selectedPieceMoves[row - 1][column - 1] ?? false
                             return (
                                 <div key={`${row}${column}`} onClick={() => handleSelectPiece(p)} id={`${row} ${column}`} className="bg-red-500 border-black border-2 w-16 h-16 flex items-center justify-center" >
                                     {p?.piece.draw(p.color)}
@@ -358,4 +414,4 @@ function Board() {
     )
 }
 
-export default Board
+export default Game
