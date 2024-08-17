@@ -25,7 +25,7 @@ export enum PieceName {
 enum ColumnValues {
     A = 1, B = 2, C = 3, D = 4, E = 5, F = 6, G = 7, H = 8
 }
-type Coordinate = { row: number, column: number }
+export type Coordinate = { row: number, column: number }
 
 export type ActivePiece = {
     color: Color
@@ -34,7 +34,7 @@ export type ActivePiece = {
     id: string
 }
 
-type MovesFunction = (coorinates: Coordinate) => Array<Coordinate>
+type MovesFunction = (coorinates: Coordinate, board: Board<ActivePiece>) => Array<Coordinate>
 
 export type Piece = {
     name: PieceName
@@ -82,19 +82,40 @@ const isOnBoard = (coordinate: Coordinate) => {
     return (coordinate.row <= 8 && coordinate.row >= 1 && coordinate.column >= 1 && coordinate.column <= 8)
 }
 
+export function isCellOfSameColor(color: Color, coordinates: Coordinate, board: Board<ActivePiece>) {
+    const cell = getBoardCell(coordinates, board)
 
-export function BishopMoves(coordinates: Coordinate) {
+    const noPiece = !cell
+
+    const pieceDiffColor = cell?.color !== color
+
+    return !noPiece || !pieceDiffColor
+}
+
+
+export function BishopMoves(coordinates: Coordinate, board: Board<ActivePiece>) {
     const dirs = [[-1, -1], [1, 1], [-1, 1], [1, -1]]
     let res: Array<Coordinate> = []
-    dirs.forEach(([r, c]) => {
-        let currentCoordinate = { row: coordinates.row, column: coordinates.column }
-        currentCoordinate.row += r
-        currentCoordinate.column += c
+    const pieceColor = getBoardCell(coordinates, board)?.color
 
-        while (isOnBoard(currentCoordinate)) {
+    if (!pieceColor){
+        return []
+    }
+
+    dirs.forEach(([r, c]) => {
+        let currentCoordinate = { row: coordinates.row + r, column: coordinates.column + c }
+        let pieceOnCurrent = getBoardCell(currentCoordinate, board)
+        // console.log("direction", r, c, "current coord", currentCoordinate, "is off board", !isOnBoard(currentCoordinate), "board cell", getBoardCell(currentCoordinate, board), "falsy", !getBoardCell(currentCoordinate, board))
+        console.log("piece on current", pieceOnCurrent?.color, 'piece color', pieceColor)
+
+
+        while (isOnBoard(currentCoordinate) && isCellOfSameColor(pieceColor, currentCoordinate, board)) {
             res.push({ row: currentCoordinate.row, column: currentCoordinate.column })
-            currentCoordinate.row += r
-            currentCoordinate.column += c
+            // console.log("current coord", currentCoordinate, "board cell", getBoardCell(currentCoordinate, board), "falsy", !getBoardCell(currentCoordinate, board))
+
+            currentCoordinate = { row: currentCoordinate.row + r, column: currentCoordinate.column + c }
+            pieceOnCurrent = getBoardCell(currentCoordinate, board)
+            console.log("piece on current", pieceOnCurrent?.color)
         }
 
     })
@@ -107,7 +128,7 @@ function FakeMoves(coordinates: Coordinate) {
     return []
 }
 
-export function KnightMoves(coordinates: Coordinate): Array<Coordinate> {
+export function KnightMoves(coordinates: Coordinate, board: Board<ActivePiece>): Array<Coordinate> {
     const dirs = [
         [2, 1],
         [2, -1],
@@ -168,7 +189,7 @@ function BishopDisplay(color: Color) {
 }
 
 
-const Bishop: Piece = {
+export const Bishop: Piece = {
     name: PieceName.Bishop,
     draw: BishopDisplay,
     value: -1,
@@ -179,7 +200,15 @@ function RookDisplay(color: Color) {
     return color === Color.Black ? <img src={blackRookSvg} /> : <img src={whiteRookSvg} />
 }
 
-export function RookMoves(coordinates: Coordinate): Array<Coordinate> {
+
+const getBoardCell = (coord: Coordinate, board: Board<ActivePiece>) => {
+    if (!isOnBoard(coord)) {
+        return undefined
+    }
+    return board[coord.row - 1][coord.column - 1]
+}
+
+export function RookMoves(coordinates: Coordinate, board: Board<ActivePiece>): Array<Coordinate> {
     const out: Array<Coordinate> = []
 
     const dirs = [
@@ -192,11 +221,13 @@ export function RookMoves(coordinates: Coordinate): Array<Coordinate> {
     dirs.forEach(d => {
         let newCoord = { row: coordinates.row + d[0], column: coordinates.column + d[1] }
 
-        while (isOnBoard(newCoord)) {
+        while (isOnBoard(newCoord) && !getBoardCell(newCoord, board)) {
             if (!compareCoordinates(newCoord, coordinates)) {
                 out.push(newCoord)
             }
+
             newCoord = { row: newCoord.row + d[0], column: newCoord.column + d[1] }
+
         }
     })
 
@@ -211,15 +242,15 @@ export const Rook: Piece = {
 }
 
 
-export function QueenMoves(coordinates: Coordinate): Array<Coordinate> {
-    return RookMoves(coordinates).concat(BishopMoves(coordinates))
+export function QueenMoves(coordinates: Coordinate, board: Board<ActivePiece>): Array<Coordinate> {
+    return RookMoves(coordinates, board).concat(BishopMoves(coordinates, board))
 }
 
 function QueenDisplay(color: Color): React.ReactNode {
     return color === Color.Black ? <img src={blackQueenSvg} /> : <img src={whiteQueenSvg} />
 }
 
-const Queen: Piece = {
+export const Queen: Piece = {
     name: PieceName.Queen,
     draw: QueenDisplay,
     value: -1,
@@ -395,7 +426,7 @@ type Row<T> = Array<T>
 export type Board<T> = Array<Array<undefined | T>>
 
 const initBoard = () => {
-    const board: Board<ActivePiece>= emptyBoard()
+    const board: Board<ActivePiece> = emptyBoard()
     AllPieces.forEach((piece) => {
         board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
     })
@@ -459,14 +490,14 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
     }
     console.log("Selecting piece")
 
-    const pieceMoves = selectedPiece.piece.moves(coordinate)
+    const pieceMoves = selectedPiece.piece.moves(coordinate, gameState.board)
 
     if (gameState?.selectedPiece?.piece.id === gameState.board[coordinate.row - 1][coordinate.column - 1]?.id) {
         console.log("Piece already selected")
         return { ...gameState, selectedPiece: undefined }
     }
     //TODO: can i do some type magic to avoid typing it every time
-    const board: Board<boolean>= emptyBoard()
+    const board: Board<boolean> = emptyBoard()
 
     pieceMoves.forEach((move) => {
         board[move.row - 1][move.column - 1] = true
@@ -482,7 +513,7 @@ export const initGameState = (): GameState => ({
     selectedPiece: undefined,
 })
 
-const isDarkSquare = (row:number, column: number) => {
+const isDarkSquare = (row: number, column: number) => {
     if (row % 2 === 0) {
         return column % 2 === 0
     } else {
@@ -496,13 +527,13 @@ function Game() {
 
     console.log(gameState.selectedPiece)
     if (gameState.selectedPiece) {
-        console.log(gameState.selectedPiece?.piece.piece.moves(gameState.selectedPiece.coordinates))
+        console.log(gameState.selectedPiece?.piece.piece.moves(gameState.selectedPiece.coordinates, gameState.board))
     }
 
     const handleClick = (newCoordinates: Coordinate) => {
         const selectedPiece = gameState.selectedPiece
 
-        if (!selectedPiece) {
+        if (!selectedPiece || getBoardCell(newCoordinates, gameState.board)?.color === selectedPiece.piece.color) {
             setGameState(setSelectedPieceForState(gameState, newCoordinates))
         } else {
             setGameState(movePiece(gameState, newCoordinates))
@@ -518,7 +549,7 @@ function Game() {
                             const p = gameState.board[row - 1][column - 1]
                             const validMove = gameState.selectedPiece?.moves[row - 1][column - 1] ?? false
 
-                            const bgColor = isDarkSquare(row, column)? "bg-green-800" : "bg-gray-200"
+                            const bgColor = isDarkSquare(row, column) ? "bg-green-800" : "bg-gray-200"
                             return (
 
                                 <div key={`${row}${column}`} onClick={() => handleClick({ row: row, column: column })} id={`${row} ${column}`} className={`${bgColor}  w-16 h-16 flex items-center justify-center`} >

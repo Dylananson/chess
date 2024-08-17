@@ -28,16 +28,6 @@ test("set selected happy path", () => {
 
   const newState = setSelectedPieceForState(state, {row: 1, column: 7});
 
-  const expectedMoves = [
-    { row: 2, column: 2 },
-    { row: 3, column: 3 },
-    { row: 4, column: 4 },
-    { row: 5, column: 5 },
-    { row: 6, column: 6 },
-    { row: 7, column: 7 },
-    { row: 8, column: 8 },
-  ];
-
   const expectedResult = [
     [
       undefined,
