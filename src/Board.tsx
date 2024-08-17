@@ -365,11 +365,18 @@ const BlackPieces = [
 
 const AllPieces = BlackPieces.concat(WhitePieces)
 
-function ValidMove() {
-    return <div className="absolute text-4xl text-blue-500 color-blue-500 justify-center align-center text-center">
-        .
-    </div>
-
+function MoveMarker() {
+    return (
+        <>
+            <svg className="fill-gray-400 absolute w-16 opacity-80" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                    <path d="M7.8 10a2.2 2.2 0 0 0 4.4 0 2.2 2.2 0 0 0-4.4 0z">
+                    </path>
+                </g></svg>
+        </>
+    )
 }
 
 export const emptyRow = (): Array<undefined> => {
@@ -470,7 +477,7 @@ function Game() {
                             return (
                                 <div key={`${row}${column}`} onClick={() => handleSelectPiece(p)} id={`${row} ${column}`} className="bg-red-500 border-black border-2 w-16 h-16 flex items-center justify-center" >
                                     {p?.piece.draw(p.color)}
-                                    {validMove ? <ValidMove /> : <></>}
+                                    {validMove ? <MoveMarker /> : <></>}
                                 </div>
                             )
                         })}
