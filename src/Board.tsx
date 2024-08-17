@@ -27,11 +27,10 @@ enum ColumnValues {
 }
 type Coordinate = { row: number, column: number }
 
-type ActivePiece = {
+export type ActivePiece = {
     color: Color
     piece: Piece
     startingCoordinate: Coordinate
-    curentCoordinate: Coordinate
     id: string
 }
 
@@ -44,7 +43,7 @@ export type Piece = {
     draw: DrawPieceFunction
 }
 
-enum Color {
+export enum Color {
     White,
     Black
 }
@@ -204,7 +203,7 @@ export function RookMoves(coordinates: Coordinate): Array<Coordinate> {
     return out
 }
 
-const Rook: Piece = {
+export const Rook: Piece = {
     name: PieceName.Rook,
     draw: RookDisplay,
     value: -1,
@@ -232,7 +231,6 @@ const BlackKing: ActivePiece = {
     color: Color.Black,
     piece: King,
     startingCoordinate: { row: 8, column: ColumnValues.E },
-    curentCoordinate: { row: 8, column: ColumnValues.E }
 }
 
 const WhiteKing: ActivePiece = {
@@ -240,7 +238,6 @@ const WhiteKing: ActivePiece = {
     color: Color.White,
     piece: King,
     startingCoordinate: { row: 1, column: ColumnValues.E },
-    curentCoordinate: { row: 1, column: ColumnValues.E }
 }
 
 const WhiteQueen: ActivePiece = {
@@ -248,7 +245,6 @@ const WhiteQueen: ActivePiece = {
     color: Color.White,
     piece: Queen,
     startingCoordinate: { row: 1, column: ColumnValues.D },
-    curentCoordinate: { row: 1, column: ColumnValues.D }
 }
 
 const BlackQueen: ActivePiece = {
@@ -256,7 +252,6 @@ const BlackQueen: ActivePiece = {
     color: Color.Black,
     piece: Queen,
     startingCoordinate: { row: 8, column: ColumnValues.D },
-    curentCoordinate: { row: 8, column: ColumnValues.D }
 }
 
 const WhiteARook: ActivePiece = {
@@ -264,7 +259,6 @@ const WhiteARook: ActivePiece = {
     color: Color.White,
     piece: Rook,
     startingCoordinate: { row: 1, column: ColumnValues.A },
-    curentCoordinate: { row: 1, column: ColumnValues.A }
 }
 
 const WhiteHRook: ActivePiece = {
@@ -272,7 +266,6 @@ const WhiteHRook: ActivePiece = {
     color: Color.White,
     piece: Rook,
     startingCoordinate: { row: 1, column: ColumnValues.H },
-    curentCoordinate: { row: 1, column: ColumnValues.H }
 }
 
 const BlackARook: ActivePiece = {
@@ -280,7 +273,6 @@ const BlackARook: ActivePiece = {
     color: Color.Black,
     piece: Rook,
     startingCoordinate: { row: 8, column: ColumnValues.A },
-    curentCoordinate: { row: 8, column: ColumnValues.A },
 }
 
 
@@ -289,7 +281,6 @@ const BlackHRook: ActivePiece = {
     color: Color.Black,
     piece: Rook,
     startingCoordinate: { row: 8, column: ColumnValues.H },
-    curentCoordinate: { row: 8, column: ColumnValues.H },
 }
 
 const WhiteBBishop: ActivePiece = {
@@ -297,7 +288,6 @@ const WhiteBBishop: ActivePiece = {
     color: Color.White,
     piece: Bishop,
     startingCoordinate: { row: 1, column: ColumnValues.B },
-    curentCoordinate: { row: 1, column: ColumnValues.B },
 }
 
 
@@ -306,7 +296,6 @@ const WhiteGBishop: ActivePiece = {
     color: Color.White,
     piece: Bishop,
     startingCoordinate: { row: 1, column: ColumnValues.G },
-    curentCoordinate: { row: 1, column: ColumnValues.G },
 }
 
 
@@ -315,7 +304,6 @@ const BlackBBishop: ActivePiece = {
     color: Color.Black,
     piece: Bishop,
     startingCoordinate: { row: 8, column: ColumnValues.B },
-    curentCoordinate: { row: 8, column: ColumnValues.B },
 }
 
 
@@ -324,7 +312,6 @@ const BlackGBishop: ActivePiece = {
     color: Color.Black,
     piece: Bishop,
     startingCoordinate: { row: 8, column: ColumnValues.G },
-    curentCoordinate: { row: 8, column: ColumnValues.G },
 }
 
 const WhiteCKnight: ActivePiece = {
@@ -332,7 +319,6 @@ const WhiteCKnight: ActivePiece = {
     color: Color.White,
     piece: Knight,
     startingCoordinate: { row: 1, column: ColumnValues.C },
-    curentCoordinate: { row: 1, column: ColumnValues.C },
 }
 
 
@@ -341,7 +327,6 @@ const WhiteFKnight: ActivePiece = {
     color: Color.White,
     piece: Knight,
     startingCoordinate: { row: 1, column: ColumnValues.F },
-    curentCoordinate: { row: 1, column: ColumnValues.F },
 }
 
 const BlackCKnight: ActivePiece = {
@@ -349,7 +334,6 @@ const BlackCKnight: ActivePiece = {
     color: Color.Black,
     piece: Knight,
     startingCoordinate: { row: 8, column: ColumnValues.C },
-    curentCoordinate: { row: 8, column: ColumnValues.C },
 }
 
 
@@ -358,7 +342,6 @@ const BlackFKnight: ActivePiece = {
     color: Color.Black,
     piece: Knight,
     startingCoordinate: { row: 8, column: ColumnValues.F },
-    curentCoordinate: { row: 8, column: ColumnValues.F },
 }
 
 
@@ -409,7 +392,7 @@ export const emptyBoard = (): Board<undefined> => {
 
 type Row<T> = Array<T>
 
-type Board<T> = Array<Array<undefined | T>>
+export type Board<T> = Array<Array<undefined | T>>
 
 const initBoard = () => {
     const board: Board<ActivePiece>= emptyBoard()
@@ -434,21 +417,6 @@ type GameState = {
 
 export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
     return coord1.row === coord2.row && coord1.column === coord2.column
-}
-
-export function comparePieces(piece1: ActivePiece, piece2?: ActivePiece) {
-    if (!piece1 && !piece2) {
-        return true
-    }
-
-    if (!piece1) {
-        return false
-    }
-
-    if (!piece2) {
-        return false
-    }
-    return compareCoordinates(piece1.curentCoordinate, piece2.curentCoordinate);
 }
 
 
