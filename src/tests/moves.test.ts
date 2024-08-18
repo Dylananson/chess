@@ -1,5 +1,8 @@
 import { expect, test } from "vitest";
-import { QueenMoves, BishopMoves, KnightMoves, RookMoves } from "../Board";
+import { QueenMoves} from "../pieces/Queen";
+import { BishopMoves } from "../pieces/Bishop";
+import { KnightMoves } from "../pieces/Knight";
+import { RookMoves } from "../pieces/Rook";
 
 test("bishop moves works", () => {
   const moves = BishopMoves({ row: 1, column: 1 });

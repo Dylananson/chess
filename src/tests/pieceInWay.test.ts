@@ -1,5 +1,8 @@
 import { expect, test } from "vitest";
-import { ActivePiece, Coordinate, Board, emptyBoard, Rook, Color, Bishop, Queen, isPieceInWay } from "../Board";
+import { ActivePiece, Coordinate, Board, emptyBoard, Color, isPieceInWay } from "../Board";
+import { Queen } from "../pieces/Queen";
+import { Rook } from "../pieces/Rook";
+import { Bishop } from "../pieces/Bishop";
 
 const createBoard = (pieces: Array<ActivePiece>) => {
     const board: Board<ActivePiece> = emptyBoard()

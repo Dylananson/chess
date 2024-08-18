@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { initGameState, movePiece, PieceName, setSelectedPieceForState } from "../Board";
+import { initGameState, movePiece, setSelectedPieceForState } from "../Board";
 
 test("move piece happy path", () => {
 
