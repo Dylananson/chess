@@ -556,9 +556,6 @@ export function movePiece(gameState: GameState, newCoordinates: Coordinate): Gam
 
     console.log("Selected piece", gameState.selectedPiece)
     console.log("Selected piece moves", gameState.selectedPiece.piece.piece.moves(gameState.selectedPiece.coordinates))
-    //const validMoves = filterBlockingMoves(gameState.selectedPiece.coordinates, gameState.selectedPiece.piece.piece.moves(gameState.selectedPiece.coordinates), gameState.board)
-
-    console.log("piece name", PieceName.Knight, gameState.selectedPiece.piece.piece.name)
 
     if (gameState.selectedPiece.piece.piece.name !== PieceName.Knight && isPieceInWay(gameState.selectedPiece.coordinates, newCoordinates, gameState.board)) {
         console.log("Piece in way")
