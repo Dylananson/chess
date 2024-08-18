@@ -52,3 +52,7 @@ test("move piece on own piece shouldn't move piece", () => {
   //piece shouldn't have moved from old coordinates
   expect(newGame.board[0][0]?.id).toEqual("WhtARook")
 });
+
+
+
+

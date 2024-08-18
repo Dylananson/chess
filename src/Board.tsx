@@ -25,7 +25,7 @@ export enum PieceName {
 enum ColumnValues {
     A = 1, B = 2, C = 3, D = 4, E = 5, F = 6, G = 7, H = 8
 }
-type Coordinate = { row: number, column: number }
+export type Coordinate = { row: number, column: number }
 
 export type ActivePiece = {
     color: Color
@@ -78,7 +78,7 @@ function KingMoves(coordinates: Coordinate) {
     }).filter(isOnBoard)
 }
 
-const isOnBoard = (coordinate: Coordinate) => {
+export const isOnBoard = (coordinate: Coordinate) => {
     return (coordinate.row <= 8 && coordinate.row >= 1 && coordinate.column >= 1 && coordinate.column <= 8)
 }
 
@@ -144,7 +144,7 @@ function KnightDisplay(color: Color) {
 }
 
 const Knight: Piece = {
-    name: PieceName.King,
+    name: PieceName.Knight,
     draw: KnightDisplay,
     value: - 1,
     moves: KnightMoves
@@ -168,7 +168,7 @@ function BishopDisplay(color: Color) {
 }
 
 
-const Bishop: Piece = {
+export const Bishop: Piece = {
     name: PieceName.Bishop,
     draw: BishopDisplay,
     value: -1,
@@ -219,7 +219,7 @@ function QueenDisplay(color: Color): React.ReactNode {
     return color === Color.Black ? <img src={blackQueenSvg} /> : <img src={whiteQueenSvg} />
 }
 
-const Queen: Piece = {
+export const Queen: Piece = {
     name: PieceName.Queen,
     draw: QueenDisplay,
     value: -1,
@@ -395,7 +395,7 @@ type Row<T> = Array<T>
 export type Board<T> = Array<Array<undefined | T>>
 
 const initBoard = () => {
-    const board: Board<ActivePiece>= emptyBoard()
+    const board: Board<ActivePiece> = emptyBoard()
     AllPieces.forEach((piece) => {
         board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
     })
@@ -419,6 +419,132 @@ export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
     return coord1.row === coord2.row && coord1.column === coord2.column
 }
 
+export function getBoardCell(board: Board<ActivePiece>, coord: Coordinate) {
+    return board[coord.row - 1][coord.column - 1]
+}
+
+function bfs(startingCoordinate: Coordinate, validMoves: Array<Coordinate>, dirs: Array<Coordinate>, board: Board<ActivePiece>) {
+    const queue = [startingCoordinate]
+    const blockedDirs: Set<string> = new Set([])
+    const seen: Board<boolean> = emptyBoard()
+    const out: Array<Coordinate> = []
+    let x = 0
+    console.log('here')
+
+    while (queue.length) {
+        x += 1
+        const coord = queue.pop()
+        console.log('theree')
+
+        if (!coord) {
+            console.error("this shouldnt happend")
+            return
+        }
+
+        console.log('queue', queue)
+        console.log('blocked', blockedDirs)
+        dirs.forEach(dir => {
+            x += 1
+            if (!blockedDirs.has(`${dir.row}${dir.column}`)) {
+                const nextCoord = { row: coord.row - dir.row, column: coord.column - dir.column }
+
+
+                if (validMoves.some(x => x.row === nextCoord.row && x.column === nextCoord.column) && isOnBoard(nextCoord) &&
+                    !seen[nextCoord.row - 1][nextCoord.column - 1]
+                ) {
+                    console.log('valid')
+
+                    if (getBoardCell(board, nextCoord)) {
+                        blockedDirs.add(`${dir.row}${dir.column}`)
+                    }
+                    else {
+                        console.log('adding')
+                        out.push(nextCoord)
+                        queue.push(nextCoord)
+                        seen[nextCoord.row - 1][nextCoord.column - 1] = true
+                    }
+                }
+            }
+
+        })
+    }
+
+    return out
+
+}
+
+export function filterBlockingMoves(startingCoordinate: Coordinate, validMoves: Array<Coordinate>, board: Board<ActivePiece>) {
+
+    const filtered = bfs(startingCoordinate, validMoves, [
+        { row: 1, column: 0 },
+        { row: 0, column: 1 },
+        { row: -1, column: 0 },
+        { row: 0, column: -1 },
+
+        { row: 1, column: 1 },
+        { row: -1, column: -1 },
+        { row: 1, column: -1 },
+        { row: -1, column: 1 },
+    ], board)
+
+
+    return filtered
+}
+
+export function isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coordinate, board: Board<ActivePiece>): boolean {
+    const isOccupied = (row: number, column: number) => {
+        console.log(row)
+        return board[row - 1][column - 1] !== undefined;
+    }
+
+    const checkPath = (startingCoordinate: Coordinate, endCoordinate: Coordinate, rowStep: number, colStep: number) => {
+        const startRow = startingCoordinate.row
+        const startCol = startingCoordinate.column
+
+        const endRow = endCoordinate.row
+        const endCol = endCoordinate.column
+
+        for (let r = startRow + rowStep, c = startCol + colStep; 
+             r !== endRow || c !== endCol; 
+             r += rowStep, c += colStep) {
+            if (!isOnBoard({ row: r, column: c })) {
+                return false;
+            }
+            if (isOccupied(r, c)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    if (startingCoordinate.row === endCoordinate.row) {
+        // Moving horizontally
+        if (startingCoordinate.column < endCoordinate.column) {
+            // Moving right
+            return checkPath(startingCoordinate, endCoordinate, 0, 1);
+        } else {
+            // Moving left
+            return checkPath(startingCoordinate, endCoordinate, 0, -1);
+        }
+    } else if (startingCoordinate.column === endCoordinate.column) {
+        // Moving vertically
+        if (startingCoordinate.row < endCoordinate.row) {
+            // Moving up
+            return checkPath(startingCoordinate, endCoordinate, 1, 0);
+        } else {
+            // Moving down
+            return checkPath(startingCoordinate, endCoordinate, -1, 0);
+        }
+    } else {
+        // Moving diagonally
+        const rowStep = startingCoordinate.row < endCoordinate.row ? 1 : -1;
+        const colStep = startingCoordinate.column < endCoordinate.column ? 1 : -1;
+
+        return checkPath(startingCoordinate, endCoordinate, rowStep, colStep);
+    }
+}
+
+
 
 export function movePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
     if (!gameState.selectedPiece) {
@@ -427,6 +553,18 @@ export function movePiece(gameState: GameState, newCoordinates: Coordinate): Gam
     }
 
     console.log(`Attempting to move piece ${gameState.selectedPiece.piece.piece.name} moved from ${gameState.selectedPiece.coordinates.row} ${gameState.selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
+
+    console.log("Selected piece", gameState.selectedPiece)
+    console.log("Selected piece moves", gameState.selectedPiece.piece.piece.moves(gameState.selectedPiece.coordinates))
+    //const validMoves = filterBlockingMoves(gameState.selectedPiece.coordinates, gameState.selectedPiece.piece.piece.moves(gameState.selectedPiece.coordinates), gameState.board)
+
+    console.log("piece name", PieceName.Knight, gameState.selectedPiece.piece.piece.name)
+
+    if (gameState.selectedPiece.piece.piece.name !== PieceName.Knight && isPieceInWay(gameState.selectedPiece.coordinates, newCoordinates, gameState.board)) {
+        console.log("Piece in way")
+        return gameState
+    }
+
 
     if (!gameState.selectedPiece.moves[newCoordinates.row - 1][newCoordinates.column - 1]) {
         console.log("Cannot move piece to invalid spot")
@@ -439,7 +577,6 @@ export function movePiece(gameState: GameState, newCoordinates: Coordinate): Gam
         console.log("Cannot move piece on top of piece of the same team")
         return gameState
     }
-
 
     const gameWithoutSelectedPiece = { ...gameState, selectedPiece: undefined, selectedPieceMoves: emptyBoard() }
 
@@ -466,7 +603,7 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
         return { ...gameState, selectedPiece: undefined }
     }
     //TODO: can i do some type magic to avoid typing it every time
-    const board: Board<boolean>= emptyBoard()
+    const board: Board<boolean> = emptyBoard()
 
     pieceMoves.forEach((move) => {
         board[move.row - 1][move.column - 1] = true
@@ -482,7 +619,7 @@ export const initGameState = (): GameState => ({
     selectedPiece: undefined,
 })
 
-const isDarkSquare = (row:number, column: number) => {
+const isDarkSquare = (row: number, column: number) => {
     if (row % 2 === 0) {
         return column % 2 === 0
     } else {
@@ -502,7 +639,7 @@ function Game() {
     const handleClick = (newCoordinates: Coordinate) => {
         const selectedPiece = gameState.selectedPiece
 
-        if (!selectedPiece) {
+        if (!selectedPiece || getBoardCell(gameState.board, newCoordinates)?.color === gameState.playerTurn) {
             setGameState(setSelectedPieceForState(gameState, newCoordinates))
         } else {
             setGameState(movePiece(gameState, newCoordinates))
@@ -518,7 +655,7 @@ function Game() {
                             const p = gameState.board[row - 1][column - 1]
                             const validMove = gameState.selectedPiece?.moves[row - 1][column - 1] ?? false
 
-                            const bgColor = isDarkSquare(row, column)? "bg-green-800" : "bg-gray-200"
+                            const bgColor = isDarkSquare(row, column) ? "bg-green-800" : "bg-gray-200"
                             return (
 
                                 <div key={`${row}${column}`} onClick={() => handleClick({ row: row, column: column })} id={`${row} ${column}`} className={`${bgColor}  w-16 h-16 flex items-center justify-center`} >
