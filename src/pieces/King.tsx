@@ -1,8 +1,8 @@
 import { Coordinate, isOnBoard } from "../Board";
 import { Color, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
-import blackKingSvg from './assets/Chess_kdt45.svg'
-import whiteKingSvg from './assets/Chess_klt45.svg'
+import blackKingSvg from '../assets/Chess_kdt45.svg'
+import whiteKingSvg from '../assets/Chess_klt45.svg'
 
 export function KingDisplay(color: Color) {
     return color === Color.Black ? <img src={blackKingSvg} /> : <img src={whiteKingSvg} />

@@ -1,8 +1,8 @@
 import { compareCoordinates, Coordinate, isOnBoard } from "../Board";
 import { Color, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
-import blackRookSvg from './assets/Chess_rdt45.svg'
-import whiteRookSvg from './assets/Chess_rlt45.svg'
+import blackRookSvg from '../assets/Chess_rdt45.svg'
+import whiteRookSvg from '../assets/Chess_rlt45.svg'
 
 
 export function RookDisplay(color: Color) {
