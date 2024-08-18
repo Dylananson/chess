@@ -230,16 +230,38 @@ const initBoard = () => {
     return board
 }
 
-type SelectedPiece = {
+export type SelectedPiece = {
     piece: ActivePiece,
     coordinates: Coordinate,
     moves: Board<boolean>
 }
 
-type GameState = {
+export type GameState = {
     board: Board<ActivePiece>
     selectedPiece: SelectedPiece | undefined
     playerTurn: Color
+    inCheck: boolean
+}
+
+export function isCheck(gameState: GameState, color: Color) {
+    const king = AllPieces.find(p => p.color === color && p.piece.name === PieceName.King)
+    console.log("King", king)
+    if (!king) {
+        return false
+    }
+
+    const kingCoordinate = king.startingCoordinate
+
+    const enemyPieces = gameState.board.flatMap((row) => row.filter(p => p?.color !== color)).filter(Boolean)
+
+    console.log("Enemy pieces", enemyPieces)
+
+    const enemyMoves = enemyPieces.flatMap(p => p?.piece.moves(p.startingCoordinate, p.hasMoved)).filter(Boolean)
+
+    console.log("Enemy moves", enemyMoves.filter(x => x?.row === 8))
+
+
+    return enemyMoves.some(move => compareCoordinates(move ?? { row: -1, column: -1 }, kingCoordinate))
 }
 
 export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
@@ -375,19 +397,35 @@ export function deselectPiece(gameState: GameState): GameState {
     return { ...gameState, selectedPiece: undefined }
 }
 
+export function deepCopyBoard<T>(board: Board<T>): Board<T> {
+    return  board.map(arr => arr.slice()) 
+}
+
 
 export function movePiece(gameState: GameState, selectedPiece: SelectedPiece, newCoordinates: Coordinate): GameState {
 
     selectedPiece.piece.hasMoved = true
 
-    const gameWithoutSelectedPiece  = deselectPiece(gameState)
+    const gameWithoutSelectedPiece = deselectPiece(gameState)
 
-    const newBoard = [...gameState.board]
+    const newBoard = deepCopyBoard(gameWithoutSelectedPiece.board)
     newBoard[selectedPiece.coordinates?.row - 1][selectedPiece?.coordinates.column - 1] = undefined
     newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = selectedPiece.piece
- 
+
     console.log(`Piece ${selectedPiece.piece.piece.name} moved from ${selectedPiece.coordinates.row} ${selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
-    return { ...gameWithoutSelectedPiece, board: newBoard }
+    const out = { ...gameWithoutSelectedPiece, board: newBoard }
+
+    console.log("board", out.board)
+
+    if (isCheck(out, Color.Black)) {
+        console.log("Check!")
+        console.log("Check!")
+        console.log("Check!")
+        console.log("Check!")
+        console.log("Check!")
+    }
+
+    return out
 }
 
 
@@ -415,14 +453,14 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
     const pieceAtCoordinates = gameState.board[newCoordinates.row - 1][newCoordinates.column - 1]
     const isForwardMove = gameState.selectedPiece.coordinates && gameState.selectedPiece.coordinates.column === newCoordinates.column
 
-    if(gameState.selectedPiece.piece.piece.name === PieceName.Pawn && pieceAtCoordinates && isForwardMove) {
+    if (gameState.selectedPiece.piece.piece.name === PieceName.Pawn && pieceAtCoordinates && isForwardMove) {
 
         console.log("Cannot move pawn on top of piece")
 
         return gameState
     }
 
-    if(gameState.selectedPiece.piece.piece.name === PieceName.Pawn && !pieceAtCoordinates && !isForwardMove) {
+    if (gameState.selectedPiece.piece.piece.name === PieceName.Pawn && !pieceAtCoordinates && !isForwardMove) {
         console.log("Cannot move pawn diagonally without capturing")
         return gameState
     }
@@ -449,7 +487,6 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
         console.log("Piece already selected")
         return { ...gameState, selectedPiece: undefined }
     }
-    //TODO: can i do some type magic to avoid typing it every time
     const board: Board<boolean> = emptyBoard()
 
     pieceMoves.forEach((move: Coordinate) => {
@@ -464,6 +501,7 @@ export const initGameState = (): GameState => ({
     board: initBoard(),
     playerTurn: Color.White,
     selectedPiece: undefined,
+    inCheck: false
 })
 
 const isDarkSquare = (row: number, column: number) => {
