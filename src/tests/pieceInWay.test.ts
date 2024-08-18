@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Coordinate, Board, emptyBoard,  isPieceInWay } from "../Board";
+import { Coordinate, Board, emptyBoard,  isPieceInWay } from "../Game";
 import { ActivePiece, Color } from "../pieces/ActivePiece";
 import { Queen } from "../pieces/Queen";
 import { Rook } from "../pieces/Rook";

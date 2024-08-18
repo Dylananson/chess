@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import {
   initGameState,
   setSelectedPieceForState,
-} from "../Board";
+} from "../Game";
 import { PieceName } from "../pieces/PieceName";
 
 test("set selected piece unselects if current is selected", () => {

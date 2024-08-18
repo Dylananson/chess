@@ -1,5 +1,5 @@
 import { BishopMoves } from "./Bishop";
-import { Coordinate } from "../Board";
+import { Coordinate } from "../Game";
 import { PieceName } from "./PieceName";
 import { RookMoves } from "./Rook";
 import blackQueenSvg from '../assets/Chess_qdt45.svg'
