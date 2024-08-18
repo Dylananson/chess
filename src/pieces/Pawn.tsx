@@ -1,4 +1,5 @@
-import { Piece, Color, Coordinate } from "../Board";
+import { Coordinate } from "../Board";
+import { Color, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackPawnSvg from './assets/Chess_pdt45.svg'
 import whitePawnSvg from './assets/Chess_plt45.svg'

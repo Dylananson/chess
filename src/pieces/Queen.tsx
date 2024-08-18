@@ -1,9 +1,10 @@
 import { BishopMoves } from "./Bishop";
-import { Color, Coordinate, Piece } from "../Board";
+import { Coordinate } from "../Board";
 import { PieceName } from "./PieceName";
 import { RookMoves } from "./Rook";
 import blackQueenSvg from './assets/Chess_qdt45.svg'
 import whiteQueenSvg from './assets/Chess_qlt45.svg'
+import { Color, Piece } from "./ActivePiece";
 
 
 export const Queen: Piece = {

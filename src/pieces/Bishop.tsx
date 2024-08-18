@@ -1,4 +1,5 @@
-import { Piece, Color, Coordinate, isOnBoard } from "../Board";
+import { Coordinate, isOnBoard } from "../Board";
+import { Color, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackBishopSvg from './assets/Chess_bdt45.svg'
 import whiteBishopSvg from './assets/Chess_blt45.svg'

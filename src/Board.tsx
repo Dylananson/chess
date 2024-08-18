@@ -6,40 +6,16 @@ import { Knight } from "./pieces/Knight"
 import { Bishop } from "./pieces/Bishop"
 import { Rook } from "./pieces/Rook"
 import { Queen } from "./pieces/Queen"
+import { Color, ActivePiece } from "./ActivePiece"
 
 enum ColumnValues {
     A = 1, B = 2, C = 3, D = 4, E = 5, F = 6, G = 7, H = 8
 }
 export type Coordinate = { row: number, column: number }
 
-export type ActivePiece = {
-    color: Color
-    piece: Piece
-    startingCoordinate: Coordinate
-    id: string
-}
-
-type MovesFunction = (coorinates: Coordinate) => Array<Coordinate>
-
-export type Piece = {
-    name: PieceName
-    value: number
-    moves: MovesFunction
-    draw: DrawPieceFunction
-}
-
-export enum Color {
-    White,
-    Black
-}
-
-type DrawPieceFunction = (color: Color) => React.ReactNode
-
-
 export const isOnBoard = (coordinate: Coordinate) => {
     return (coordinate.row <= 8 && coordinate.row >= 1 && coordinate.column >= 1 && coordinate.column <= 8)
 }
-
 
 const BlackKing: ActivePiece = {
     id: "BlkK",
@@ -227,7 +203,6 @@ type GameState = {
     board: Board<ActivePiece>
     selectedPiece: SelectedPiece | undefined
     playerTurn: Color
-    //TODO: i dont like this how to fix
 }
 
 export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
