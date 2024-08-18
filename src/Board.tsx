@@ -476,7 +476,7 @@ function Game() {
 
     console.log(gameState.selectedPiece)
     if (gameState.selectedPiece) {
-        console.log(gameState.selectedPiece?.piece.piece.moves(gameState.selectedPiece.coordinates))
+        console.log(gameState.selectedPiece?.piece.piece.moves(gameState.selectedPiece.coordinates, gameState.selectedPiece.piece.hasMoved))
     }
 
     const handleClick = (newCoordinates: Coordinate) => {
