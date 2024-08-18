@@ -1,10 +1,9 @@
 import { expect, test } from "vitest";
 import {
-  emptyBoard,
   initGameState,
-  PieceName,
   setSelectedPieceForState,
-} from "../Board";
+} from "../Game";
+import { PieceName } from "../pieces/PieceName";
 
 test("set selected piece unselects if current is selected", () => {
   const state = initGameState();
@@ -13,8 +12,8 @@ test("set selected piece unselects if current is selected", () => {
 
   expect(bishop?.piece.name).toEqual(PieceName.Bishop);
 
-  const newState = setSelectedPieceForState(state, {row: 1, column: 2});
-  const noSelectedState = setSelectedPieceForState(newState, {row:1, column:2});
+  const newState = setSelectedPieceForState(state, { row: 1, column: 2 });
+  const noSelectedState = setSelectedPieceForState(newState, { row: 1, column: 2 });
 
   expect(noSelectedState.selectedPiece).toEqual(undefined);
 });
@@ -26,17 +25,7 @@ test("set selected happy path", () => {
 
   expect(bishop?.id).toEqual("WhtGBishop");
 
-  const newState = setSelectedPieceForState(state, {row: 1, column: 7});
-
-  const expectedMoves = [
-    { row: 2, column: 2 },
-    { row: 3, column: 3 },
-    { row: 4, column: 4 },
-    { row: 5, column: 5 },
-    { row: 6, column: 6 },
-    { row: 7, column: 7 },
-    { row: 8, column: 8 },
-  ];
+  const newState = setSelectedPieceForState(state, { row: 1, column: 7 });
 
   const expectedResult = [
     [
