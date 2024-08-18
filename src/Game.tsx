@@ -420,7 +420,11 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         console.log("Cannot move pawn on top of piece")
 
         return gameState
+    }
 
+    if(gameState.selectedPiece.piece.piece.name === PieceName.Pawn && !pieceAtCoordinates && !isForwardMove) {
+        console.log("Cannot move pawn diagonally without capturing")
+        return gameState
     }
 
     if (pieceAtCoordinates && pieceAtCoordinates.color === gameState.selectedPiece.piece.color) {
