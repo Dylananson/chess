@@ -493,7 +493,6 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
 
 export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, coordinate: Coordinate, moves: Array<Coordinate>) {
     const newBoard = deepCopyBoard(board)
-    console.log('newBoard', newBoard)
 
     const piece = getBoardCell(newBoard, coordinate)
 
@@ -501,7 +500,6 @@ export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, co
         console.error("Piece not found")
         return []
     }
-
 
     const validMoves = moves.filter(move => {
         const newBoard = deepCopyBoard(board)
@@ -516,6 +514,14 @@ export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, co
     return validMoves
 }
 
+export function filterMovesOntopOfSameColor(board: Board<ActivePiece>, moves: Array<Coordinate>, color: Color) {
+    return moves.filter(move => {
+        const piece = getBoardCell(board, move)
+
+        return !piece || piece.color !== color
+    })
+}
+
 export function setSelectedPieceForState(gameState: GameState, coordinate: Coordinate): GameState {
     const selectedPiece = gameState.board[coordinate.row - 1][coordinate.column - 1]
 
@@ -524,9 +530,9 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
     }
     console.log("Selecting piece")
 
-    //const pieceMoves = selectedPiece.piece.moves(gameState.board, coordinate)
+    const filteredCheckMoves = filterPieceMovesThatPutKingInCheck(gameState.board, coordinate, selectedPiece.piece.moves(gameState.board, coordinate))
 
-    const pieceMoves = filterPieceMovesThatPutKingInCheck(gameState.board, coordinate, selectedPiece.piece.moves(gameState.board, coordinate))
+    const pieceMoves = filterMovesOntopOfSameColor(gameState.board, filteredCheckMoves, selectedPiece.color)
 
 
     if (gameState?.selectedPiece?.piece.id === gameState.board[coordinate.row - 1][coordinate.column - 1]?.id) {
