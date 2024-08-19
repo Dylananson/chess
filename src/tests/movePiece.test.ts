@@ -5,6 +5,7 @@ import { Bishop } from "../pieces/Bishop";
 import { Rook } from "../pieces/Rook";
 import { Queen } from "../pieces/Queen";
 import { createPawn } from "../pieces/Pawn";
+import { Knight } from "../pieces/Knight";
 
 const addPieceToBoard = (board: Board<ActivePiece>, piece: ActivePiece, coordinates: Coordinate) => {
     return board[coordinates.row - 1][coordinates.column - 1] = piece
@@ -29,6 +30,17 @@ const createBishop = (row: number, column: number, color: Color) => {
         hasMoved: false,
     }
 }
+
+const createKnight = (color: Color, startingCoordinate: Coordinate) => {
+    return {
+        piece: Knight,
+        color: color,
+        id: coordToKey(startingCoordinate),
+        startingCoordinate: startingCoordinate,
+        hasMoved: false,
+    }
+}
+
 
 const createRook = (row: number, column: number, color: Color) => {
     return {
@@ -77,6 +89,27 @@ function selectAndMovePiece(game: GameState, startCoordinate: Coordinate, endCoo
 
     return tryMovePiece(gameWithSelectedPiece, endCoordinate);
 }
+
+test("knight can move over pieces", () => {
+    const startCoordinate = { row: 1, column: 1 }
+
+    const knight = createKnight(Color.White, startCoordinate)
+    const bishop = createBishop(1, 3, Color.White)
+    const pawn = createPawn( Color.White, {row: 2, column: 2})
+
+    const board = createBoard([
+        knight,
+        bishop,
+        pawn
+    ])
+
+    const game = createGameState(board, undefined, Color.White, false)
+    const endCoordinate = { row: 3, column: 2 }
+
+    const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
+
+    assertPieceMovedCorrectly(newGame, startCoordinate, endCoordinate, knight)
+});
 
 test("pawn can move twice if hasn't moved", () => {
     const startCoordinate = { row: 1, column: 1 }
