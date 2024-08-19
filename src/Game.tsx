@@ -522,6 +522,41 @@ export function filterMovesOntopOfSameColor(board: Board<ActivePiece>, moves: Ar
     })
 }
 
+export function hasLegalMove(board: Board<ActivePiece>, color: Color) {
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board.length; col++) {
+            const piece = board[row][col]
+            if (piece?.color === color) {
+                const moves = piece?.piece.moves(board, { row: row + 1, column: col + 1 })
+                if (moves) {
+                    const validMoves = filterPieceMovesThatPutKingInCheck(board, { row: row + 1, column: col + 1 }, moves)
+                    if (validMoves.length > 0) {
+                        return true
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+
+export function isCheckMate(board: Board<ActivePiece>, color: Color) {
+    const checked = isCheck(board, color)
+
+    const hasLegalMoves = hasLegalMove(board, color)
+
+    console.log('has legal move', hasLegalMoves)
+
+    return checked && !hasLegalMoves;
+}
+
+export function isStaleMate(board: Board<ActivePiece>, color: Color) {
+    const checked = isCheck(board, color)
+
+    return !checked && !hasLegalMove(board, color);
+}
+
 export function setSelectedPieceForState(gameState: GameState, coordinate: Coordinate): GameState {
     const selectedPiece = gameState.board[coordinate.row - 1][coordinate.column - 1]
 
