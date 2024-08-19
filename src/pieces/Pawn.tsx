@@ -13,6 +13,9 @@ export function PawnMoves(board: Board<ActivePiece>, coordinates: Coordinate) {
         ]
 
     const piece = board[coordinates.row-1][coordinates.column-1]
+    console.log('piece', piece)
+    console.log('coordinates', coordinates)
+
     if(!piece) {
         console.error('Piece not found')
         throw new Error('Piece not found')

@@ -22,5 +22,4 @@ test("is in check happy path", () => {
     const checked = isCheck(game, Color.Black)
 
     expect(checked).toEqual(true);
-
 });

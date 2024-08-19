@@ -241,11 +241,20 @@ export function isCheck(gameState: GameState, color: Color) {
 
     const kingCoordinate = king.startingCoordinate
 
-    const enemyPieces = gameState.board.flatMap((row) => row.filter(p => p?.color !== color)).filter(Boolean)
+    gameState.board.forEach((row, ri) => {
+        row.forEach((p, c) => {
+            const coordinate = { row: ri + 1, column: c +1 }
+            if (p?.color === color) {
+                const moves = p.piece.moves(gameState.board, coordinate)
 
-    const enemyMoves = enemyPieces.flatMap(p => p?.piece.moves(gameState.board, p.startingCoordinate)).filter(Boolean)
+                if (moves.some(move => compareCoordinates(move, kingCoordinate))) {
+                    return true
+                }
+            }
+        })
+    })
 
-    return enemyMoves.some(move => compareCoordinates(move ?? { row: -1, column: -1 }, kingCoordinate))
+    return false
 }
 
 export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
