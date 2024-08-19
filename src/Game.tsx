@@ -255,9 +255,7 @@ export function isCheck(gameState: GameState, color: Color) {
             if (p?.color !== color) {
                 const moves = p?.piece.moves(gameState.board, coordinate)
                 if (moves) {
-                    console.log('moves', moves)
                     allMoves = allMoves.concat(moves)
-                    console.log('allmoves', allMoves)
                 }
             }
         })
@@ -280,20 +278,16 @@ function bfs(startingCoordinate: Coordinate, validMoves: Array<Coordinate>, dirs
     const seen: Board<boolean> = emptyBoard()
     const out: Array<Coordinate> = []
     let x = 0
-    console.log('here')
 
     while (queue.length) {
         x += 1
         const coord = queue.pop()
-        console.log('theree')
 
         if (!coord) {
             console.error("this shouldnt happend")
             return
         }
 
-        console.log('queue', queue)
-        console.log('blocked', blockedDirs)
         dirs.forEach(dir => {
             x += 1
             if (!blockedDirs.has(`${dir.row}${dir.column}`)) {
@@ -303,13 +297,11 @@ function bfs(startingCoordinate: Coordinate, validMoves: Array<Coordinate>, dirs
                 if (validMoves.some(x => x.row === nextCoord.row && x.column === nextCoord.column) && isOnBoard(nextCoord) &&
                     !seen[nextCoord.row - 1][nextCoord.column - 1]
                 ) {
-                    console.log('valid')
 
                     if (getBoardCell(board, nextCoord)) {
                         blockedDirs.add(`${dir.row}${dir.column}`)
                     }
                     else {
-                        console.log('adding')
                         out.push(nextCoord)
                         queue.push(nextCoord)
                         seen[nextCoord.row - 1][nextCoord.column - 1] = true
@@ -413,19 +405,7 @@ export function movePiece(gameState: GameState, selectedPiece: SelectedPiece, ne
     newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = selectedPiece.piece
 
     console.log(`Piece ${selectedPiece.piece.piece.name} moved from ${selectedPiece.coordinates.row} ${selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
-    const out = { ...gameWithoutSelectedPiece, board: newBoard }
-
-    console.log("board", out.board)
-
-    if (isCheck(out, Color.Black)) {
-        console.log("Check!")
-        console.log("Check!")
-        console.log("Check!")
-        console.log("Check!")
-        console.log("Check!")
-    }
-
-    return out
+    return { ...gameWithoutSelectedPiece, board: newBoard }
 }
 
 
@@ -445,12 +425,7 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
 
     console.log(`Attempting to move piece ${gameState.selectedPiece.piece.piece.name} moved from ${gameState.selectedPiece.coordinates.row} ${gameState.selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
 
-    console.log("Selected piece", gameState.selectedPiece)
-    console.log("Selected piece moves", gameState.selectedPiece.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates))
-
-
     const pieceMoves = gameState.selectedPiece.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates)
-
     const moves: Board<boolean> = emptyBoard()
 
     pieceMoves.forEach((move: Coordinate) => {
@@ -469,7 +444,15 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
-    return movePiece(gameState, gameState.selectedPiece, newCoordinates)
+    const movedPieceGame =  movePiece(gameState, gameState.selectedPiece, newCoordinates)
+
+    if(isCheck(movedPieceGame, gameState.playerTurn)){
+        console.log("Cannot move piece in check")
+        return gameState
+    }
+
+    return {...movedPieceGame, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White}
+
 }
 
 export function setSelectedPieceForState(gameState: GameState, coordinate: Coordinate): GameState {
@@ -515,7 +498,6 @@ function Game() {
     const rows = [1, 2, 3, 4, 5, 6, 7, 8]
     const columns = [1, 2, 3, 4, 5, 6, 7, 8]
 
-    console.log(gameState.selectedPiece)
     if (gameState.selectedPiece) {
         console.log(gameState.selectedPiece?.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates))
     }

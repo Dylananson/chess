@@ -21,6 +21,7 @@ function assertPieceNotMoved(newGame: GameState, startCoordinate: Coordinate, en
     //piece shouldnt have moved
     expect(getBoardCell(newGame.board, endCoordinate)).toEqual(expectedPiece)
     expect(getBoardCell(newGame.board, startCoordinate)).toEqual(piece)
+    expect(newGame.playerTurn).toEqual(piece.color)
 }
 
 
@@ -36,6 +37,92 @@ export function selectAndMovePiece(game: GameState, startCoordinate: Coordinate,
 
     return tryMovePiece(gameWithSelectedPiece, endCoordinate);
 }
+
+test("cant move pinned piece", () => {
+    const kingCoordinate = { row: 1, column: 1 }
+    const rookCoordinate = { row: 1, column: 5 }
+    const pinnedCoordinates = { row: 1, column: 3 }
+
+    const king = createKing(Color.Black, kingCoordinate)
+    const pinnedRook = createRook(pinnedCoordinates.row, pinnedCoordinates.column, Color.Black)
+    const rook = createRook(rookCoordinate.row, rookCoordinate.column, Color.White)
+
+    const board = createBoard([
+        king,
+        rook,
+        pinnedRook
+    ])
+
+    const game = createGameState(board, undefined, Color.Black, false)
+
+    const newGame = selectAndMovePiece(game, pinnedCoordinates, { row: 6, column: 3 })
+    assertPieceNotMoved(newGame, pinnedCoordinates, { row: 6, column: 3 }, pinnedRook)
+});
+
+
+test("cant move other piece if in check", () => {
+    const kingCoordinate = { row: 1, column: 1 }
+    const rookCoordinate = { row: 2, column: 2 }
+    const pawnCoordinate = { row: 7, column: 3 }
+
+    const king = createKing(Color.Black, kingCoordinate)
+    const pawn = createKing(Color.Black, pawnCoordinate)
+    const rook = createRook(rookCoordinate.row, rookCoordinate.column, Color.White)
+
+    const board = createBoard([
+        king,
+        rook,
+        pawn
+    ])
+
+    const game = createGameState(board, undefined, Color.White, false)
+
+    const movedRookGame = selectAndMovePiece(game, rookCoordinate, { row: 1, column: 2 })
+    assertPieceMovedCorrectly(movedRookGame, rookCoordinate, { row: 1, column: 2 }, rook)
+
+    const movedPawnGame = selectAndMovePiece(movedRookGame, pawnCoordinate, { row: 6, column: 3 })
+    assertPieceNotMoved(movedPawnGame, pawnCoordinate, { row: 6, column: 3 }, pawn)
+});
+
+
+test("king cant move into check", () => {
+    const startCoordinate = { row: 1, column: 1 }
+
+    const king = createKing(Color.White, startCoordinate)
+    const rook = createRook(2, 2, Color.Black)
+
+    const board = createBoard([
+        king,
+        rook,
+    ])
+
+    const game = createGameState(board, undefined, Color.White, false)
+    const endCoordinate = { row: 1, column: 2 }
+
+    const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
+
+    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, king)
+});
+
+
+test("king cant move into check", () => {
+    const startCoordinate = { row: 1, column: 1 }
+
+    const king = createKing(Color.White, startCoordinate)
+    const bishop = createRook(2, 2, Color.Black)
+
+    const board = createBoard([
+        king,
+        bishop,
+    ])
+
+    const game = createGameState(board, undefined, Color.White, false)
+    const endCoordinate = { row: 1, column: 2 }
+
+    const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
+
+    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, king)
+});
 
 
 test("king can take enemy piece", () => {
@@ -120,9 +207,11 @@ test("pawn cant move twice if already moved", () => {
     const startCoordinate = { row: 1, column: 1 }
 
     const pawn = createPawn(Color.White, startCoordinate)
+    const blackPawn = createPawn(Color.Black, { row: 8, column: 1 })
 
     const board = createBoard([
         pawn,
+        blackPawn
     ])
 
     const game = createGameState(board, undefined, Color.White, false)
@@ -130,8 +219,10 @@ test("pawn cant move twice if already moved", () => {
     const nextCoordinate = { row: 3, column: 1 }
     const movedPawnGame = selectAndMovePiece(game, startCoordinate, nextCoordinate)
 
+    const whiteTurnGame = selectAndMovePiece(movedPawnGame, { row: 8, column: 1 }, { row: 7, column: 1 })
+
     const endCoordinate = { row: 6, column: 1 }
-    const newGame = selectAndMovePiece(movedPawnGame, startCoordinate, endCoordinate)
+    const newGame = selectAndMovePiece(whiteTurnGame, startCoordinate, endCoordinate)
 
     assertPieceNotMoved(newGame, nextCoordinate, endCoordinate, pawn)
 });
