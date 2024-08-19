@@ -77,65 +77,65 @@ const BlackHRook: ActivePiece = {
     startingCoordinate: { row: 8, column: ColumnValues.H },
 }
 
-const WhiteBBishop: ActivePiece = {
-    id: "WhtBBishop",
+const WhiteCBishop: ActivePiece = {
+    id: "WhtCBishop",
     color: Color.White,
     piece: Bishop,
-    startingCoordinate: { row: 1, column: ColumnValues.B },
-}
-
-
-const WhiteGBishop: ActivePiece = {
-    id: "WhtGBishop",
-    color: Color.White,
-    piece: Bishop,
-    startingCoordinate: { row: 1, column: ColumnValues.G },
-}
-
-
-const BlackBBishop: ActivePiece = {
-    id: "BlkBBishop",
-    color: Color.Black,
-    piece: Bishop,
-    startingCoordinate: { row: 8, column: ColumnValues.B },
-}
-
-
-const BlackGBishop: ActivePiece = {
-    id: "BlkGBishop",
-    color: Color.Black,
-    piece: Bishop,
-    startingCoordinate: { row: 8, column: ColumnValues.G },
-}
-
-const WhiteCKnight: ActivePiece = {
-    id: "WhtCKnight",
-    color: Color.White,
-    piece: Knight,
     startingCoordinate: { row: 1, column: ColumnValues.C },
 }
 
 
-const WhiteFKnight: ActivePiece = {
-    id: "WhtFKnight",
+const WhiteFBishop: ActivePiece = {
+    id: "WhtFBishop",
     color: Color.White,
-    piece: Knight,
+    piece: Bishop,
     startingCoordinate: { row: 1, column: ColumnValues.F },
 }
 
-const BlackCKnight: ActivePiece = {
-    id: "BlkCKnight",
+
+const BlackCBishop: ActivePiece = {
+    id: "BlkCBishop",
     color: Color.Black,
-    piece: Knight,
+    piece: Bishop,
     startingCoordinate: { row: 8, column: ColumnValues.C },
 }
 
 
-const BlackFKnight: ActivePiece = {
-    id: "BlkFKnight",
+const BlackFBishop: ActivePiece = {
+    id: "BlkFBishop",
+    color: Color.Black,
+    piece: Bishop,
+    startingCoordinate: { row: 8, column: ColumnValues.F },
+}
+
+const WhiteBKnight: ActivePiece = {
+    id: "WhtBKnight",
+    color: Color.White,
+    piece: Knight,
+    startingCoordinate: { row: 1, column: ColumnValues.B },
+}
+
+
+const WhiteGKnight: ActivePiece = {
+    id: "WhtGKnight",
+    color: Color.White,
+    piece: Knight,
+    startingCoordinate: { row: 1, column: ColumnValues.G },
+}
+
+const BlackBKnight: ActivePiece = {
+    id: "BlkBKnight",
     color: Color.Black,
     piece: Knight,
-    startingCoordinate: { row: 8, column: ColumnValues.F },
+    startingCoordinate: { row: 8, column: ColumnValues.B },
+}
+
+
+const BlackGKnight: ActivePiece = {
+    id: "BlkGKnight",
+    color: Color.Black,
+    piece: Knight,
+    startingCoordinate: { row: 8, column: ColumnValues.G },
 }
 
 const WhitePawns: Array<ActivePiece> = Array.from(Array(8)).map((_, i) => {
@@ -160,23 +160,23 @@ const BlackPawns: Array<ActivePiece> = Array.from(Array(8)).map((_, i) => {
 const WhitePieces = [
     WhiteKing,
     WhiteQueen,
-    WhiteBBishop,
-    WhiteGBishop,
+    WhiteCBishop,
+    WhiteFBishop,
     WhiteHRook,
     WhiteARook,
-    WhiteCKnight,
-    WhiteFKnight
+    WhiteBKnight,
+    WhiteGKnight
 ].concat(WhitePawns)
 
 const BlackPieces = [
     BlackKing,
     BlackQueen,
-    BlackBBishop,
-    BlackGBishop,
+    BlackCBishop,
+    BlackFBishop,
     BlackHRook,
     BlackARook,
-    BlackCKnight,
-    BlackFKnight
+    BlackBKnight,
+    BlackGKnight
 ].concat(BlackPawns)
 
 const AllPieces = BlackPieces.concat(WhitePieces)
