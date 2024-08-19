@@ -227,7 +227,7 @@ export type GameState = {
     inCheck: boolean
 }
 
-export function findKing(board: Board<ActivePiece>, color: Color){
+export function findKing(board: Board<ActivePiece>, color: Color) {
     let king: ActivePiece | undefined;
     let kingCoordinate: Coordinate | undefined;
 
@@ -250,7 +250,7 @@ export function findKing(board: Board<ActivePiece>, color: Color){
 }
 
 export function isAttacked(board: Board<ActivePiece>, color: Color, coordinate: Coordinate) {
-    let allMoves : Array<Coordinate> = [];
+    let allMoves: Array<Coordinate> = [];
 
     board.forEach((row, ri) => {
         row.forEach((p, ci) => {
@@ -268,14 +268,16 @@ export function isAttacked(board: Board<ActivePiece>, color: Color, coordinate: 
 }
 
 export function isCheck(board: Board<ActivePiece>, color: Color) {
-    const kingCoordinate = findKing(board, color)   
+    const kingCoordinate = findKing(board, color)
 
     if (!kingCoordinate) {
         console.error("King not found")
         return false
     }
 
-    let allMoves : Array<Coordinate> = [];
+    console.log("boardincheck", board)
+
+    let allMoves: Array<Coordinate> = [];
 
     board.forEach((row, ri) => {
         row.forEach((p, ci) => {
@@ -289,6 +291,7 @@ export function isCheck(board: Board<ActivePiece>, color: Color) {
         })
     })
 
+    console.log('allmoves', allMoves)
     return allMoves.some(move => compareCoordinates(move, kingCoordinate))
 }
 
@@ -451,7 +454,7 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
-    if(gameState.selectedPiece.piece.color !== gameState.playerTurn){
+    if (gameState.selectedPiece.piece.color !== gameState.playerTurn) {
         console.log("Cannot move piece on other players turn")
         return gameState
     }
@@ -477,15 +480,40 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
-    const movedPieceGame =  movePiece(gameState, gameState.selectedPiece, newCoordinates)
+    const movedPieceGame = movePiece(gameState, gameState.selectedPiece, newCoordinates)
 
-    if(isCheck(movedPieceGame.board, gameState.playerTurn)){
+    if (isCheck(movedPieceGame.board, gameState.playerTurn)) {
         console.log("Cannot move piece in check")
         return gameState
     }
 
-    return {...movedPieceGame, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White}
+    return { ...movedPieceGame, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White }
 
+}
+
+export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, coordinate: Coordinate, moves: Array<Coordinate>) {
+    const newBoard = deepCopyBoard(board)
+    console.log('newBoard', newBoard)
+
+    const piece = getBoardCell(newBoard, coordinate)
+
+    if (!piece) {
+        console.error("Piece not found")
+        return []
+    }
+
+
+    const validMoves = moves.filter(move => {
+        const newBoard = deepCopyBoard(board)
+        newBoard[coordinate.row - 1][coordinate.column - 1] = undefined
+        newBoard[move.row - 1][move.column - 1] = piece
+
+        const checked = isCheck(newBoard, piece.color)
+
+        return !checked
+    })
+
+    return validMoves
 }
 
 export function setSelectedPieceForState(gameState: GameState, coordinate: Coordinate): GameState {
@@ -496,7 +524,10 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
     }
     console.log("Selecting piece")
 
-    const pieceMoves = selectedPiece.piece.moves(gameState.board, coordinate)
+    //const pieceMoves = selectedPiece.piece.moves(gameState.board, coordinate)
+
+    const pieceMoves = filterPieceMovesThatPutKingInCheck(gameState.board, coordinate, selectedPiece.piece.moves(gameState.board, coordinate))
+
 
     if (gameState?.selectedPiece?.piece.id === gameState.board[coordinate.row - 1][coordinate.column - 1]?.id) {
         console.log("Piece already selected")
