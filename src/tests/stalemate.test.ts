@@ -1,0 +1,33 @@
+import { expect, test } from 'vitest';
+import { createBoard, isStaleMate as isStalemate } from '../Game';
+import { createKing } from '../pieces/King';
+import { Color } from '../pieces/ActivePiece';
+import { createRook } from '../pieces/Rook';
+
+test("stalemate happy path", () => {
+
+    const board = createBoard([
+        createKing(Color.Black, { row: 1, column: 1 }),
+        createRook(3,2, Color.White),
+        createKing(Color.White, { row: 3, column: 1 }),
+    ])
+
+    const stalemate = isStalemate(board, Color.Black)
+
+    expect(stalemate).toEqual(true);
+})
+
+
+test("not stalemate if checked", () => {
+    const board = createBoard([
+        createKing(Color.Black, { row: 1, column: 1 }),
+        createRook(3,2, Color.White),
+        createRook(1,2, Color.White),
+        createKing(Color.White, { row: 3, column: 1 }),
+    ])
+
+    const stalemate = isStalemate(board, Color.Black)
+
+    expect(stalemate).toEqual(false);
+})
+

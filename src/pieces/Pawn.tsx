@@ -7,14 +7,9 @@ import { oppositeColor } from "./Rook";
 
 export function PawnMoves(board: Board<ActivePiece>, coordinates: Coordinate) {
     const forwardMoves = []
-
-
-    console.log('coordinates', coordinates)
     const diagonalMoves = []
 
     const piece = board[coordinates.row - 1][coordinates.column - 1]
-    console.log('piece', piece)
-    console.log('coordinates', coordinates)
 
     if (!piece) {
         console.error('Piece not found')

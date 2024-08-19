@@ -275,8 +275,6 @@ export function isCheck(board: Board<ActivePiece>, color: Color) {
         return false
     }
 
-    console.log("boardincheck", board)
-
     let allMoves: Array<Coordinate> = [];
 
     board.forEach((row, ri) => {
@@ -291,7 +289,6 @@ export function isCheck(board: Board<ActivePiece>, color: Color) {
         })
     })
 
-    console.log('allmoves', allMoves)
     return allMoves.some(move => compareCoordinates(move, kingCoordinate))
 }
 
@@ -435,7 +432,7 @@ export function movePiece(gameState: GameState, selectedPiece: SelectedPiece, ne
     newBoard[selectedPiece.coordinates?.row - 1][selectedPiece?.coordinates.column - 1] = undefined
     newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = selectedPiece.piece
 
-    console.log(`Piece ${selectedPiece.piece.piece.name} moved from ${selectedPiece.coordinates.row} ${selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
+    //console.log(`Piece ${selectedPiece.piece.piece.name} moved from ${selectedPiece.coordinates.row} ${selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
     return { ...gameWithoutSelectedPiece, board: newBoard }
 }
 
@@ -450,16 +447,16 @@ export const createBoard = (pieces: Array<ActivePiece>) => {
 
 export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
     if (!gameState.selectedPiece) {
-        console.log("Cannot move piece if no piece is selected");
+        //console.log("Cannot move piece if no piece is selected");
         return gameState
     }
 
     if (gameState.selectedPiece.piece.color !== gameState.playerTurn) {
-        console.log("Cannot move piece on other players turn")
+        //console.log("Cannot move piece on other players turn")
         return gameState
     }
 
-    console.log(`Attempting to move piece ${gameState.selectedPiece.piece.piece.name} moved from ${gameState.selectedPiece.coordinates.row} ${gameState.selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
+    //console.log(`Attempting to move piece ${gameState.selectedPiece.piece.piece.name} moved from ${gameState.selectedPiece.coordinates.row} ${gameState.selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
 
     const pieceMoves = gameState.selectedPiece.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates)
     const moves: Board<boolean> = emptyBoard()
@@ -523,21 +520,29 @@ export function filterMovesOntopOfSameColor(board: Board<ActivePiece>, moves: Ar
 }
 
 export function hasLegalMove(board: Board<ActivePiece>, color: Color) {
+    return getLegalMoves(board, color).length > 0
+}
+
+export function getLegalMoves(board: Board<ActivePiece>, color: Color) {
+    const legalMoves: Array<Coordinate> = []
+
     for (let row = 0; row < board.length; row++) {
         for (let col = 0; col < board.length; col++) {
             const piece = board[row][col]
             if (piece?.color === color) {
                 const moves = piece?.piece.moves(board, { row: row + 1, column: col + 1 })
                 if (moves) {
-                    const validMoves = filterPieceMovesThatPutKingInCheck(board, { row: row + 1, column: col + 1 }, moves)
-                    if (validMoves.length > 0) {
-                        return true
-                    }
+                    const nonCheckedMoves = filterPieceMovesThatPutKingInCheck(board, { row: row + 1, column: col + 1 }, moves)
+                    const validMoves = filterMovesOntopOfSameColor(board, nonCheckedMoves, color)
+                    
+                    validMoves.forEach(move => {
+                        legalMoves.push(move)
+                    })
                 }
             }
         }
     }
-    return false;
+    return legalMoves
 }
 
 
@@ -545,8 +550,6 @@ export function isCheckMate(board: Board<ActivePiece>, color: Color) {
     const checked = isCheck(board, color)
 
     const hasLegalMoves = hasLegalMove(board, color)
-
-    console.log('has legal move', hasLegalMoves)
 
     return checked && !hasLegalMoves;
 }
@@ -604,17 +607,31 @@ function Game() {
     const columns = [1, 2, 3, 4, 5, 6, 7, 8]
 
     if (gameState.selectedPiece) {
-        console.log(gameState.selectedPiece?.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates))
+        //console.log(gameState.selectedPiece?.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates))
     }
 
     const handleClick = (newCoordinates: Coordinate) => {
         const selectedPiece = gameState.selectedPiece
+        let newGame;
 
         if (!selectedPiece || getBoardCell(gameState.board, newCoordinates)?.color === gameState.playerTurn) {
-            setGameState(setSelectedPieceForState(gameState, newCoordinates))
+            newGame = setSelectedPieceForState(gameState, newCoordinates)
         } else {
-            setGameState(tryMovePiece(gameState, newCoordinates))
+            newGame = tryMovePiece(gameState, newCoordinates)
         }
+
+        console.log("Player turn", newGame.playerTurn)
+        console.log("Check", isCheck(newGame.board, newGame.playerTurn))
+        console.log("has legal move", hasLegalMove(newGame.board, newGame.playerTurn))
+        console.log("stalemate", isStaleMate(newGame.board, newGame.playerTurn))
+        console.log("legal moves", getLegalMoves(newGame.board, newGame.playerTurn))
+
+        if(isCheckMate(newGame.board, newGame.playerTurn)) {
+            console.log("Checkmate")
+            alert("Checkmate")
+        }
+
+        setGameState(newGame)
     }
 
     return (
