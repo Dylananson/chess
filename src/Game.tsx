@@ -423,6 +423,11 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
+    if(gameState.selectedPiece.piece.color !== gameState.playerTurn){
+        console.log("Cannot move piece on other players turn")
+        return gameState
+    }
+
     console.log(`Attempting to move piece ${gameState.selectedPiece.piece.piece.name} moved from ${gameState.selectedPiece.coordinates.row} ${gameState.selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
 
     const pieceMoves = gameState.selectedPiece.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates)
