@@ -227,7 +227,7 @@ export type GameState = {
     inCheck: boolean
 }
 
-export function findKing(board: Board<ActivePiece>, color: Color) {
+export function findKing(board: Board<ActivePiece>, color: Color){
     let king: ActivePiece | undefined;
     let kingCoordinate: Coordinate | undefined;
 
@@ -250,7 +250,7 @@ export function findKing(board: Board<ActivePiece>, color: Color) {
 }
 
 export function isAttacked(board: Board<ActivePiece>, color: Color, coordinate: Coordinate) {
-    let allMoves: Array<Coordinate> = [];
+    let allMoves : Array<Coordinate> = [];
 
     board.forEach((row, ri) => {
         row.forEach((p, ci) => {
@@ -268,14 +268,14 @@ export function isAttacked(board: Board<ActivePiece>, color: Color, coordinate: 
 }
 
 export function isCheck(board: Board<ActivePiece>, color: Color) {
-    const kingCoordinate = findKing(board, color)
+    const kingCoordinate = findKing(board, color)   
 
     if (!kingCoordinate) {
         console.error("King not found")
         return false
     }
 
-    let allMoves: Array<Coordinate> = [];
+    let allMoves : Array<Coordinate> = [];
 
     board.forEach((row, ri) => {
         row.forEach((p, ci) => {
@@ -451,7 +451,7 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
-    if (gameState.selectedPiece.piece.color !== gameState.playerTurn) {
+    if(gameState.selectedPiece.piece.color !== gameState.playerTurn){
         console.log("Cannot move piece on other players turn")
         return gameState
     }
@@ -477,14 +477,14 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
-    const movedPieceGame = movePiece(gameState, gameState.selectedPiece, newCoordinates)
+    const movedPieceGame =  movePiece(gameState, gameState.selectedPiece, newCoordinates)
 
-    if (isCheck(movedPieceGame.board, gameState.playerTurn)) {
+    if(isCheck(movedPieceGame.board, gameState.playerTurn)){
         console.log("Cannot move piece in check")
         return gameState
     }
 
-    return { ...movedPieceGame, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White }
+    return {...movedPieceGame, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White}
 
 }
 
@@ -559,7 +559,7 @@ function Game() {
 
                                 <div key={`${row}${column}`} onClick={() => handleClick({ row: row, column: column })} id={`${row} ${column}`} className={`${bgColor}  w-16 h-16 flex items-center justify-center`} >
                                     {p?.piece.draw(p.color)}
-                                    {validMove ?? <MoveMarker />}
+                                    {validMove ? <MoveMarker /> : <></>}
                                 </div>
                             )
                         })}
