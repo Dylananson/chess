@@ -6,6 +6,7 @@ import { Rook } from "../pieces/Rook";
 import { Queen } from "../pieces/Queen";
 import { createPawn } from "../pieces/Pawn";
 import { Knight } from "../pieces/Knight";
+import { King } from "../pieces/King";
 
 const addPieceToBoard = (board: Board<ActivePiece>, piece: ActivePiece, coordinates: Coordinate) => {
     return board[coordinates.row - 1][coordinates.column - 1] = piece
@@ -30,6 +31,17 @@ const createBishop = (row: number, column: number, color: Color) => {
         hasMoved: false,
     }
 }
+
+const createKing = (color: Color, startingCoordinate: Coordinate) => {
+    return {
+        piece: King,
+        color: color,
+        id: coordToKey(startingCoordinate),
+        startingCoordinate: startingCoordinate,
+        hasMoved: false,
+    }
+}
+
 
 const createKnight = (color: Color, startingCoordinate: Coordinate) => {
     return {
@@ -89,6 +101,46 @@ function selectAndMovePiece(game: GameState, startCoordinate: Coordinate, endCoo
 
     return tryMovePiece(gameWithSelectedPiece, endCoordinate);
 }
+
+
+test("king can take enemy piece", () => {
+    const startCoordinate = { row: 1, column: 1 }
+
+    const king = createKing(Color.White, startCoordinate)
+    const bishop = createBishop(1, 2, Color.Black)
+
+    const board = createBoard([
+        king,
+        bishop,
+    ])
+
+    const game = createGameState(board, undefined, Color.White, false)
+    const endCoordinate = { row: 1, column: 2 }
+
+    const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
+
+    assertPieceMovedCorrectly(newGame, startCoordinate, endCoordinate, king)
+});
+
+test("king cant move on same color piece", () => {
+    const startCoordinate = { row: 1, column: 1 }
+
+    const king = createKing(Color.White, startCoordinate)
+    const bishop = createBishop(1, 2, Color.White)
+
+    const board = createBoard([
+        king,
+        bishop,
+    ])
+
+    const game = createGameState(board, undefined, Color.White, false)
+    const endCoordinate = { row: 1, column: 2 }
+
+    const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
+
+    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, king, bishop)
+});
+
 
 test("knight can move over pieces", () => {
     const startCoordinate = { row: 1, column: 1 }
