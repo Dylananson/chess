@@ -21,7 +21,7 @@ test("is in check happy path", () => {
 
     game.playerTurn = Color.Black
 
-    const checked = isCheck(game, Color.Black)
+    const checked = isCheck(game.board, Color.Black)
 
     expect(checked).toEqual(true);
 });
@@ -39,7 +39,7 @@ test("not in check if hit by same color", () => {
 
     game.playerTurn = Color.Black
 
-    const checked = isCheck(game, Color.Black)
+    const checked = isCheck(game.board, Color.Black)
 
     expect(checked).toEqual(false);
 });
@@ -66,7 +66,7 @@ test("in check if hit by knight with pieces in way", () => {
 
     game.playerTurn = Color.Black
 
-    const checked = isCheck(game, Color.Black)
+    const checked = isCheck(game.board, Color.Black)
 
     expect(checked).toEqual(true);
 });
@@ -88,7 +88,7 @@ test("not in check if piece blocked", () => {
 
     game.playerTurn = Color.Black
 
-    const checked = isCheck(game, Color.Black)
+    const checked = isCheck(game.board, Color.Black)
 
     expect(checked).toEqual(false);
 });

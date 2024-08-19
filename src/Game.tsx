@@ -227,13 +227,13 @@ export type GameState = {
     inCheck: boolean
 }
 
-export function isCheck(gameState: GameState, color: Color) {
+export function isCheck(board: Board<ActivePiece>, color: Color) {
     let king: ActivePiece | undefined;
     let kingCoordinate: Coordinate | undefined;
 
-    for (let row = 0; row < gameState.board.length; row++) {
-        for (let col = 0; col < gameState.board.length; col++) {
-            const piece = gameState.board[row][col]
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board.length; col++) {
+            const piece = board[row][col]
             if (piece?.color === color && piece?.piece?.name === PieceName.King) {
                 king = piece
                 kingCoordinate = { row: row + 1, column: col + 1 }
@@ -249,11 +249,11 @@ export function isCheck(gameState: GameState, color: Color) {
 
     let allMoves : Array<Coordinate> = [];
 
-    gameState.board.forEach((row, ri) => {
+    board.forEach((row, ri) => {
         row.forEach((p, ci) => {
             const coordinate = { row: ri + 1, column: ci + 1 }
             if (p?.color !== color) {
-                const moves = p?.piece.moves(gameState.board, coordinate)
+                const moves = p?.piece.moves(board, coordinate)
                 if (moves) {
                     allMoves = allMoves.concat(moves)
                 }
@@ -451,7 +451,7 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
 
     const movedPieceGame =  movePiece(gameState, gameState.selectedPiece, newCoordinates)
 
-    if(isCheck(movedPieceGame, gameState.playerTurn)){
+    if(isCheck(movedPieceGame.board, gameState.playerTurn)){
         console.log("Cannot move piece in check")
         return gameState
     }
