@@ -462,25 +462,7 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
-    // if (gameState.selectedPiece.piece.piece.name !== PieceName.Knight && isPieceInWay(gameState.selectedPiece.coordinates, newCoordinates, gameState.board)) {
-    //     console.log("Piece in way")
-    //     return gameState
-    // }
-
     const pieceAtCoordinates = gameState.board[newCoordinates.row - 1][newCoordinates.column - 1]
-    const isForwardMove = gameState.selectedPiece.coordinates && gameState.selectedPiece.coordinates.column === newCoordinates.column
-
-    if (gameState.selectedPiece.piece.piece.name === PieceName.Pawn && pieceAtCoordinates && isForwardMove) {
-
-        console.log("Cannot move pawn on top of piece")
-
-        return gameState
-    }
-
-    if (gameState.selectedPiece.piece.piece.name === PieceName.Pawn && !pieceAtCoordinates && !isForwardMove) {
-        console.log("Cannot move pawn diagonally without capturing")
-        return gameState
-    }
 
     if (pieceAtCoordinates && pieceAtCoordinates.color === gameState.selectedPiece.piece.color) {
         console.log("Cannot move piece on top of piece of the same team")
