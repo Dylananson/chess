@@ -20,6 +20,9 @@ export function RookDisplay(color: Color) {
     return color === Color.Black ? <img src={blackRookSvg} /> : <img src={whiteRookSvg} />
 }
 
+export function oppositeColor(color: Color) {
+    return color === Color.Black ? Color.White : Color.Black
+}
 
 export function RookMoves(board: Board<ActivePiece>, coordinates: Coordinate): Array<Coordinate> {
     const out: Array<Coordinate> = []
@@ -45,6 +48,13 @@ export function RookMoves(board: Board<ActivePiece>, coordinates: Coordinate): A
                 //there is a piece blocking the path
                 break
             }
+
+            if(getBoardCell(board, newCoord)?.color === oppositeColor(pieceColor)) {
+                //there is a piece blocking the path
+                out.push({ row: newCoord.row, column: newCoord.column })
+                break
+            }
+
             if (!compareCoordinates(newCoord, coordinates)) {
                 out.push(newCoord)
             }

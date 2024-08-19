@@ -229,32 +229,41 @@ export type GameState = {
 
 export function isCheck(gameState: GameState, color: Color) {
     let king: ActivePiece | undefined;
+    let kingCoordinate: Coordinate | undefined;
 
-    for (const row of gameState.board) {
-        king = row.find(p => p?.color === color && p?.piece?.name === PieceName.King);
+    for (let row = 0; row < gameState.board.length; row++) {
+        for (let col = 0; col < gameState.board.length; col++) {
+            const piece = gameState.board[row][col]
+            if (piece?.color === color && piece?.piece?.name === PieceName.King) {
+                king = piece
+                kingCoordinate = { row: row + 1, column: col + 1 }
+                break
+            }
+        }
         if (king) break;
     }
 
-    if (!king) {
+    if (!king || !kingCoordinate) {
         return false
     }
 
-    const kingCoordinate = king.startingCoordinate
+    let allMoves : Array<Coordinate> = [];
 
     gameState.board.forEach((row, ri) => {
-        row.forEach((p, c) => {
-            const coordinate = { row: ri + 1, column: c +1 }
-            if (p?.color === color) {
-                const moves = p.piece.moves(gameState.board, coordinate)
-
-                if (moves.some(move => compareCoordinates(move, kingCoordinate))) {
-                    return true
+        row.forEach((p, ci) => {
+            const coordinate = { row: ri + 1, column: ci + 1 }
+            if (p?.color !== color) {
+                const moves = p?.piece.moves(gameState.board, coordinate)
+                if (moves) {
+                    console.log('moves', moves)
+                    allMoves = allMoves.concat(moves)
+                    console.log('allmoves', allMoves)
                 }
             }
         })
     })
 
-    return false
+    return allMoves.some(move => compareCoordinates(move, kingCoordinate))
 }
 
 export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
@@ -440,17 +449,23 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
     console.log("Selected piece moves", gameState.selectedPiece.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates))
 
 
-    const moves = gameState.selectedPiece.moves
+    const pieceMoves = gameState.selectedPiece.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates)
+
+    const moves: Board<boolean> = emptyBoard()
+
+    pieceMoves.forEach((move: Coordinate) => {
+        moves[move.row - 1][move.column - 1] = true
+    })
 
     if (!moves[newCoordinates.row - 1][newCoordinates.column - 1]) {
         console.log("Cannot move piece to invalid spot")
         return gameState
     }
 
-    if (gameState.selectedPiece.piece.piece.name !== PieceName.Knight && isPieceInWay(gameState.selectedPiece.coordinates, newCoordinates, gameState.board)) {
-        console.log("Piece in way")
-        return gameState
-    }
+    // if (gameState.selectedPiece.piece.piece.name !== PieceName.Knight && isPieceInWay(gameState.selectedPiece.coordinates, newCoordinates, gameState.board)) {
+    //     console.log("Piece in way")
+    //     return gameState
+    // }
 
     const pieceAtCoordinates = gameState.board[newCoordinates.row - 1][newCoordinates.column - 1]
     const isForwardMove = gameState.selectedPiece.coordinates && gameState.selectedPiece.coordinates.column === newCoordinates.column

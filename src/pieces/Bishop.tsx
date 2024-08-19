@@ -4,6 +4,7 @@ import { PieceName } from "./PieceName";
 import blackBishopSvg from '../assets/Chess_bdt45.svg'
 import whiteBishopSvg from '../assets/Chess_blt45.svg'
 import { coordToKey } from '../Game'
+import { oppositeColor } from "./Rook";
 
 export const createBishop = (row: number, column: number, color: Color) => {
     return {
@@ -47,6 +48,12 @@ export function BishopMoves(board: Board<ActivePiece>, coordinates: Coordinate) 
         while (isOnBoard(currentCoordinate)) {
             if(getBoardCell(board, currentCoordinate)?.color === pieceColor) {
                 //there is a piece blocking the path
+                break
+            }
+
+            if(getBoardCell(board, currentCoordinate)?.color === oppositeColor(pieceColor)) {
+                //there is a piece blocking the path
+                res.push({ row: currentCoordinate.row, column: currentCoordinate.column })
                 break
             }
             res.push({ row: currentCoordinate.row, column: currentCoordinate.column })
