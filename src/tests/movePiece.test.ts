@@ -1,80 +1,14 @@
 import { expect, test } from "vitest";
-import { type GameState, initGameState, tryMovePiece, setSelectedPieceForState, emptyBoard, Board, Coordinate, SelectedPiece, getBoardCell } from "../Game";
+import { createBoard, type GameState, initGameState, tryMovePiece, setSelectedPieceForState,  Board, Coordinate, SelectedPiece, getBoardCell } from "../Game";
 import { ActivePiece, Color } from "../pieces/ActivePiece";
-import { Bishop } from "../pieces/Bishop";
-import { Rook } from "../pieces/Rook";
-import { Queen } from "../pieces/Queen";
+import { createBishop } from "../pieces/Bishop";
+import { createRook } from "../pieces/Rook";
 import { createPawn } from "../pieces/Pawn";
-import { Knight } from "../pieces/Knight";
-import { King } from "../pieces/King";
-
-const addPieceToBoard = (board: Board<ActivePiece>, piece: ActivePiece, coordinates: Coordinate) => {
-    return board[coordinates.row - 1][coordinates.column - 1] = piece
-}
-
-const createBoard = (pieces: Array<ActivePiece>) => {
-    const board: Board<ActivePiece> = emptyBoard()
-    pieces.forEach(piece => {
-        board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
-    })
-    return board
-}
-
-const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
-
-const createBishop = (row: number, column: number, color: Color) => {
-    return {
-        piece: Bishop,
-        color: color,
-        id: coordToKey({ row, column }),
-        startingCoordinate: { row, column },
-        hasMoved: false,
-    }
-}
-
-const createKing = (color: Color, startingCoordinate: Coordinate) => {
-    return {
-        piece: King,
-        color: color,
-        id: coordToKey(startingCoordinate),
-        startingCoordinate: startingCoordinate,
-        hasMoved: false,
-    }
-}
+import { createKnight } from "../pieces/Knight";
+import { createKing } from "../pieces/King";
 
 
-const createKnight = (color: Color, startingCoordinate: Coordinate) => {
-    return {
-        piece: Knight,
-        color: color,
-        id: coordToKey(startingCoordinate),
-        startingCoordinate: startingCoordinate,
-        hasMoved: false,
-    }
-}
-
-
-const createRook = (row: number, column: number, color: Color) => {
-    return {
-        piece: Rook,
-        color: color,
-        id: coordToKey({ row, column }),
-        startingCoordinate: { row, column },
-        hasMoved: false,
-    }
-}
-
-const createQueen = (row: number, column: number, color: Color) => {
-    return {
-        piece: Queen,
-        color: color,
-        id: coordToKey({ row, column }),
-        startingCoordinate: { row, column },
-        hasMoved: false,
-    }
-}
-
-const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean): GameState => {
+export const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean): GameState => {
     return {
         board,
         selectedPiece,
@@ -82,6 +16,7 @@ const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece
         inCheck,
     }
 }
+
 function assertPieceNotMoved(newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece, expectedPiece?: ActivePiece) {
     //piece shouldnt have moved
     expect(getBoardCell(newGame.board, endCoordinate)).toEqual(expectedPiece)
@@ -96,7 +31,7 @@ function assertPieceMovedCorrectly(newGame: GameState, startCoordinate: Coordina
     expect(getBoardCell(newGame.board, startCoordinate)).toEqual(undefined)
 }
 
-function selectAndMovePiece(game: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate) {
+export function selectAndMovePiece(game: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate) {
     const gameWithSelectedPiece = setSelectedPieceForState(game, startCoordinate)
 
     return tryMovePiece(gameWithSelectedPiece, endCoordinate);
@@ -167,7 +102,6 @@ test("pawn can move twice if hasn't moved", () => {
     const startCoordinate = { row: 1, column: 1 }
 
     const pawn = createPawn(Color.White, startCoordinate)
-    pawn.hasMoved = false
 
     const board = createBoard([
         pawn,
@@ -186,18 +120,20 @@ test("pawn cant move twice if already moved", () => {
     const startCoordinate = { row: 1, column: 1 }
 
     const pawn = createPawn(Color.White, startCoordinate)
-    pawn.hasMoved = true
 
     const board = createBoard([
         pawn,
     ])
 
     const game = createGameState(board, undefined, Color.White, false)
-    const endCoordinate = { row: 3, column: 1 }
 
-    const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
+    const nextCoordinate = { row: 3, column: 1 }
+    const movedPawnGame = selectAndMovePiece(game, startCoordinate, nextCoordinate)
 
-    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, pawn)
+    const endCoordinate = { row: 6, column: 1 }
+    const newGame = selectAndMovePiece(movedPawnGame, startCoordinate, endCoordinate)
+
+    assertPieceNotMoved(newGame, nextCoordinate, endCoordinate, pawn)
 });
 
 

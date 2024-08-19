@@ -1,10 +1,20 @@
 import { BishopMoves } from "./Bishop";
-import { Coordinate } from "../Game";
+import { Board, Coordinate, coordToKey } from "../Game";
 import { PieceName } from "./PieceName";
 import { RookMoves } from "./Rook";
 import blackQueenSvg from '../assets/Chess_qdt45.svg'
 import whiteQueenSvg from '../assets/Chess_qlt45.svg'
-import { Color, Piece } from "./ActivePiece";
+import { ActivePiece, Color, Piece } from "./ActivePiece";
+
+export const createQueen = (color: Color, startingCoordinate: Coordinate) => {
+    return {
+        piece: Queen,
+        color: color,
+        id: coordToKey(startingCoordinate),
+        startingCoordinate: startingCoordinate,
+        hasMoved: false,
+    }
+}
 
 
 export const Queen: Piece = {
@@ -16,8 +26,8 @@ export const Queen: Piece = {
 
 
 
-export function QueenMoves(coordinates: Coordinate): Array<Coordinate> {
-    return RookMoves(coordinates).concat(BishopMoves(coordinates))
+export function QueenMoves(board:Board<ActivePiece>, coordinates: Coordinate): Array<Coordinate> {
+    return RookMoves(board, coordinates).concat(BishopMoves(board, coordinates))
 }
 
 export function QueenDisplay(color: Color): React.ReactNode {

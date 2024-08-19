@@ -1,8 +1,19 @@
-import { Coordinate, isOnBoard } from "../Game";
-import { Color, Piece } from "./ActivePiece";
+import { Board, Coordinate, getBoardCell, isOnBoard } from "../Game";
+import { ActivePiece, Color, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackBishopSvg from '../assets/Chess_bdt45.svg'
 import whiteBishopSvg from '../assets/Chess_blt45.svg'
+import { coordToKey } from '../Game'
+
+export const createBishop = (row: number, column: number, color: Color) => {
+    return {
+        piece: Bishop,
+        color: color,
+        id: coordToKey({ row, column }),
+        startingCoordinate: { row, column },
+        hasMoved: false,
+    }
+}
 
 
 export const Bishop: Piece = {
@@ -18,15 +29,26 @@ export function BishopDisplay(color: Color) {
 }
 
 
-export function BishopMoves(coordinates: Coordinate) {
+export function BishopMoves(board: Board<ActivePiece>, coordinates: Coordinate) {
     const dirs = [[-1, -1], [1, 1], [-1, 1], [1, -1]]
     let res: Array<Coordinate> = []
+
+    const pieceColor = getBoardCell(board, coordinates)?.color
+
+    if(pieceColor === undefined) {
+        throw new Error('No piece found on the board')
+    }
+
     dirs.forEach(([r, c]) => {
         let currentCoordinate = { row: coordinates.row, column: coordinates.column }
         currentCoordinate.row += r
         currentCoordinate.column += c
 
         while (isOnBoard(currentCoordinate)) {
+            if(getBoardCell(board, currentCoordinate)?.color === pieceColor) {
+                //there is a piece blocking the path
+                break
+            }
             res.push({ row: currentCoordinate.row, column: currentCoordinate.column })
             currentCoordinate.row += r
             currentCoordinate.column += c

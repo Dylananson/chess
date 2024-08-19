@@ -1,11 +1,18 @@
 import { expect, test } from "vitest";
-import { QueenMoves} from "../pieces/Queen";
-import { BishopMoves } from "../pieces/Bishop";
+import { createQueen } from "../pieces/Queen";
+import { createBishop } from "../pieces/Bishop";
 import { KnightMoves } from "../pieces/Knight";
-import { RookMoves } from "../pieces/Rook";
+import { createRook } from "../pieces/Rook";
+import { createBoard, emptyBoard } from "../Game";
+import { Color } from "../pieces/ActivePiece";
 
 test("bishop moves works", () => {
-  const moves = BishopMoves({ row: 1, column: 1 });
+  const coordinates = { row: 1, column: 1 };
+  const bishop = createBishop(coordinates.row, coordinates.column, Color.White);
+  const board = createBoard([
+    bishop
+  ])
+  const moves = bishop.piece.moves(board, coordinates)
 
   expect(moves).toEqual([
     { row: 2, column: 2 },
@@ -19,7 +26,7 @@ test("bishop moves works", () => {
 });
 
 test("knight moves works", () => {
-  const moves = KnightMoves({ row: 4, column: 4 });
+  const moves = KnightMoves(emptyBoard(), { row: 4, column: 4 });
 
   expect(moves.map((a) => `${a.row}${a.column}`).sort()).toEqual(
     [
@@ -39,7 +46,7 @@ test("knight moves works", () => {
 });
 
 test("knight moves works at starting pos 8,3", () => {
-  const moves = KnightMoves({ row: 8, column: 3 });
+  const moves = KnightMoves(emptyBoard(), { row: 8, column: 3 });
 
   expect(moves.map((a) => `${a.row}${a.column}`).sort()).toEqual(
     [
@@ -54,7 +61,12 @@ test("knight moves works at starting pos 8,3", () => {
 });
 
 test("rook moves works", () => {
-  const moves = RookMoves({ row: 4, column: 4 });
+  const coordinates = { row: 4, column: 4 };
+  const rook = createRook(coordinates.row, coordinates.column, Color.White);
+  const board = createBoard([
+    rook
+  ])
+  const moves = rook.piece.moves(board, coordinates)
 
   const expected = [
     { row: 1, column: 4 },
@@ -79,7 +91,12 @@ test("rook moves works", () => {
 });
 
 test("queen moves works", () => {
-  const moves = QueenMoves({ row: 4, column: 4 });
+  const coordinates = { row: 4, column: 4 };
+  const queen = createQueen(Color.White, coordinates);
+  const board = createBoard([
+    queen
+  ])
+  const moves = queen.piece.moves(board, coordinates)
 
   const expected = [
     { row: 1, column: 1 },

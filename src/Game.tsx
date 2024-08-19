@@ -9,6 +9,8 @@ import { Queen } from "./pieces/Queen"
 import { Pawn } from "./pieces/Pawn"
 import { Color, ActivePiece } from "./pieces/ActivePiece"
 
+export const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
+
 enum ColumnValues {
     A = 1, B = 2, C = 3, D = 4, E = 5, F = 6, G = 7, H = 8
 }
@@ -20,7 +22,6 @@ export const isOnBoard = (coordinate: Coordinate) => {
 
 const BlackKing: ActivePiece = {
     id: "BlkK",
-    hasMoved: false,
     color: Color.Black,
     piece: King,
     startingCoordinate: { row: 8, column: ColumnValues.E },
@@ -29,7 +30,6 @@ const BlackKing: ActivePiece = {
 const WhiteKing: ActivePiece = {
     id: "WhtK",
     color: Color.White,
-    hasMoved: false,
     piece: King,
     startingCoordinate: { row: 1, column: ColumnValues.E },
 }
@@ -38,7 +38,6 @@ const WhiteQueen: ActivePiece = {
     id: "WhtQ",
     color: Color.White,
     piece: Queen,
-    hasMoved: false,
     startingCoordinate: { row: 1, column: ColumnValues.D },
 }
 
@@ -47,11 +46,9 @@ const BlackQueen: ActivePiece = {
     color: Color.Black,
     piece: Queen,
     startingCoordinate: { row: 8, column: ColumnValues.D },
-    hasMoved: false,
 }
 
 const WhiteARook: ActivePiece = {
-    hasMoved: false,
     id: "WhtARook",
     color: Color.White,
     piece: Rook,
@@ -60,7 +57,6 @@ const WhiteARook: ActivePiece = {
 
 const WhiteHRook: ActivePiece = {
     id: "WhtHRook",
-    hasMoved: false,
     color: Color.White,
     piece: Rook,
     startingCoordinate: { row: 1, column: ColumnValues.H },
@@ -69,7 +65,6 @@ const WhiteHRook: ActivePiece = {
 const BlackARook: ActivePiece = {
     id: "BlkARook",
     color: Color.Black,
-    hasMoved: false,
     piece: Rook,
     startingCoordinate: { row: 8, column: ColumnValues.A },
 }
@@ -78,7 +73,6 @@ const BlackARook: ActivePiece = {
 const BlackHRook: ActivePiece = {
     id: "BlkHRook",
     color: Color.Black,
-    hasMoved: false,
     piece: Rook,
     startingCoordinate: { row: 8, column: ColumnValues.H },
 }
@@ -87,7 +81,6 @@ const WhiteBBishop: ActivePiece = {
     id: "WhtBBishop",
     color: Color.White,
     piece: Bishop,
-    hasMoved: false,
     startingCoordinate: { row: 1, column: ColumnValues.B },
 }
 
@@ -96,7 +89,6 @@ const WhiteGBishop: ActivePiece = {
     id: "WhtGBishop",
     color: Color.White,
     piece: Bishop,
-    hasMoved: false,
     startingCoordinate: { row: 1, column: ColumnValues.G },
 }
 
@@ -105,7 +97,6 @@ const BlackBBishop: ActivePiece = {
     id: "BlkBBishop",
     color: Color.Black,
     piece: Bishop,
-    hasMoved: false,
     startingCoordinate: { row: 8, column: ColumnValues.B },
 }
 
@@ -114,13 +105,11 @@ const BlackGBishop: ActivePiece = {
     id: "BlkGBishop",
     color: Color.Black,
     piece: Bishop,
-    hasMoved: false,
     startingCoordinate: { row: 8, column: ColumnValues.G },
 }
 
 const WhiteCKnight: ActivePiece = {
     id: "WhtCKnight",
-    hasMoved: false,
     color: Color.White,
     piece: Knight,
     startingCoordinate: { row: 1, column: ColumnValues.C },
@@ -131,7 +120,6 @@ const WhiteFKnight: ActivePiece = {
     id: "WhtFKnight",
     color: Color.White,
     piece: Knight,
-    hasMoved: false,
     startingCoordinate: { row: 1, column: ColumnValues.F },
 }
 
@@ -139,7 +127,6 @@ const BlackCKnight: ActivePiece = {
     id: "BlkCKnight",
     color: Color.Black,
     piece: Knight,
-    hasMoved: false,
     startingCoordinate: { row: 8, column: ColumnValues.C },
 }
 
@@ -148,7 +135,6 @@ const BlackFKnight: ActivePiece = {
     id: "BlkFKnight",
     color: Color.Black,
     piece: Knight,
-    hasMoved: false,
     startingCoordinate: { row: 8, column: ColumnValues.F },
 }
 
@@ -157,7 +143,6 @@ const WhitePawns: Array<ActivePiece> = Array.from(Array(8)).map((_, i) => {
         id: `WhtPawn${i}`,
         color: Color.White,
         piece: Pawn,
-        hasMoved: false,
         startingCoordinate: { row: 2, column: i + 1 },
     }
 })
@@ -167,7 +152,6 @@ const BlackPawns: Array<ActivePiece> = Array.from(Array(8)).map((_, i) => {
         id: `BlkPawn${i}`,
         color: Color.Black,
         piece: Pawn,
-        hasMoved: false,
         startingCoordinate: { row: 7, column: i + 1 },
     }
 })
@@ -244,8 +228,13 @@ export type GameState = {
 }
 
 export function isCheck(gameState: GameState, color: Color) {
-    const king = AllPieces.find(p => p.color === color && p.piece.name === PieceName.King)
-    console.log("King", king)
+    let king: ActivePiece | undefined;
+
+    for (const row of gameState.board) {
+        king = row.find(p => p?.color === color && p?.piece?.name === PieceName.King);
+        if (king) break;
+    }
+
     if (!king) {
         return false
     }
@@ -254,12 +243,7 @@ export function isCheck(gameState: GameState, color: Color) {
 
     const enemyPieces = gameState.board.flatMap((row) => row.filter(p => p?.color !== color)).filter(Boolean)
 
-    console.log("Enemy pieces", enemyPieces)
-
-    const enemyMoves = enemyPieces.flatMap(p => p?.piece.moves(p.startingCoordinate, p.hasMoved)).filter(Boolean)
-
-    console.log("Enemy moves", enemyMoves.filter(x => x?.row === 8))
-
+    const enemyMoves = enemyPieces.flatMap(p => p?.piece.moves(gameState.board, p.startingCoordinate)).filter(Boolean)
 
     return enemyMoves.some(move => compareCoordinates(move ?? { row: -1, column: -1 }, kingCoordinate))
 }
@@ -398,13 +382,11 @@ export function deselectPiece(gameState: GameState): GameState {
 }
 
 export function deepCopyBoard<T>(board: Board<T>): Board<T> {
-    return  board.map(arr => arr.slice()) 
+    return board.map(arr => arr.slice())
 }
 
 
 export function movePiece(gameState: GameState, selectedPiece: SelectedPiece, newCoordinates: Coordinate): GameState {
-
-    selectedPiece.piece.hasMoved = true
 
     const gameWithoutSelectedPiece = deselectPiece(gameState)
 
@@ -429,6 +411,14 @@ export function movePiece(gameState: GameState, selectedPiece: SelectedPiece, ne
 }
 
 
+export const createBoard = (pieces: Array<ActivePiece>) => {
+    const board: Board<ActivePiece> = emptyBoard()
+    pieces.forEach(piece => {
+        board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
+    })
+    return board
+}
+
 export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
     if (!gameState.selectedPiece) {
         console.log("Cannot move piece if no piece is selected");
@@ -438,9 +428,12 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
     console.log(`Attempting to move piece ${gameState.selectedPiece.piece.piece.name} moved from ${gameState.selectedPiece.coordinates.row} ${gameState.selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
 
     console.log("Selected piece", gameState.selectedPiece)
-    console.log("Selected piece moves", gameState.selectedPiece.piece.piece.moves(gameState.selectedPiece.coordinates, gameState.selectedPiece.piece.hasMoved))
+    console.log("Selected piece moves", gameState.selectedPiece.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates))
 
-    if (!gameState.selectedPiece.moves[newCoordinates.row - 1][newCoordinates.column - 1]) {
+
+    const moves = gameState.selectedPiece.moves
+
+    if (!moves[newCoordinates.row - 1][newCoordinates.column - 1]) {
         console.log("Cannot move piece to invalid spot")
         return gameState
     }
@@ -481,7 +474,7 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
     }
     console.log("Selecting piece")
 
-    const pieceMoves = selectedPiece.piece.moves(coordinate, selectedPiece.hasMoved)
+    const pieceMoves = selectedPiece.piece.moves(gameState.board, coordinate)
 
     if (gameState?.selectedPiece?.piece.id === gameState.board[coordinate.row - 1][coordinate.column - 1]?.id) {
         console.log("Piece already selected")
@@ -518,7 +511,7 @@ function Game() {
 
     console.log(gameState.selectedPiece)
     if (gameState.selectedPiece) {
-        console.log(gameState.selectedPiece?.piece.piece.moves(gameState.selectedPiece.coordinates, gameState.selectedPiece.piece.hasMoved))
+        console.log(gameState.selectedPiece?.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates))
     }
 
     const handleClick = (newCoordinates: Coordinate) => {

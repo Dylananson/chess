@@ -1,9 +1,13 @@
 import { expect, test } from "vitest";
 import {
+    createBoard,
   initGameState,
   setSelectedPieceForState,
 } from "../Game";
 import { PieceName } from "../pieces/PieceName";
+import { createGameState } from "./movePiece.test";
+import { createBishop } from "../pieces/Bishop";
+import { Color } from "../pieces/ActivePiece";
 
 test("set selected piece unselects if current is selected", () => {
   const state = initGameState();
@@ -19,11 +23,12 @@ test("set selected piece unselects if current is selected", () => {
 });
 
 test("set selected happy path", () => {
-  const state = initGameState();
+  const bishop = createBishop(1, 7, Color.White);
+  const board = createBoard([
+    bishop
 
-  const bishop = state.board[0][6];
-
-  expect(bishop?.id).toEqual("WhtGBishop");
+  ])
+  const state = createGameState(board, undefined, Color.Black, false)
 
   const newState = setSelectedPieceForState(state, { row: 1, column: 7 });
 

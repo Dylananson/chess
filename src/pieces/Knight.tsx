@@ -1,5 +1,5 @@
-import { Coordinate, isOnBoard } from "../Game";
-import { Color, Piece } from "./ActivePiece";
+import { Board, Coordinate, coordToKey, isOnBoard } from "../Game";
+import { ActivePiece, Color, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackKnightSvg from '../assets/Chess_ndt45.svg'
 import whiteKnightSvg from '../assets/Chess_nlt45.svg'
@@ -11,8 +11,18 @@ export const Knight: Piece = {
     moves: KnightMoves
 };
 
+export const createKnight = (color: Color, startingCoordinate: Coordinate) => {
+    return {
+        piece: Knight,
+        color: color,
+        id: coordToKey(startingCoordinate),
+        startingCoordinate: startingCoordinate,
+        hasMoved: false,
+    }
+}
 
-export function KnightMoves(coordinates: Coordinate): Array<Coordinate> {
+
+export function KnightMoves(board: Board<ActivePiece>, coordinates: Coordinate): Array<Coordinate> {
     const dirs = [
         [2, 1],
         [2, -1],

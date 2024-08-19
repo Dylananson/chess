@@ -1,15 +1,27 @@
-import { compareCoordinates, Coordinate, isOnBoard } from "../Game";
-import { Color, Piece } from "./ActivePiece";
+import { Board, compareCoordinates, Coordinate, coordToKey, getBoardCell, isOnBoard } from "../Game";
+import { ActivePiece, Color, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackRookSvg from '../assets/Chess_rdt45.svg'
 import whiteRookSvg from '../assets/Chess_rlt45.svg'
+
+export const createRook = (row: number, column: number, color: Color) => {
+    return {
+        piece: Rook,
+        color: color,
+        id: coordToKey({ row, column }),
+        startingCoordinate: { row, column },
+        hasMoved: false,
+    }
+}
+
 
 
 export function RookDisplay(color: Color) {
     return color === Color.Black ? <img src={blackRookSvg} /> : <img src={whiteRookSvg} />
 }
 
-export function RookMoves(coordinates: Coordinate): Array<Coordinate> {
+
+export function RookMoves(board: Board<ActivePiece>, coordinates: Coordinate): Array<Coordinate> {
     const out: Array<Coordinate> = []
 
     const dirs = [
@@ -19,10 +31,20 @@ export function RookMoves(coordinates: Coordinate): Array<Coordinate> {
         [0, -1]
     ]
 
+    const pieceColor = getBoardCell(board, coordinates)?.color
+
+    if(pieceColor === undefined) {
+        throw new Error('No piece found on the board')
+    }
+
     dirs.forEach(d => {
         let newCoord = { row: coordinates.row + d[0], column: coordinates.column + d[1] }
 
         while (isOnBoard(newCoord)) {
+            if(getBoardCell(board, newCoord)?.color === pieceColor) {
+                //there is a piece blocking the path
+                break
+            }
             if (!compareCoordinates(newCoord, coordinates)) {
                 out.push(newCoord)
             }
