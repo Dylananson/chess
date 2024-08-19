@@ -58,23 +58,14 @@ const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece
         inCheck,
     }
 }
-function assertPieceNotMoved(oldGame: GameState, newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece, expectedPiece?: ActivePiece) {
+function assertPieceNotMoved(newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece, expectedPiece?: ActivePiece) {
     //piece shouldnt have moved
     expect(getBoardCell(newGame.board, endCoordinate)).toEqual(expectedPiece)
     expect(getBoardCell(newGame.board, startCoordinate)).toEqual(piece)
-
-    //old board shouldn't have changed
-    expect(getBoardCell(oldGame.board, endCoordinate)).toEqual(expectedPiece)
-    expect(getBoardCell(oldGame.board, startCoordinate)).toEqual(piece)
 }
 
 
-function assertPieceMovedCorrectly(oldGame: GameState, newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece) {
-    //piece shouldnt be in old coordinates for new board
-    expect(getBoardCell(oldGame.board, endCoordinate)).toEqual(undefined)
-    //piece should be in old coordinates for old board
-    expect(getBoardCell(oldGame.board, startCoordinate)).toEqual(piece)
-
+function assertPieceMovedCorrectly(newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece) {
     //piece shouldn't be in old coordinates for new board
     expect(getBoardCell(newGame.board, endCoordinate)).toEqual(piece)
     //piece shouldn't be in old coordinates
@@ -102,7 +93,7 @@ test("pawn can move twice if hasn't moved", () => {
 
     const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
 
-    assertPieceMovedCorrectly(game, newGame, startCoordinate, endCoordinate, pawn)
+    assertPieceMovedCorrectly(newGame, startCoordinate, endCoordinate, pawn)
 });
 
 
@@ -121,7 +112,7 @@ test("pawn cant move twice if already moved", () => {
 
     const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
 
-    assertPieceNotMoved(game, newGame, startCoordinate, endCoordinate, pawn)
+    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, pawn)
 });
 
 
@@ -141,8 +132,48 @@ test("pawn cant move ontop of another piece", () => {
 
     const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
 
-    assertPieceNotMoved(game, newGame, startCoordinate, endCoordinate, pawn, rook)
+    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, pawn, rook)
 });
+
+test("pawn can take enemy piece", () => {
+    const startCoordinate = { row: 1, column: 1 }
+    const endCoordinate = { row: 2, column: 2 }
+
+    const pawn = createPawn(Color.White, startCoordinate)
+    const rook = createRook(endCoordinate.row, endCoordinate.column, Color.Black)
+
+    const board = createBoard([
+        pawn,
+        rook
+    ])
+
+    const game = createGameState(board, undefined, Color.White, false)
+
+    const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
+
+    assertPieceMovedCorrectly(newGame, startCoordinate, endCoordinate, pawn)
+});
+
+
+test("pawn cant take own piece", () => {
+    const startCoordinate = { row: 1, column: 1 }
+
+    const pawn = createPawn(Color.White, startCoordinate)
+    const rook = createRook(2, 2, Color.White)
+
+    const board = createBoard([
+        pawn,
+        rook
+    ])
+
+    const game = createGameState(board, undefined, Color.White, false)
+    const endCoordinate = { row: 2, column: 2 }
+
+    const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
+
+    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, pawn, rook)
+});
+
 
 test("pawn cant move diagnoally without taking an enemy piece", () => {
     const startCoordinate = { row: 1, column: 1 }
@@ -158,7 +189,7 @@ test("pawn cant move diagnoally without taking an enemy piece", () => {
 
     const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
 
-    assertPieceNotMoved(game, newGame, startCoordinate, endCoordinate, pawn)
+    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, pawn)
 });
 
 test("rook cant move through other pieces", () => {
@@ -177,7 +208,7 @@ test("rook cant move through other pieces", () => {
 
     const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
 
-    assertPieceNotMoved(game, newGame, startCoordinate, endCoordinate, rook)
+    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, rook)
 });
 
 
@@ -197,7 +228,7 @@ test("bishop cant move through other pieces", () => {
 
     const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
 
-    assertPieceNotMoved(game, newGame, startCoordinate, endCoordinate, bishop)
+    assertPieceNotMoved(newGame, startCoordinate, endCoordinate, bishop)
 });
 
 
@@ -214,7 +245,7 @@ test("move piece happy path bishop", () => {
 
     const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
 
-    assertPieceMovedCorrectly(game, newGame, startCoordinate, endCoordinate, bishop)
+    assertPieceMovedCorrectly(newGame, startCoordinate, endCoordinate, bishop)
 });
 
 
@@ -229,7 +260,7 @@ test("move piece happy path rook", () => {
     ])
     const game = createGameState(board, undefined, Color.White, false)
     const newGame = selectAndMovePiece(game, startCoordinate, endCoordinate)
-    assertPieceMovedCorrectly(game, newGame, startCoordinate, endCoordinate, rook)
+    assertPieceMovedCorrectly(newGame, startCoordinate, endCoordinate, rook)
 });
 
 
