@@ -227,7 +227,7 @@ export type GameState = {
     inCheck: boolean
 }
 
-export function isCheck(board: Board<ActivePiece>, color: Color) {
+export function findKing(board: Board<ActivePiece>, color: Color){
     let king: ActivePiece | undefined;
     let kingCoordinate: Coordinate | undefined;
 
@@ -244,6 +244,16 @@ export function isCheck(board: Board<ActivePiece>, color: Color) {
     }
 
     if (!king || !kingCoordinate) {
+        return undefined
+    }
+    return kingCoordinate
+}
+
+export function isCheck(board: Board<ActivePiece>, color: Color) {
+    const kingCoordinate = findKing(board, color)   
+
+    if (!kingCoordinate) {
+        console.error("King not found")
         return false
     }
 
