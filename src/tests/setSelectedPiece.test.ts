@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import {
     createBoard,
   initGameState,
-  setSelectedPieceForState,
+  selectPiece,
 } from "../Game";
 import { PieceName } from "../pieces/PieceName";
 import { createGameState } from "./movePiece.test";
@@ -16,8 +16,8 @@ test("set selected piece unselects if current is selected", () => {
 
   expect(bishop?.piece.name).toEqual(PieceName.Bishop);
 
-  const newState = setSelectedPieceForState(state, { row: 1, column: 2 });
-  const noSelectedState = setSelectedPieceForState(newState, { row: 1, column: 2 });
+  const newState = selectPiece(state, { row: 1, column: 2 });
+  const noSelectedState = selectPiece(newState, { row: 1, column: 2 });
 
   expect(noSelectedState.selectedPiece).toEqual(undefined);
 });
@@ -30,7 +30,7 @@ test("set selected happy path", () => {
   ])
   const state = createGameState(board, undefined, Color.Black, false)
 
-  const newState = setSelectedPieceForState(state, { row: 1, column: 7 });
+  const newState = selectPiece(state, { row: 1, column: 7 });
 
   const expectedResult = [
     [

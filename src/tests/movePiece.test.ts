@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { createBoard, type GameState, initGameState, tryMovePiece, setSelectedPieceForState,  Board, Coordinate, SelectedPiece, getBoardCell } from "../Game";
+import { createBoard, type GameState, initGameState, tryMovePiece, selectPiece,  Board, Coordinate, SelectedPiece, getBoardCell } from "../Game";
 import { ActivePiece, Color } from "../pieces/ActivePiece";
 import { createBishop } from "../pieces/Bishop";
 import { createRook } from "../pieces/Rook";
@@ -35,7 +35,7 @@ function assertPieceMovedCorrectly(newGame: GameState, startCoordinate: Coordina
 }
 
 export function selectAndMovePiece(game: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate) {
-    const gameWithSelectedPiece = setSelectedPieceForState(game, startCoordinate)
+    const gameWithSelectedPiece = selectPiece(game, startCoordinate)
 
     return tryMovePiece(gameWithSelectedPiece, endCoordinate);
 }
@@ -381,7 +381,7 @@ test("move piece happy path rook", () => {
 test("move piece on own piece shouldn't move piece", () => {
     const game = initGameState();
 
-    const gameWithSelectedPiece = setSelectedPieceForState(game, { row: 1, column: 1 })
+    const gameWithSelectedPiece = selectPiece(game, { row: 1, column: 1 })
 
     const otherPieceId = gameWithSelectedPiece.board[0][1]?.id
 

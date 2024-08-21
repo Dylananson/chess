@@ -8,7 +8,6 @@ import { Rook } from "./pieces/Rook"
 import { Queen } from "./pieces/Queen"
 import { Pawn } from "./pieces/Pawn"
 import { Color, ActivePiece } from "./pieces/ActivePiece"
-import { A } from "vitest/dist/chunks/environment.0M5R1SX_.js"
 
 export const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
 
@@ -598,7 +597,7 @@ export function isStaleMate(board: Board<ActivePiece>, color: Color) {
     return !checked && !hasLegalMove(board, color);
 }
 
-export function setSelectedPieceForState(gameState: GameState, coordinate: Coordinate): GameState {
+export function selectPiece(gameState: GameState, coordinate: Coordinate): GameState {
     const selectedPiece = gameState.board[coordinate.row - 1][coordinate.column - 1]
 
     if (!selectedPiece) {
@@ -660,7 +659,7 @@ function Game() {
         let newGame;
 
         if (!selectedPiece || getBoardCell(gameState.board, newCoordinates)?.color === gameState.playerTurn) {
-            newGame = setSelectedPieceForState(gameState, newCoordinates)
+            newGame = selectPiece(gameState, newCoordinates)
         } else {
             newGame = tryMovePiece(gameState, newCoordinates)
         }
