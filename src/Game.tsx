@@ -721,13 +721,15 @@ function Game() {
             </div >
 
             <div className="m-2">
-                {gameState.historyIndex > 0 ?
-                    <button className="rounded-md bg-blue-500 p-2 font-semibold" onClick={handleShowPreviousState}>
-                        prev
-                    </button> : <></>}
+                {
+                    //TODO: fix this stuff
+                    gameState.historyIndex > 0 ?
+                    <button className="rounded-md bg-blue-500 p-2 font-semibold" onClick={handleShowPreviousState}> prev </button> :
+                    <button className="rounded-md bg-blue-100 p-2 font-semibold"> prev </button>}
 
                 {gameState.historyIndex < gameState.history.length - 1 ?
-                    <button className="rounded-md bg-blue-500 p-2 font-semibold" onClick={handleShowNextState}> next </button> : <></>
+                    <button className="rounded-md bg-blue-500 p-2 font-semibold" onClick={handleShowNextState}> next </button> :
+                    <button className="rounded-md bg-blue-100 p-2 font-semibold"> next </button>
                 }
             </div >
         </>
