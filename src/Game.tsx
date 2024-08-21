@@ -8,6 +8,7 @@ import { Rook } from "./pieces/Rook"
 import { Queen } from "./pieces/Queen"
 import { Pawn } from "./pieces/Pawn"
 import { Color, ActivePiece } from "./pieces/ActivePiece"
+import { A } from "vitest/dist/chunks/environment.0M5R1SX_.js"
 
 export const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
 
@@ -222,9 +223,11 @@ export type SelectedPiece = {
 
 export type GameState = {
     board: Board<ActivePiece>
-    selectedPiece: SelectedPiece | undefined
+    selectedPiece?: SelectedPiece
     playerTurn: Color
     inCheck: boolean
+    history: Array<Board<ActivePiece>>
+    historyIndex: number
 }
 
 export function findKing(board: Board<ActivePiece>, color: Color) {
@@ -432,7 +435,6 @@ export function movePiece(gameState: GameState, selectedPiece: SelectedPiece, ne
     newBoard[selectedPiece.coordinates?.row - 1][selectedPiece?.coordinates.column - 1] = undefined
     newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = selectedPiece.piece
 
-    //console.log(`Piece ${selectedPiece.piece.piece.name} moved from ${selectedPiece.coordinates.row} ${selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
     return { ...gameWithoutSelectedPiece, board: newBoard }
 }
 
@@ -445,20 +447,15 @@ export const createBoard = (pieces: Array<ActivePiece>) => {
     return board
 }
 
-export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
-    if (!gameState.selectedPiece) {
-        //console.log("Cannot move piece if no piece is selected");
-        return gameState
+export function isLegalMove(board: Board<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate): boolean {
+    const piece = getBoardCell(board, oldCoordinates)
+
+    if (!piece) {
+        console.error("Piece not found")
+        return false
     }
 
-    if (gameState.selectedPiece.piece.color !== gameState.playerTurn) {
-        //console.log("Cannot move piece on other players turn")
-        return gameState
-    }
-
-    //console.log(`Attempting to move piece ${gameState.selectedPiece.piece.piece.name} moved from ${gameState.selectedPiece.coordinates.row} ${gameState.selectedPiece.coordinates.column} to ${newCoordinates.row} ${newCoordinates.column}`)
-
-    const pieceMoves = gameState.selectedPiece.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates)
+    const pieceMoves = piece.piece.moves(board, oldCoordinates)
     const moves: Board<boolean> = emptyBoard()
 
     pieceMoves.forEach((move: Coordinate) => {
@@ -467,26 +464,60 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
 
     if (!moves[newCoordinates.row - 1][newCoordinates.column - 1]) {
         console.log("Cannot move piece to invalid spot")
+        return false
+    }
+
+    const pieceAtNewCoordinates = board[newCoordinates.row - 1][newCoordinates.column - 1]
+
+    if (pieceAtNewCoordinates && pieceAtNewCoordinates.color === piece.color) {
+        console.log("Cannot move piece on top of piece of the same team")
+        return false
+    }
+
+    const newBoard = deepCopyBoard(board)
+    newBoard[oldCoordinates?.row - 1][oldCoordinates.column - 1] = undefined
+    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = piece
+
+    if (isCheck(newBoard, piece.color)) {
+        console.log("Cannot move piece in check")
+        return false
+    }
+
+    return true
+}
+
+
+export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
+    if (!gameState.selectedPiece) {
+        console.log("Cannot move piece if no piece is selected");
         return gameState
     }
 
-    const pieceAtCoordinates = gameState.board[newCoordinates.row - 1][newCoordinates.column - 1]
+    if (gameState.selectedPiece.piece.color !== gameState.playerTurn) {
+        console.log("Cannot move piece on other players turn")
+        return gameState
+    }
 
-    if (pieceAtCoordinates && pieceAtCoordinates.color === gameState.selectedPiece.piece.color) {
-        console.log("Cannot move piece on top of piece of the same team")
+    if(!gameState.selectedPiece) {
+        console.error("No piece selected")
+        return gameState
+    }
+
+    const canMove = isLegalMove(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
+
+    if (!canMove) {
         return gameState
     }
 
     const movedPieceGame = movePiece(gameState, gameState.selectedPiece, newCoordinates)
 
-    if (isCheck(movedPieceGame.board, gameState.playerTurn)) {
-        console.log("Cannot move piece in check")
-        return gameState
+    return {
+        ...movedPieceGame,
+        playerTurn: movedPieceGame .playerTurn === Color.White ? Color.Black : Color.White,
+        history: [...movedPieceGame .history, movedPieceGame.board],
     }
-
-    return { ...movedPieceGame, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White }
-
 }
+
 
 export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, coordinate: Coordinate, moves: Array<Coordinate>) {
     const newBoard = deepCopyBoard(board)
@@ -534,7 +565,7 @@ export function getLegalMoves(board: Board<ActivePiece>, color: Color) {
                 if (moves) {
                     const nonCheckedMoves = filterPieceMovesThatPutKingInCheck(board, { row: row + 1, column: col + 1 }, moves)
                     const validMoves = filterMovesOntopOfSameColor(board, nonCheckedMoves, color)
-                    
+
                     validMoves.forEach(move => {
                         legalMoves.push(move)
                     })
@@ -588,10 +619,14 @@ export function setSelectedPieceForState(gameState: GameState, coordinate: Coord
 
 
 export const initGameState = (): GameState => ({
-    board: initBoard(),
+    get board() {
+        return this.history[this.history.length - 1]
+    },
     playerTurn: Color.White,
     selectedPiece: undefined,
-    inCheck: false
+    inCheck: false,
+    history: [initBoard()],
+    historyIndex: 0
 })
 
 const isDarkSquare = (row: number, column: number) => {
@@ -625,13 +660,23 @@ function Game() {
         console.log("has legal move", hasLegalMove(newGame.board, newGame.playerTurn))
         console.log("stalemate", isStaleMate(newGame.board, newGame.playerTurn))
         console.log("legal moves", getLegalMoves(newGame.board, newGame.playerTurn))
+        setGameState(newGame)
 
-        if(isCheckMate(newGame.board, newGame.playerTurn)) {
+        if (isCheckMate(newGame.board, newGame.playerTurn)) {
             console.log("Checkmate")
             alert("Checkmate")
+
+            setGameState(initGameState())
         }
 
-        setGameState(newGame)
+    }
+
+    function handleShowPreviousState(): void {
+        setGameState({ ...gameState, historyIndex: gameState.historyIndex ? gameState.historyIndex - 1 : 0 })
+    }
+
+    function handleShowNextState(): void {
+        setGameState({ ...gameState, historyIndex: gameState.historyIndex ? gameState.historyIndex + 1 : 0 })
     }
 
     return (
@@ -640,7 +685,8 @@ function Game() {
                 {rows.reverse().map((row) => (
                     <div key={row} className="flex justify-items-center place-items-center">
                         {columns.map((column) => {
-                            const p = gameState.board[row - 1][column - 1]
+                            const p = gameState.history[gameState.historyIndex][row - 1][column - 1]
+
                             const validMove = gameState.selectedPiece?.moves[row - 1][column - 1] ?? false
 
                             const bgColor = isDarkSquare(row, column) ? "bg-green-800" : "bg-gray-200"
@@ -654,6 +700,17 @@ function Game() {
                         })}
                     </div>
                 ))}
+            </div >
+
+            <div>
+                {gameState.historyIndex < gameState.history.length - 1 ?
+                    <button className="bg-blue-500 p-2 font-semibold" onClick={handleShowPreviousState}>
+                        prev
+                    </button> : <></>}
+
+                {gameState.historyIndex ?
+                    < button className="bg-blue-500 p-2 font-semibold" onClick={handleShowNextState}> next </button> : <></>
+                }
             </div >
         </>
     )

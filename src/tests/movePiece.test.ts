@@ -8,12 +8,14 @@ import { createKnight } from "../pieces/Knight";
 import { createKing } from "../pieces/King";
 
 
-export const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean): GameState => {
+export const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean, history?: Array<Board<ActivePiece>>): GameState => {
     return {
         board,
         selectedPiece,
         playerTurn,
         inCheck,
+        history: history ?? [board],
+        historyIndex: 0
     }
 }
 
