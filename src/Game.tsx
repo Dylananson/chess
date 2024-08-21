@@ -427,15 +427,12 @@ export function deepCopyBoard<T>(board: Board<T>): Board<T> {
 }
 
 
-export function movePiece(gameState: GameState, selectedPiece: SelectedPiece, newCoordinates: Coordinate): GameState {
-
-    const gameWithoutSelectedPiece = deselectPiece(gameState)
-
-    const newBoard = deepCopyBoard(gameWithoutSelectedPiece.board)
+export function movePiece(board: Board<ActivePiece>, selectedPiece: SelectedPiece, newCoordinates: Coordinate): Board<ActivePiece> {
+    const newBoard = deepCopyBoard(board)
     newBoard[selectedPiece.coordinates?.row - 1][selectedPiece?.coordinates.column - 1] = undefined
     newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = selectedPiece.piece
 
-    return { ...gameWithoutSelectedPiece, board: newBoard }
+    return newBoard
 }
 
 
@@ -498,7 +495,7 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
-    if(!gameState.selectedPiece) {
+    if (!gameState.selectedPiece) {
         console.error("No piece selected")
         return gameState
     }
@@ -506,16 +503,26 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
     const canMove = isLegalMove(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
 
     if (!canMove) {
+        console.log("Cannot move piece")
         return gameState
     }
 
-    const movedPieceGame = movePiece(gameState, gameState.selectedPiece, newCoordinates)
+    const newBoard = deepCopyBoard(gameState.board)
+    newBoard[gameState.selectedPiece.coordinates?.row - 1][gameState.selectedPiece?.coordinates.column - 1] = undefined
+    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = gameState.selectedPiece.piece
 
-    return {
-        ...movedPieceGame,
-        playerTurn: movedPieceGame .playerTurn === Color.White ? Color.Black : Color.White,
-        history: [...movedPieceGame .history, movedPieceGame.board],
+    const newGame = {
+        ...gameState,
+        get board(): Board<ActivePiece> {
+            return this.history[this.history.length - 1]
+        },
+        selectedPiece: undefined,
+        playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White,
+        historyIndex: gameState.historyIndex + 1,
+        history: [...gameState.history, newBoard],
     }
+
+    return newGame
 }
 
 
@@ -646,6 +653,9 @@ function Game() {
     }
 
     const handleClick = (newCoordinates: Coordinate) => {
+        if(gameState.historyIndex !== gameState.history.length - 1){
+            return
+        }
         const selectedPiece = gameState.selectedPiece
         let newGame;
 
@@ -672,11 +682,14 @@ function Game() {
     }
 
     function handleShowPreviousState(): void {
-        setGameState({ ...gameState, historyIndex: gameState.historyIndex ? gameState.historyIndex - 1 : 0 })
+        if(gameState.historyIndex === 0){
+            return
+        }
+        setGameState({ ...gameState, historyIndex: gameState.historyIndex - 1  })
     }
 
     function handleShowNextState(): void {
-        setGameState({ ...gameState, historyIndex: gameState.historyIndex ? gameState.historyIndex + 1 : 0 })
+        setGameState({ ...gameState, historyIndex: gameState.historyIndex + 1 })
     }
 
     return (
@@ -685,7 +698,14 @@ function Game() {
                 {rows.reverse().map((row) => (
                     <div key={row} className="flex justify-items-center place-items-center">
                         {columns.map((column) => {
-                            const p = gameState.history[gameState.historyIndex][row - 1][column - 1]
+
+                            let p ;
+                            if (gameState.historyIndex !== gameState.history.length - 1) {
+                                console.log("history index", gameState.historyIndex, gameState.history.length)
+                                p = gameState.history[gameState.historyIndex][row - 1][column - 1]
+                            } else {
+                                p = gameState.board[row - 1][column - 1]
+                            }
 
                             const validMove = gameState.selectedPiece?.moves[row - 1][column - 1] ?? false
 
@@ -703,13 +723,13 @@ function Game() {
             </div >
 
             <div>
-                {gameState.historyIndex < gameState.history.length - 1 ?
+                {gameState.historyIndex > 0 ?
                     <button className="bg-blue-500 p-2 font-semibold" onClick={handleShowPreviousState}>
                         prev
                     </button> : <></>}
 
-                {gameState.historyIndex ?
-                    < button className="bg-blue-500 p-2 font-semibold" onClick={handleShowNextState}> next </button> : <></>
+                {gameState.historyIndex < gameState.history.length-1 ?
+                    <button className="bg-blue-500 p-2 font-semibold" onClick={handleShowNextState}> next </button> : <></>
                 }
             </div >
         </>
