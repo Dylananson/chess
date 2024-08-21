@@ -653,7 +653,7 @@ function Game() {
     }
 
     const handleClick = (newCoordinates: Coordinate) => {
-        if(gameState.historyIndex !== gameState.history.length - 1){
+        if (gameState.historyIndex !== gameState.history.length - 1) {
             return
         }
         const selectedPiece = gameState.selectedPiece
@@ -682,10 +682,10 @@ function Game() {
     }
 
     function handleShowPreviousState(): void {
-        if(gameState.historyIndex === 0){
+        if (gameState.historyIndex === 0) {
             return
         }
-        setGameState({ ...gameState, historyIndex: gameState.historyIndex - 1  })
+        setGameState({ ...gameState, historyIndex: gameState.historyIndex - 1 })
     }
 
     function handleShowNextState(): void {
@@ -698,10 +698,8 @@ function Game() {
                 {rows.reverse().map((row) => (
                     <div key={row} className="flex justify-items-center place-items-center">
                         {columns.map((column) => {
-
-                            let p ;
+                            let p;
                             if (gameState.historyIndex !== gameState.history.length - 1) {
-                                console.log("history index", gameState.historyIndex, gameState.history.length)
                                 p = gameState.history[gameState.historyIndex][row - 1][column - 1]
                             } else {
                                 p = gameState.board[row - 1][column - 1]
@@ -722,14 +720,14 @@ function Game() {
                 ))}
             </div >
 
-            <div>
+            <div className="m-2">
                 {gameState.historyIndex > 0 ?
-                    <button className="bg-blue-500 p-2 font-semibold" onClick={handleShowPreviousState}>
+                    <button className="rounded-md bg-blue-500 p-2 font-semibold" onClick={handleShowPreviousState}>
                         prev
                     </button> : <></>}
 
-                {gameState.historyIndex < gameState.history.length-1 ?
-                    <button className="bg-blue-500 p-2 font-semibold" onClick={handleShowNextState}> next </button> : <></>
+                {gameState.historyIndex < gameState.history.length - 1 ?
+                    <button className="rounded-md bg-blue-500 p-2 font-semibold" onClick={handleShowNextState}> next </button> : <></>
                 }
             </div >
         </>
