@@ -1,7 +1,8 @@
 import { expect, test } from 'vitest'
-import { Color, moveActivePiece } from '../pieces/ActivePiece'
+import { Color } from '../pieces/ActivePiece'
 import { createRook, } from '../pieces/Rook'
-import { createBoard, canCastleQueenSide, canCastleKingSide, castleKingSide, castleQueenSide, getBoardCell } from '../Game'
+import { canCastleQueenSide, canCastleKingSide, castleKingSide, castleQueenSide } from '../Game'
+import { getBoardCell, createBoard } from '../Board'
 import { createKing } from '../pieces/King'
 import { createBishop } from '../pieces/Bishop'
 

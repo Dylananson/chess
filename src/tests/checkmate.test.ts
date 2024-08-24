@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
-import { createBoard, isCheckMate } from '../Game';
+import {  isCheckMate } from '../Game';
+import { createBoard } from '../Board';
 import { createKing } from '../pieces/King';
 import { Color } from '../pieces/ActivePiece';
 import { createQueen } from '../pieces/Queen';

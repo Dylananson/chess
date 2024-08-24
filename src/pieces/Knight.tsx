@@ -1,4 +1,5 @@
-import { Board, Coordinate, coordToKey, isOnBoard } from "../Game";
+import { Board, coordToKey, isOnBoard } from "../Board";
+import { Coordinate } from "../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackKnightSvg from '../assets/Chess_ndt45.svg'

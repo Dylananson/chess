@@ -1,4 +1,5 @@
-import { Board, Coordinate, coordToKey, isOnBoard } from "../Game";
+import { coordToKey, Board, isOnBoard } from "../Board";
+import { Coordinate } from "../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackKingSvg from '../assets/Chess_kdt45.svg'
@@ -8,7 +9,7 @@ export function KingDisplay(color: Color) {
     return color === Color.Black ? <img src={blackKingSvg} /> : <img src={whiteKingSvg} />
 }
 
-export const createKing = (color: Color, startingCoordinate: Coordinate) :ActivePiece => {
+export const createKing = (color: Color, startingCoordinate: Coordinate): ActivePiece => {
     return createActivePiece({
         piece: King,
         color: color,

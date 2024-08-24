@@ -1,4 +1,7 @@
-import { Board, compareCoordinates, Coordinate, getBoardCell, isOnBoard } from "../Game";
+import { compareCoordinates} from "../Game";
+import { getBoardCell } from "../Board"
+import { Board, isOnBoard } from "../Board";
+import { Coordinate } from "../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackPawnSvg from '../assets/Chess_pdt45.svg'

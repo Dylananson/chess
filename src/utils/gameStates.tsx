@@ -1,4 +1,5 @@
-import { Game, Board, createBoard, SelectedPiece, emptyBoard, GameState } from "../Game"
+import { Game, SelectedPiece, GameState } from "../Game"
+import { Board, createBoard, emptyBoard } from "../Board"
 import { ActivePiece, Color } from "../pieces/ActivePiece"
 import { createBishop } from "../pieces/Bishop"
 import { createKing } from "../pieces/King"
@@ -6,7 +7,7 @@ import { createKnight } from "../pieces/Knight"
 import { createPawn } from "../pieces/Pawn"
 import { createQueen } from "../pieces/Queen"
 import { createRook } from "../pieces/Rook"
-import { ColumnValues } from "../Game"
+import { ColumnValues } from "../Board"
 
 export const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean, history?: Array<Board<ActivePiece>>): GameState => {
     return {

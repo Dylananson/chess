@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
-import { createBoard, isStaleMate as isStalemate } from '../Game';
+import { isStaleMate as isStalemate } from '../Game';
+import { createBoard } from '../Board';
 import { createKing } from '../pieces/King';
 import { Color } from '../pieces/ActivePiece';
 import { createRook } from '../pieces/Rook';

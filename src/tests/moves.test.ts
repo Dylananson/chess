@@ -3,7 +3,7 @@ import { createQueen } from "../pieces/Queen";
 import { createBishop } from "../pieces/Bishop";
 import { KnightMoves } from "../pieces/Knight";
 import { createRook } from "../pieces/Rook";
-import { createBoard, emptyBoard } from "../Game";
+import { emptyBoard, createBoard } from "../Board";
 import { Color } from "../pieces/ActivePiece";
 
 test("bishop moves works", () => {

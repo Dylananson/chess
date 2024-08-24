@@ -7,25 +7,8 @@ import { createRook } from "./pieces/Rook"
 import { createQueen } from "./pieces/Queen"
 import { Color, ActivePiece } from "./pieces/ActivePiece"
 import { defaultGame } from "./utils/gameStates"
-
-const printBoard = (board: any) => {
-    const s = board.map((row: any) => row.map((cell: any) => cell?.piece?.name || '_').join('|').concat('|')).reverse().join('\n')
-    console.log()
-    console.log(s)
-    console.log()
-}
-
-
-export const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
-
-export enum ColumnValues {
-    A = 1, B = 2, C = 3, D = 4, E = 5, F = 6, G = 7, H = 8
-}
-export type Coordinate = { row: number, column: number }
-
-export const isOnBoard = (coordinate: Coordinate) => {
-    return (coordinate.row <= 8 && coordinate.row >= 1 && coordinate.column >= 1 && coordinate.column <= 8)
-}
+import { emptyBoard, Board, isOnBoard, deepCopyBoard, getBoardCell } from "./Board"
+import { Coordinate } from "./Coordinate"
 
 
 function MoveMarker() {
@@ -41,17 +24,6 @@ function MoveMarker() {
         </>
     )
 }
-
-export const emptyRow = (): Row<undefined> => {
-    return Array.from(Array(8))
-}
-export const emptyBoard = (): Board<undefined> => {
-    return Array.from(Array(8)).map(emptyRow);
-}
-
-type Row<T> = Array<T>
-
-export type Board<T> = Array<Array<undefined | T>>
 
 export type SelectedPiece = {
     piece: ActivePiece,
@@ -135,10 +107,6 @@ export function isCheck(board: Board<ActivePiece>, color: Color) {
 
 export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
     return coord1.row === coord2.row && coord1.column === coord2.column
-}
-
-export function getBoardCell(board: Board<ActivePiece>, coord: Coordinate) {
-    return board[coord.row - 1][coord.column - 1]
 }
 
 function bfs(startingCoordinate: Coordinate, validMoves: Array<Coordinate>, dirs: Array<Coordinate>, board: Board<ActivePiece>) {
@@ -260,10 +228,6 @@ export function deselectPiece(gameState: GameState): GameState {
     return { ...gameState, selectedPiece: undefined }
 }
 
-export function deepCopyBoard<T>(board: Board<T>): Board<T> {
-    return board.map(arr => arr.slice())
-}
-
 
 export function movePiece(board: Board<ActivePiece>, selectedPiece: SelectedPiece, newCoordinates: Coordinate): Board<ActivePiece> {
     const newBoard = deepCopyBoard(board)
@@ -273,14 +237,6 @@ export function movePiece(board: Board<ActivePiece>, selectedPiece: SelectedPiec
     return newBoard
 }
 
-
-export const createBoard = (pieces: Array<ActivePiece>) => {
-    const board: Board<ActivePiece> = emptyBoard()
-    pieces.forEach(piece => {
-        board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
-    })
-    return board
-}
 
 export function isLegalMove(board: Board<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate): boolean {
     const piece = getBoardCell(board, oldCoordinates)

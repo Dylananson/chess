@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
 import {
-    createBoard,
     selectPiece,
 } from "../Game";
+import { createBoard } from "../Board";
 import { defaultGame } from '../utils/gameStates';
 import { PieceName } from "../pieces/PieceName";
 import { createGameState } from "./movePiece.test";

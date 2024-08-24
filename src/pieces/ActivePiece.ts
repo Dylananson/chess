@@ -1,4 +1,5 @@
-import { Board, Coordinate } from "../Game";
+import { Board } from "../Board";
+import { Coordinate } from "../Coordinate";
 import { PieceName } from "./PieceName";
 
 export enum Color {
