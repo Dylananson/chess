@@ -1,18 +1,19 @@
 import { Board, Coordinate, getBoardCell, isOnBoard } from "../Game";
-import { ActivePiece, Color, Piece } from "./ActivePiece";
+import { ActivePiece, BaseActivePiece, Color, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackBishopSvg from '../assets/Chess_bdt45.svg'
 import whiteBishopSvg from '../assets/Chess_blt45.svg'
 import { coordToKey } from '../Game'
 import { oppositeColor } from "./Rook";
 
-export const createBishop = (color: Color, startingCoordinates: Coordinate) => {
+export const createBishop = (color: Color, startingCoordinates: Coordinate) :ActivePiece => {
     return {
         piece: Bishop,
         color: color,
         id: coordToKey(startingCoordinates),
         startingCoordinate: startingCoordinates,
         hasMoved: false,
+        __proto__: BaseActivePiece
     }
 }
 
@@ -21,7 +22,7 @@ export const Bishop: Piece = {
     name: PieceName.Bishop,
     draw: BishopDisplay,
     value: -1,
-    moves: BishopMoves
+    moves: BishopMoves,
 };
 
 

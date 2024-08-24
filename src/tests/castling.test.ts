@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { Color } from '../pieces/ActivePiece'
+import { Color, moveActivePiece } from '../pieces/ActivePiece'
 import { createRook, } from '../pieces/Rook'
 import { createBoard, canCastleQueenSide, canCastleKingSide, castleKingSide, castleQueenSide, getBoardCell } from '../Game'
 import { createKing } from '../pieces/King'
@@ -149,8 +149,8 @@ test('castle kingside', () => {
 
     const newBoard = castleKingSide(board, Color.White)
 
-    expect(getBoardCell(newBoard, { row: 1, column: 7 })).toEqual({ ...king, hasMoved: true })
-    expect(getBoardCell(newBoard, { row: 1, column: 6 })).toEqual({ ...rook, hasMoved: true })
+    expect(getBoardCell(newBoard, { row: 1, column: 7 })).toEqual(moveActivePiece(king))
+    expect(getBoardCell(newBoard, { row: 1, column: 6 })).toEqual(moveActivePiece(rook))
 })
 
 

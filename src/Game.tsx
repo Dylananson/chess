@@ -1,16 +1,13 @@
 import { useState } from "react"
 
 import { PieceName } from "./pieces/PieceName"
-import { createKing, King } from "./pieces/King"
-import { Knight } from "./pieces/Knight"
-import { Bishop } from "./pieces/Bishop"
-import { Rook } from "./pieces/Rook"
-import { Queen } from "./pieces/Queen"
-import { createPawn, Pawn } from "./pieces/Pawn"
+import { createKnight } from "./pieces/Knight"
+import { createBishop } from "./pieces/Bishop"
+import { createRook } from "./pieces/Rook"
+import { createQueen } from "./pieces/Queen"
 import { Color, ActivePiece } from "./pieces/ActivePiece"
-//import { createGameState } from "./tests/movePiece.test"
-//
-//
+import { defaultGame } from "./utils/gameStates"
+
 const printBoard = (board: any) => {
     const s = board.map((row: any) => row.map((cell: any) => cell?.piece?.name || '_').join('|').concat('|')).reverse().join('\n')
     console.log()
@@ -21,7 +18,7 @@ const printBoard = (board: any) => {
 
 export const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
 
-enum ColumnValues {
+export enum ColumnValues {
     A = 1, B = 2, C = 3, D = 4, E = 5, F = 6, G = 7, H = 8
 }
 export type Coordinate = { row: number, column: number }
@@ -30,184 +27,6 @@ export const isOnBoard = (coordinate: Coordinate) => {
     return (coordinate.row <= 8 && coordinate.row >= 1 && coordinate.column >= 1 && coordinate.column <= 8)
 }
 
-const BlackKing: ActivePiece = {
-    id: "BlkK",
-    color: Color.Black,
-    piece: King,
-    startingCoordinate: { row: 8, column: ColumnValues.E },
-    hasMoved: false
-}
-
-const WhiteKing: ActivePiece = {
-    id: "WhtK",
-    color: Color.White,
-    piece: King,
-    startingCoordinate: { row: 1, column: ColumnValues.E },
-    hasMoved: false
-}
-
-const WhiteQueen: ActivePiece = {
-    id: "WhtQ",
-    color: Color.White,
-    piece: Queen,
-    startingCoordinate: { row: 1, column: ColumnValues.D },
-    hasMoved: false
-}
-
-const BlackQueen: ActivePiece = {
-    id: "BlkQ",
-    color: Color.Black,
-    piece: Queen,
-    startingCoordinate: { row: 8, column: ColumnValues.D },
-    hasMoved: false
-}
-
-const WhiteARook: ActivePiece = {
-    id: "WhtARook",
-    color: Color.White,
-    piece: Rook,
-    startingCoordinate: { row: 1, column: ColumnValues.A },
-    hasMoved: false
-}
-
-const WhiteHRook: ActivePiece = {
-    id: "WhtHRook",
-    color: Color.White,
-    piece: Rook,
-    startingCoordinate: { row: 1, column: ColumnValues.H },
-    hasMoved: false
-}
-
-const BlackARook: ActivePiece = {
-    id: "BlkARook",
-    color: Color.Black,
-    piece: Rook,
-    startingCoordinate: { row: 8, column: ColumnValues.A },
-    hasMoved: false
-}
-
-
-const BlackHRook: ActivePiece = {
-    id: "BlkHRook",
-    color: Color.Black,
-    piece: Rook,
-    startingCoordinate: { row: 8, column: ColumnValues.H },
-    hasMoved: false
-}
-
-const WhiteCBishop: ActivePiece = {
-    id: "WhtCBishop",
-    color: Color.White,
-    piece: Bishop,
-    startingCoordinate: { row: 1, column: ColumnValues.C },
-    hasMoved: false
-}
-
-
-const WhiteFBishop: ActivePiece = {
-    id: "WhtFBishop",
-    color: Color.White,
-    piece: Bishop,
-    startingCoordinate: { row: 1, column: ColumnValues.F },
-    hasMoved: false
-}
-
-
-const BlackCBishop: ActivePiece = {
-    id: "BlkCBishop",
-    color: Color.Black,
-    piece: Bishop,
-    startingCoordinate: { row: 8, column: ColumnValues.C },
-    hasMoved: false
-}
-
-
-const BlackFBishop: ActivePiece = {
-    id: "BlkFBishop",
-    color: Color.Black,
-    piece: Bishop,
-    startingCoordinate: { row: 8, column: ColumnValues.F },
-    hasMoved: false
-}
-
-const WhiteBKnight: ActivePiece = {
-    id: "WhtBKnight",
-    color: Color.White,
-    piece: Knight,
-    startingCoordinate: { row: 1, column: ColumnValues.B },
-    hasMoved: false
-}
-
-
-const WhiteGKnight: ActivePiece = {
-    id: "WhtGKnight",
-    color: Color.White,
-    piece: Knight,
-    startingCoordinate: { row: 1, column: ColumnValues.G },
-    hasMoved: false
-}
-
-const BlackBKnight: ActivePiece = {
-    id: "BlkBKnight",
-    color: Color.Black,
-    piece: Knight,
-    startingCoordinate: { row: 8, column: ColumnValues.B },
-    hasMoved: false
-}
-
-
-const BlackGKnight: ActivePiece = {
-    id: "BlkGKnight",
-    color: Color.Black,
-    piece: Knight,
-    startingCoordinate: { row: 8, column: ColumnValues.G },
-    hasMoved: false
-}
-
-const WhitePawns: Array<ActivePiece> = Array.from(Array(8)).map((_, i) => {
-    return {
-        id: `WhtPawn${i}`,
-        color: Color.White,
-        piece: Pawn,
-        startingCoordinate: { row: 2, column: i + 1 },
-        hasMoved: false
-    }
-})
-
-const BlackPawns: Array<ActivePiece> = Array.from(Array(8)).map((_, i) => {
-    return {
-        id: `BlkPawn${i}`,
-        color: Color.Black,
-        piece: Pawn,
-        startingCoordinate: { row: 7, column: i + 1 },
-        hasMoved: false
-    }
-})
-
-
-const WhitePieces = [
-    WhiteKing,
-    WhiteQueen,
-    WhiteCBishop,
-    WhiteFBishop,
-    WhiteHRook,
-    WhiteARook,
-    WhiteBKnight,
-    WhiteGKnight
-].concat(WhitePawns)
-
-const BlackPieces = [
-    BlackKing,
-    BlackQueen,
-    BlackCBishop,
-    BlackFBishop,
-    BlackHRook,
-    BlackARook,
-    BlackBKnight,
-    BlackGKnight
-].concat(BlackPawns)
-
-const AllPieces = BlackPieces.concat(WhitePieces)
 
 function MoveMarker() {
     return (
@@ -233,14 +52,6 @@ export const emptyBoard = (): Board<undefined> => {
 type Row<T> = Array<T>
 
 export type Board<T> = Array<Array<undefined | T>>
-
-const initBoard = () => {
-    const board: Board<ActivePiece> = emptyBoard()
-    AllPieces.forEach((piece) => {
-        board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
-    })
-    return board
-}
 
 export type SelectedPiece = {
     piece: ActivePiece,
@@ -708,17 +519,6 @@ export function selectPiece(gameState: GameState, coordinate: Coordinate): GameS
 }
 
 
-export const getInitGameState = (): GameState => ({
-    get board() {
-        return this.history[this.history.length - 1]
-    },
-    playerTurn: Color.White,
-    selectedPiece: undefined,
-    inCheck: false,
-    history: [initBoard()],
-    historyIndex: 0
-})
-
 const isDarkSquare = (row: number, column: number) => {
     if (row % 2 === 0) {
         return column % 2 === 0
@@ -920,29 +720,23 @@ export function Game({ initGameState }: { initGameState: GameState }) {
 
         switch (name) {
             case PieceName.Queen:
-                newPiece = Queen
+                newPiece = { ...createQueen(gameState.playerTurn === Color.Black ? Color.White : Color.Black, canPromote), hasMoved: true }
                 break;
             case PieceName.Rook:
-                newPiece = Rook
+                newPiece = { ...createRook(gameState.playerTurn === Color.Black ? Color.White : Color.Black, canPromote), hasMoved: true }
                 break;
             case PieceName.Bishop:
-                newPiece = Bishop
+                newPiece = { ...createBishop(gameState.playerTurn === Color.Black ? Color.White : Color.Black, canPromote), hasMoved: true }
                 break;
             case PieceName.Knight:
-                newPiece = Knight
+                newPiece = { ...createKnight(gameState.playerTurn === Color.Black ? Color.White : Color.Black, canPromote), hasMoved: true }
                 break;
             default:
                 console.error("Invalid piece")
                 return
         }
 
-        newBoard[canPromote?.row - 1][canPromote?.column - 1] = {
-            id: "Promoted piece",
-            color: gameState.playerTurn === Color.Black ? Color.White : Color.Black,
-            piece: newPiece,
-            startingCoordinate: canPromote,
-            hasMoved: true
-        }
+        newBoard[canPromote?.row - 1][canPromote?.column - 1] = newPiece
 
         setGameState({
             ...gameState,
@@ -984,7 +778,7 @@ export function Game({ initGameState }: { initGameState: GameState }) {
             console.log("Checkmate")
             alert("Checkmate")
 
-            setGameState(getInitGameState())
+            setGameState(defaultGame())
         }
 
     }
@@ -1049,7 +843,7 @@ export function Game({ initGameState }: { initGameState: GameState }) {
 export function InitGame() {
     return (
         <div>
-            <Game initGameState={getInitGameState()} />
+            <Game initGameState={defaultGame()} />
         </div>
     )
 }

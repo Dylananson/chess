@@ -12,6 +12,7 @@ export type ActivePiece = {
     startingCoordinate: Coordinate;
     id: string;
     hasMoved: boolean;
+    __proto__: typeof BaseActivePiece;
 };
 
 type MovesFunction = (board: Board<ActivePiece>, coorinates: Coordinate) => Array<Coordinate>
@@ -22,5 +23,16 @@ export type Piece = {
     value: number
     moves: MovesFunction  
     draw: DrawPieceFunction
+}
+
+export const BaseActivePiece = {
+    move () {
+        return {...this, hasMoved: true}
+    }
+}
+    
+
+export const moveActivePiece = (piece:ActivePiece) => {
+    return {...piece, hasMoved: true}
 }
 
