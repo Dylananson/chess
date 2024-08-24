@@ -7,7 +7,7 @@ import { createBishop } from '../pieces/Bishop'
 
 test('black castle rights king side', () => {
     const king = createKing(Color.Black, { row: 8, column: 5 })
-    const rook = createRook(Color.Black, { row: 8, column: 1 })
+    const rook = createRook(Color.Black, { row: 8, column: 8 })
     const board = createBoard(
         [king, rook]
     )
@@ -19,7 +19,7 @@ test('black castle rights king side', () => {
 
 test('black castle rights queen side', () => {
     const king = createKing(Color.Black, { row: 8, column: 5 })
-    const rook = createRook(Color.Black, { row: 8, column: 8 })
+    const rook = createRook(Color.Black, { row: 8, column: 1 })
     const board = createBoard(
         [king, rook]
     )
@@ -32,7 +32,7 @@ test('black castle rights queen side', () => {
 
 test('white castle rights king side', () => {
     const king = createKing(Color.White, { row: 1, column: 5 })
-    const rook = createRook(Color.White, { row: 1, column: 1 })
+    const rook = createRook(Color.White, { row: 1, column: 8 })
     const board = createBoard(
         [king, rook]
     )
@@ -44,7 +44,7 @@ test('white castle rights king side', () => {
 
 test('white castle rights queen side', () => {
     const king = createKing(Color.White, { row: 1, column: 5 })
-    const rook = createRook(Color.White, { row: 1, column: 8 })
+    const rook = createRook(Color.White, { row: 1, column: 1 })
     const board = createBoard(
         [king, rook]
     )
@@ -100,9 +100,9 @@ test('cant castle into attacked square queenside', () => {
 test('cant castle into attacked square kingside', () => {
     const king = createKing(Color.White, { row: 1, column: 5 })
     const rook = createRook(Color.White, { row: 1, column: 8 })
-    const bishop = createRook(Color.Black, { row: 2, column: 6 })
+    //const bishop = createRook(Color.Black, { row: 2, column: 6 })
     const board = createBoard(
-        [king, rook, bishop]
+        [king, rook]
     )
 
 
@@ -115,9 +115,9 @@ test('cant castle into attacked square kingside', () => {
 test('cant while in check', () => {
     const king = createKing(Color.White, { row: 1, column: 5 })
     const rook = createRook(Color.White, { row: 1, column: 8 })
-    const bishop = createRook(Color.Black, { row: 2, column: 5 })
+    const checkingRook = createRook(Color.Black, { row: 2, column: 4 })
     const board = createBoard(
-        [king, rook, bishop]
+        [king, rook, checkingRook]
     )
 
     const canCastle = canCastleKingSide(board, Color.White)

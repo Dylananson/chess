@@ -697,7 +697,7 @@ export const canCastleQueenSide = (board: Board<ActivePiece>, color: Color) => {
         return false
     }
 
-    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 8 })
+    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 1 })
 
     if (!rook) {
         return false
@@ -733,7 +733,7 @@ export const canCastleKingSide = (board: Board<ActivePiece>, color: Color) => {
         return false
     }
 
-    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 1 })
+    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 8 })
 
     if (!rook) {
         return false
