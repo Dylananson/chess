@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import { Color } from '../pieces/ActivePiece'
 import { createRook, } from '../pieces/Rook'
-import { createBoard, hasCastlingRights } from '../Game'
+import { createBoard, canCastleQueenSide, canCastleKingSide } from '../Game'
 import { createKing } from '../pieces/King'
 import { createBishop } from '../pieces/Bishop'
 
@@ -12,8 +12,7 @@ test('black castle rights king side', () => {
         [king, rook]
     )
 
-
-    const canCastle = hasCastlingRights(king, rook, board)
+    const canCastle = canCastleKingSide(board, Color.Black)
 
     expect(canCastle).toEqual(true)
 })
@@ -26,7 +25,7 @@ test('black castle rights queen side', () => {
     )
 
 
-    const canCastle = hasCastlingRights(king, rook, board)
+    const canCastle = canCastleQueenSide(board, Color.Black)
 
     expect(canCastle).toEqual(true)
 })
@@ -38,8 +37,7 @@ test('white castle rights king side', () => {
         [king, rook]
     )
 
-
-    const canCastle = hasCastlingRights(king, rook, board)
+    const canCastle = canCastleKingSide(board, Color.White)
 
     expect(canCastle).toEqual(true)
 })
@@ -51,8 +49,7 @@ test('white castle rights queen side', () => {
         [king, rook]
     )
 
-
-    const canCastle = hasCastlingRights(king, rook, board)
+    const canCastle = canCastleQueenSide(board, Color.White)
 
     expect(canCastle).toEqual(true)
 })
@@ -67,36 +64,63 @@ test('cant castle with piece in way kingside', () => {
     )
 
 
-    const canCastle = hasCastlingRights(king, rook, board)
+    const canCastle = canCastleKingSide(board, Color.Black)
 
     expect(canCastle).toEqual(false)
 })
 
 test('cant castle with piece in way queenside', () => {
-    const king = createKing(Color.White, { row: 1, column: 1 })
-    const rook = createRook(Color.White, { row: 1, column: 5 })
-    const bishop = createBishop(Color.White, { row: 1, column: 2 })
+    const king = createKing(Color.White, { row: 1, column: 5 })
+    const rook = createRook(Color.White, { row: 1, column: 1 })
+    const bishop = createBishop(Color.White, { row: 1, column: 3 })
     const board = createBoard(
         [king, rook, bishop]
     )
 
-
-    const canCastle = hasCastlingRights(king, rook, board)
+    const canCastle = canCastleQueenSide(board, Color.White)
 
     expect(canCastle).toEqual(false)
 })
 
 
-test('cant castle into attacked square', () => {
-    const king = createKing(Color.White, { row: 1, column: 1 })
-    const rook = createRook(Color.White, { row: 1, column: 5 })
-    const bishop = createRook(Color.Black, { row: 2, column: 8 })
+test('cant castle into attacked square queenside', () => {
+    const king = createKing(Color.White, { row: 1, column: 5 })
+    const rook = createRook(Color.White, { row: 1, column: 1 })
+    const attackingRook = createRook(Color.Black, { row: 2, column: 2 })
+    const board = createBoard(
+        [king, rook, attackingRook]
+    )
+
+
+    const canCastle = canCastleQueenSide(board, Color.White)
+
+    expect(canCastle).toEqual(false)
+})
+
+test('cant castle into attacked square kingside', () => {
+    const king = createKing(Color.White, { row: 1, column: 5 })
+    const rook = createRook(Color.White, { row: 1, column: 8 })
+    const bishop = createRook(Color.Black, { row: 2, column: 6 })
     const board = createBoard(
         [king, rook, bishop]
     )
 
 
-    const canCastle = hasCastlingRights(king, rook, board)
+    const canCastle = canCastleKingSide(board, Color.White)
+
+    expect(canCastle).toEqual(false)
+})
+
+
+test('cant while in check', () => {
+    const king = createKing(Color.White, { row: 1, column: 5 })
+    const rook = createRook(Color.White, { row: 1, column: 8 })
+    const bishop = createRook(Color.Black, { row: 2, column: 5 })
+    const board = createBoard(
+        [king, rook, bishop]
+    )
+
+    const canCastle = canCastleKingSide(board, Color.White)
 
     expect(canCastle).toEqual(false)
 })

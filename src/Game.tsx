@@ -684,30 +684,74 @@ const PromotionModal = ({ handleClick }: PromotionProps) => {
     )
 }
 
-export const hasCastlingRights = (king: ActivePiece, rook: ActivePiece, board: Board<ActivePiece>) => {
-    if(king.hasMoved || rook.hasMoved){
+export const canCastleQueenSide = (board: Board<ActivePiece>, color: Color) => {
+    const kingCoordinates = findKing(board, color)
+
+    if (!kingCoordinates) {
         return false
     }
-    const kingSide = rook.startingCoordinate.column === 8
-    if(kingSide){
-        for(let i = king.startingCoordinate.column + 1; i < rook.startingCoordinate.column; i++){
-            if(board[king.startingCoordinate.row - 1][i - 1]){
-                return false
-            }
-            if(isAttacked(board, king.color, {row: king.startingCoordinate.row, column: i})){
-                return false
-            }
+
+    const king = getBoardCell(board, kingCoordinates)
+
+    if (!king) {
+        return false
+    }
+
+    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 8 })
+
+    if (!rook) {
+        return false
+    }
+
+    if (king.hasMoved || rook.hasMoved) {
+        return false
+    }
+
+    for (let i = king.startingCoordinate.column - 1; i > rook.startingCoordinate.column; i--) {
+        if (board[king.startingCoordinate.row - 1][i - 1]) {
+            return false
+        }
+        if (isAttacked(board, king.color, { row: king.startingCoordinate.row, column: i })) {
+            return false
         }
     }
 
-        for(let i = king.startingCoordinate.column - 1; i < rook.startingCoordinate.column; i--){
-            if(board[king.startingCoordinate.row - 1][i - 1]){
-                return false
-            }
-            if(isAttacked(board, king.color, {row: king.startingCoordinate.row, column: i})){
-                return false
-            }
+    return true
+}
+
+
+export const canCastleKingSide = (board: Board<ActivePiece>, color: Color) => {
+    const kingCoordinates = findKing(board, color)
+
+    if (!kingCoordinates) {
+        return false
+    }
+
+    const king = getBoardCell(board, kingCoordinates)
+
+    if (!king) {
+        return false
+    }
+
+    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 1 })
+
+    if (!rook) {
+        return false
+    }
+
+    if (king.hasMoved || rook.hasMoved) {
+        return false
+    }
+
+    for (let i = king.startingCoordinate.column + 1; i < rook.startingCoordinate.column; i++) {
+        if (board[king.startingCoordinate.row - 1][i - 1]) {
+            return false
         }
+        if (isAttacked(board, king.color, { row: king.startingCoordinate.row, column: i })) {
+            return false
+        }
+    }
+
     return true
 }
 
