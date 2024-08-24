@@ -100,9 +100,9 @@ test('cant castle into attacked square queenside', () => {
 test('cant castle into attacked square kingside', () => {
     const king = createKing(Color.White, { row: 1, column: 5 })
     const rook = createRook(Color.White, { row: 1, column: 8 })
-    //const bishop = createRook(Color.Black, { row: 2, column: 6 })
+    const attackingRook = createRook(Color.Black, { row: 2, column: 6 })
     const board = createBoard(
-        [king, rook]
+        [king, rook, attackingRook]
     )
 
 
@@ -115,7 +115,7 @@ test('cant castle into attacked square kingside', () => {
 test('cant while in check', () => {
     const king = createKing(Color.White, { row: 1, column: 5 })
     const rook = createRook(Color.White, { row: 1, column: 8 })
-    const checkingRook = createRook(Color.Black, { row: 2, column: 4 })
+    const checkingRook = createRook(Color.Black, { row: 2, column: 5 })
     const board = createBoard(
         [king, rook, checkingRook]
     )

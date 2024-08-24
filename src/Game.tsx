@@ -685,6 +685,9 @@ const PromotionModal = ({ handleClick }: PromotionProps) => {
 }
 
 export const canCastleQueenSide = (board: Board<ActivePiece>, color: Color) => {
+    if(isCheck(board, color)) {
+        return false
+    }
     const kingCoordinates = findKing(board, color)
 
     if (!kingCoordinates) {
@@ -721,6 +724,9 @@ export const canCastleQueenSide = (board: Board<ActivePiece>, color: Color) => {
 
 
 export const canCastleKingSide = (board: Board<ActivePiece>, color: Color) => {
+    if(isCheck(board, color)) {
+        return false
+    }
     const kingCoordinates = findKing(board, color)
 
     if (!kingCoordinates) {
