@@ -6,17 +6,6 @@ import whiteBishopSvg from '../assets/Chess_blt45.svg'
 import { coordToKey } from '../Game'
 import { oppositeColor } from "./Rook";
 
-export const createBishopNew = (row: number, column: number, color: Color) => {
-    return {
-        piece: Bishop,
-        color: color,
-        id: coordToKey({ row, column }),
-        startingCoordinate: { row, column },
-        hasMoved: false,
-    }
-}
-
-
 export const createBishop = (color: Color, startingCoordinates: Coordinate) => {
     return {
         piece: Bishop,

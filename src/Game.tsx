@@ -510,6 +510,20 @@ export function isLegalMove(board: Board<ActivePiece>, oldCoordinates: Coordinat
     return true
 }
 
+export const isCastleKingSide = (board: Board<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
+    if (getBoardCell(board, oldCoordinates)?.piece.name !== PieceName.King) {
+        return false
+    }
+    return oldCoordinates.column === 5 && newCoordinates.column === 7
+}
+
+export const isCastleQueenSide = (board: Board<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
+    if (getBoardCell(board, oldCoordinates)?.piece.name !== PieceName.King) {
+        return false
+    }
+    return oldCoordinates.column === 5 && newCoordinates.column === 3
+}
+
 
 export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
     if (!gameState.selectedPiece) {
@@ -527,6 +541,18 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
+    const isCastleKingSideMove = isCastleKingSide(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
+
+    if (isCastleKingSideMove && canCastleKingSide(gameState.board, gameState.selectedPiece.piece.color)) {
+        return { ...gameState, board: castleKingSide(gameState.board, gameState.selectedPiece.piece.color), selectedPiece: undefined, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White }
+    }
+
+    const isCastleQueenSideMove = isCastleQueenSide(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
+
+    if (isCastleQueenSideMove && canCastleQueenSide(gameState.board, gameState.selectedPiece.piece.color)) {
+        return { ...gameState, board: castleQueenSide(gameState.board, gameState.selectedPiece.piece.color), selectedPiece: undefined, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White }
+    }
+
     const canMove = isLegalMove(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
 
     if (!canMove) {
@@ -537,7 +563,7 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
     const newBoard = deepCopyBoard(gameState.board)
 
     newBoard[gameState.selectedPiece.coordinates?.row - 1][gameState.selectedPiece?.coordinates.column - 1] = undefined
-    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = {...gameState.selectedPiece.piece, hasMoved: true}
+    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = { ...gameState.selectedPiece.piece, hasMoved: true }
 
     const newGame = {
         ...gameState,
@@ -637,6 +663,17 @@ export function selectPiece(gameState: GameState, coordinate: Coordinate): GameS
     const filteredCheckMoves = filterPieceMovesThatPutKingInCheck(gameState.board, coordinate, selectedPiece.piece.moves(gameState.board, coordinate))
 
     const pieceMoves = filterMovesOntopOfSameColor(gameState.board, filteredCheckMoves, selectedPiece.color)
+
+    if (selectedPiece.piece.name === PieceName.King) {
+        if (canCastleQueenSide(gameState.board, selectedPiece.color)) {
+            pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 3 })
+        }
+
+        if (canCastleKingSide(gameState.board, selectedPiece.color)) {
+            console.log("Can castle king side")
+            pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 7 })
+        }
+    }
 
 
     if (gameState?.selectedPiece?.piece.id === gameState.board[coordinate.row - 1][coordinate.column - 1]?.id) {
@@ -792,12 +829,12 @@ export const castleQueenSide = (board: Board<ActivePiece>, color: Color) => {
         return board
     }
 
-    if(!canCastleQueenSide(board, color)){
+    if (!canCastleQueenSide(board, color)) {
         return board
     }
 
     newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 2 -1] = king
+    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 2 - 1] = king
     newBoard[king.startingCoordinate.row - 1][1 - 1] = undefined
     newBoard[king.startingCoordinate.row - 1][4 - 1] = rook
 
@@ -824,15 +861,19 @@ export const castleKingSide = (board: Board<ActivePiece>, color: Color) => {
         return board
     }
 
-    if(!canCastleKingSide(board, color)){
+    if (!canCastleKingSide(board, color)) {
         return board
     }
 
+    const movedKing = { ...king, hasMoved: true }
+
+    const movedRook = { ...rook, hasMoved: true }
+
     newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column + 2 -1] = king
+    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column + 2 - 1] = movedKing
 
     newBoard[king.startingCoordinate.row - 1][8 - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][6 - 1] = rook
+    newBoard[king.startingCoordinate.row - 1][6 - 1] = movedRook
 
     return newBoard
 }
@@ -986,27 +1027,6 @@ export function Game({ initGameState }: { initGameState: GameState }) {
         </>
     )
 }
-
-export const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean, history?: Array<Board<ActivePiece>>): GameState => {
-    return {
-        board,
-        selectedPiece,
-        playerTurn,
-        inCheck,
-        history: history ?? [board],
-        historyIndex: 0
-    }
-}
-
-//const initGame = initGameState()
-//
-const pawn = createPawn(Color.White, { row: 7, column: 1 })
-const blackKing = createKing(Color.Black, { row: 8, column: 5 })
-const whiteKing = createKing(Color.White, { row: 1, column: 5 })
-
-const b = createBoard([pawn, blackKing, whiteKing])
-
-const initGame = createGameState(b, undefined, Color.White, false)
 
 export function InitGame() {
     return (
