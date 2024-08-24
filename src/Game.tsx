@@ -699,6 +699,15 @@ export const hasCastlingRights = (king: ActivePiece, rook: ActivePiece, board: B
             }
         }
     }
+
+        for(let i = king.startingCoordinate.column - 1; i < rook.startingCoordinate.column; i--){
+            if(board[king.startingCoordinate.row - 1][i - 1]){
+                return false
+            }
+            if(isAttacked(board, king.color, {row: king.startingCoordinate.row, column: i})){
+                return false
+            }
+        }
     return true
 }
 
