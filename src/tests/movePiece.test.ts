@@ -131,7 +131,7 @@ test("king can take enemy piece", () => {
     const startCoordinate = { row: 1, column: 1 }
 
     const king = createKing(Color.White, startCoordinate)
-    const bishop = createBishop(1, 2, Color.Black)
+    const bishop = createBishop( Color.Black,{row:1,column: 2})
 
     const board = createBoard([
         king,
@@ -150,7 +150,7 @@ test("king cant move on same color piece", () => {
     const startCoordinate = { row: 1, column: 1 }
 
     const king = createKing(Color.White, startCoordinate)
-    const bishop = createBishop(1, 2, Color.White)
+    const bishop = createBishop( Color.White,{row:1,column: 2})
 
     const board = createBoard([
         king,
@@ -170,7 +170,7 @@ test("knight can move over pieces", () => {
     const startCoordinate = { row: 1, column: 1 }
 
     const knight = createKnight(Color.White, startCoordinate)
-    const bishop = createBishop(1, 3, Color.White)
+    const bishop = createBishop( Color.White,{row:1,column: 3})
     const pawn = createPawn( Color.White, {row: 2, column: 2})
 
     const board = createBoard([
@@ -310,7 +310,7 @@ test("rook cant move through other pieces", () => {
     const startCoordinate = { row: 1, column: 1 }
 
     const rook = createRook( Color.White,{row:startCoordinate.row,column: startCoordinate.column})
-    const bishop = createBishop(1, 3, Color.White)
+    const bishop = createBishop( Color.White,{row:1,column: 3})
 
     const board = createBoard([
         rook,
@@ -329,7 +329,7 @@ test("rook cant move through other pieces", () => {
 test("bishop cant move through other pieces", () => {
     const startCoordinate = { row: 1, column: 1 }
 
-    const bishop = createBishop(startCoordinate.row, startCoordinate.column, Color.White)
+    const bishop = createBishop( Color.White,{row:startCoordinate.row,column: startCoordinate.column})
     const rook = createRook( Color.White,{row: 3, column: 3})
 
     const board = createBoard([
@@ -348,7 +348,7 @@ test("bishop cant move through other pieces", () => {
 
 test("move piece happy path bishop", () => {
     const startCoordinate = { row: 1, column: 1 }
-    const bishop = createBishop(startCoordinate.row, startCoordinate.column, Color.White)
+    const bishop = createBishop(Color.White, startCoordinate)
 
     const board = createBoard([
         bishop

@@ -16,18 +16,6 @@ export const createRook = (color: Color, coordinate: Coordinate) => {
 }
 
 
-export const createRookOld = (row: number, column: number, color: Color) => {
-    return {
-        piece: Rook,
-        color: color,
-        id: coordToKey({ row, column }),
-        startingCoordinate: { row, column },
-        hasMoved: false,
-    }
-}
-
-
-
 export function RookDisplay(color: Color) {
     return color === Color.Black ? <img src={blackRookSvg} /> : <img src={whiteRookSvg} />
 }

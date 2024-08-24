@@ -684,7 +684,7 @@ const PromotionModal = ({ handleClick }: PromotionProps) => {
     )
 }
 
-const hasCastlingRights = (king: ActivePiece, rook: ActivePiece, board: Board<ActivePiece>) => {
+export const hasCastlingRights = (king: ActivePiece, rook: ActivePiece, board: Board<ActivePiece>) => {
     if(king.hasMoved || rook.hasMoved){
         return false
     }

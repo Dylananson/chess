@@ -23,7 +23,7 @@ test("set selected piece unselects if current is selected", () => {
 });
 
 test("set selected happy path", () => {
-  const bishop = createBishop(1, 7, Color.White);
+  const bishop = createBishop( Color.White,{row:1,column: 7});
   const board = createBoard([
     bishop
 

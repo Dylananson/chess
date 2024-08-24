@@ -8,7 +8,7 @@ import { Color } from "../pieces/ActivePiece";
 
 test("bishop moves works", () => {
     const coordinates = { row: 1, column: 1 };
-    const bishop = createBishop(coordinates.row, coordinates.column, Color.White);
+    const bishop = createBishop( Color.White,{row:coordinates.row,column: coordinates.column});
     const board = createBoard([
         bishop
     ])
