@@ -839,7 +839,7 @@ const initGame = createGameState(b, undefined, Color.White, false)
 export function InitGame() {
     return (
         <div>
-            <Game initGameState={initGame} />
+            <Game initGameState={getInitGameState()} />
         </div>
     )
 }
