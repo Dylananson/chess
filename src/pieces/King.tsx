@@ -19,7 +19,6 @@ export const createKing = (color: Color, startingCoordinate: Coordinate) => {
 }
 
 
-
 export function KingMoves(board: Board<ActivePiece>, coordinates: Coordinate) {
     const dirs = [
         [1, 0],   // move right

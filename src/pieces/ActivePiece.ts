@@ -11,6 +11,7 @@ export type ActivePiece = {
     piece: Piece;
     startingCoordinate: Coordinate;
     id: string;
+    hasMoved: boolean;
 };
 
 type MovesFunction = (board: Board<ActivePiece>, coorinates: Coordinate) => Array<Coordinate>

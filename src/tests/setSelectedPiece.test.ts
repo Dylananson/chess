@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import {
     createBoard,
-  initGameState,
+   getInitGameState,
   selectPiece,
 } from "../Game";
 import { PieceName } from "../pieces/PieceName";
@@ -10,7 +10,7 @@ import { createBishop } from "../pieces/Bishop";
 import { Color } from "../pieces/ActivePiece";
 
 test("set selected piece unselects if current is selected", () => {
-  const state = initGameState();
+  const state = getInitGameState();
 
   const bishop = state.board[0][5];
 

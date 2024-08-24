@@ -26,6 +26,7 @@ const BlackKing: ActivePiece = {
     color: Color.Black,
     piece: King,
     startingCoordinate: { row: 8, column: ColumnValues.E },
+    hasMoved: false
 }
 
 const WhiteKing: ActivePiece = {
@@ -33,6 +34,7 @@ const WhiteKing: ActivePiece = {
     color: Color.White,
     piece: King,
     startingCoordinate: { row: 1, column: ColumnValues.E },
+    hasMoved: false
 }
 
 const WhiteQueen: ActivePiece = {
@@ -40,6 +42,7 @@ const WhiteQueen: ActivePiece = {
     color: Color.White,
     piece: Queen,
     startingCoordinate: { row: 1, column: ColumnValues.D },
+    hasMoved: false
 }
 
 const BlackQueen: ActivePiece = {
@@ -47,6 +50,7 @@ const BlackQueen: ActivePiece = {
     color: Color.Black,
     piece: Queen,
     startingCoordinate: { row: 8, column: ColumnValues.D },
+    hasMoved: false
 }
 
 const WhiteARook: ActivePiece = {
@@ -54,6 +58,7 @@ const WhiteARook: ActivePiece = {
     color: Color.White,
     piece: Rook,
     startingCoordinate: { row: 1, column: ColumnValues.A },
+    hasMoved: false
 }
 
 const WhiteHRook: ActivePiece = {
@@ -61,6 +66,7 @@ const WhiteHRook: ActivePiece = {
     color: Color.White,
     piece: Rook,
     startingCoordinate: { row: 1, column: ColumnValues.H },
+    hasMoved: false
 }
 
 const BlackARook: ActivePiece = {
@@ -68,6 +74,7 @@ const BlackARook: ActivePiece = {
     color: Color.Black,
     piece: Rook,
     startingCoordinate: { row: 8, column: ColumnValues.A },
+    hasMoved: false
 }
 
 
@@ -76,6 +83,7 @@ const BlackHRook: ActivePiece = {
     color: Color.Black,
     piece: Rook,
     startingCoordinate: { row: 8, column: ColumnValues.H },
+    hasMoved: false
 }
 
 const WhiteCBishop: ActivePiece = {
@@ -83,6 +91,7 @@ const WhiteCBishop: ActivePiece = {
     color: Color.White,
     piece: Bishop,
     startingCoordinate: { row: 1, column: ColumnValues.C },
+    hasMoved: false
 }
 
 
@@ -91,6 +100,7 @@ const WhiteFBishop: ActivePiece = {
     color: Color.White,
     piece: Bishop,
     startingCoordinate: { row: 1, column: ColumnValues.F },
+    hasMoved: false
 }
 
 
@@ -99,6 +109,7 @@ const BlackCBishop: ActivePiece = {
     color: Color.Black,
     piece: Bishop,
     startingCoordinate: { row: 8, column: ColumnValues.C },
+    hasMoved: false
 }
 
 
@@ -107,6 +118,7 @@ const BlackFBishop: ActivePiece = {
     color: Color.Black,
     piece: Bishop,
     startingCoordinate: { row: 8, column: ColumnValues.F },
+    hasMoved: false
 }
 
 const WhiteBKnight: ActivePiece = {
@@ -114,6 +126,7 @@ const WhiteBKnight: ActivePiece = {
     color: Color.White,
     piece: Knight,
     startingCoordinate: { row: 1, column: ColumnValues.B },
+    hasMoved: false
 }
 
 
@@ -122,6 +135,7 @@ const WhiteGKnight: ActivePiece = {
     color: Color.White,
     piece: Knight,
     startingCoordinate: { row: 1, column: ColumnValues.G },
+    hasMoved: false
 }
 
 const BlackBKnight: ActivePiece = {
@@ -129,6 +143,7 @@ const BlackBKnight: ActivePiece = {
     color: Color.Black,
     piece: Knight,
     startingCoordinate: { row: 8, column: ColumnValues.B },
+    hasMoved: false
 }
 
 
@@ -137,6 +152,7 @@ const BlackGKnight: ActivePiece = {
     color: Color.Black,
     piece: Knight,
     startingCoordinate: { row: 8, column: ColumnValues.G },
+    hasMoved: false
 }
 
 const WhitePawns: Array<ActivePiece> = Array.from(Array(8)).map((_, i) => {
@@ -145,6 +161,7 @@ const WhitePawns: Array<ActivePiece> = Array.from(Array(8)).map((_, i) => {
         color: Color.White,
         piece: Pawn,
         startingCoordinate: { row: 2, column: i + 1 },
+        hasMoved: false
     }
 })
 
@@ -154,6 +171,7 @@ const BlackPawns: Array<ActivePiece> = Array.from(Array(8)).map((_, i) => {
         color: Color.Black,
         piece: Pawn,
         startingCoordinate: { row: 7, column: i + 1 },
+        hasMoved: false
     }
 })
 
@@ -666,6 +684,24 @@ const PromotionModal = ({ handleClick }: PromotionProps) => {
     )
 }
 
+const hasCastlingRights = (king: ActivePiece, rook: ActivePiece, board: Board<ActivePiece>) => {
+    if(king.hasMoved || rook.hasMoved){
+        return false
+    }
+    const kingSide = rook.startingCoordinate.column === 8
+    if(kingSide){
+        for(let i = king.startingCoordinate.column + 1; i < rook.startingCoordinate.column; i++){
+            if(board[king.startingCoordinate.row - 1][i - 1]){
+                return false
+            }
+            if(isAttacked(board, king.color, {row: king.startingCoordinate.row, column: i})){
+                return false
+            }
+        }
+    }
+    return true
+}
+
 
 export function Game({ initGameState }: { initGameState: GameState }) {
     const [gameState, setGameState] = useState<GameState>(initGameState)
@@ -710,7 +746,8 @@ export function Game({ initGameState }: { initGameState: GameState }) {
             id: "Promoted piece",
             color: gameState.playerTurn === Color.Black ? Color.White : Color.Black,
             piece: newPiece,
-            startingCoordinate: canPromote
+            startingCoordinate: canPromote,
+            hasMoved: true
         }
 
         setGameState({

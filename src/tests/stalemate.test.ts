@@ -8,7 +8,7 @@ test("stalemate happy path", () => {
 
     const board = createBoard([
         createKing(Color.Black, { row: 1, column: 1 }),
-        createRook(3,2, Color.White),
+        createRook(Color.White, { row: 3, column: 2 }),
         createKing(Color.White, { row: 3, column: 1 }),
     ])
 
@@ -21,8 +21,8 @@ test("stalemate happy path", () => {
 test("not stalemate if checked", () => {
     const board = createBoard([
         createKing(Color.Black, { row: 1, column: 1 }),
-        createRook(3,2, Color.White),
-        createRook(1,2, Color.White),
+        createRook(Color.White, { row: 3, column: 2 }),
+        createRook(Color.White, { row: 1, column: 2 }),
         createKing(Color.White, { row: 3, column: 1 }),
     ])
 

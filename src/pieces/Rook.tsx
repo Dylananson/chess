@@ -4,7 +4,19 @@ import { PieceName } from "./PieceName";
 import blackRookSvg from '../assets/Chess_rdt45.svg'
 import whiteRookSvg from '../assets/Chess_rlt45.svg'
 
-export const createRook = (row: number, column: number, color: Color) => {
+
+export const createRook = (color: Color, coordinate: Coordinate) => {
+    return {
+        piece: Rook,
+        color: color,
+        id: coordToKey(coordinate),
+        startingCoordinate: coordinate,
+        hasMoved: false,
+    }
+}
+
+
+export const createRookOld = (row: number, column: number, color: Color) => {
     return {
         piece: Rook,
         color: color,
@@ -36,7 +48,7 @@ export function RookMoves(board: Board<ActivePiece>, coordinates: Coordinate): A
 
     const pieceColor = getBoardCell(board, coordinates)?.color
 
-    if(pieceColor === undefined) {
+    if (pieceColor === undefined) {
         throw new Error('No piece found on the board')
     }
 
@@ -44,12 +56,12 @@ export function RookMoves(board: Board<ActivePiece>, coordinates: Coordinate): A
         let newCoord = { row: coordinates.row + d[0], column: coordinates.column + d[1] }
 
         while (isOnBoard(newCoord)) {
-            if(getBoardCell(board, newCoord)?.color === pieceColor) {
+            if (getBoardCell(board, newCoord)?.color === pieceColor) {
                 //there is a piece blocking the path
                 break
             }
 
-            if(getBoardCell(board, newCoord)?.color === oppositeColor(pieceColor)) {
+            if (getBoardCell(board, newCoord)?.color === oppositeColor(pieceColor)) {
                 //there is a piece blocking the path
                 out.push({ row: newCoord.row, column: newCoord.column })
                 break
