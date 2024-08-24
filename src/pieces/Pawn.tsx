@@ -1,4 +1,4 @@
-import { Board, compareCoordinates, Coordinate, getBoardCell } from "../Game";
+import { Board, compareCoordinates, Coordinate, getBoardCell, isOnBoard } from "../Game";
 import { ActivePiece, Color, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackPawnSvg from '../assets/Chess_pdt45.svg'
@@ -20,21 +20,28 @@ export function PawnMoves(board: Board<ActivePiece>, coordinates: Coordinate) {
 
     const hasMoved = !compareCoordinates(piece.startingCoordinate, coordinates)
 
-    if (getBoardCell(board, { row: coordinates.row + direction, column: coordinates.column + 1 })?.color === oppositeColor(piece?.color)) {
-        diagonalMoves.push({ row: coordinates.row + direction, column: coordinates.column + 1 })
+    const rightDiagonal = { row: coordinates.row + direction, column: coordinates.column + 1 }
+
+    if (isOnBoard(rightDiagonal) && getBoardCell(board, rightDiagonal)?.color === oppositeColor(piece?.color)) {
+        diagonalMoves.push(rightDiagonal)
     }
 
+    const leftDiagonal = { row: coordinates.row + direction, column: coordinates.column - 1 }
 
-    if (getBoardCell(board, { row: coordinates.row + direction, column: coordinates.column - 1 })?.color === oppositeColor(piece?.color)) {
-        diagonalMoves.push({ row: coordinates.row + direction, column: coordinates.column - 1 })
+    if (isOnBoard(leftDiagonal) && getBoardCell(board, leftDiagonal)?.color === oppositeColor(piece?.color)) {
+        diagonalMoves.push(leftDiagonal)
     }
 
-    if(getBoardCell(board, { row: coordinates.row + direction, column: coordinates.column }) === undefined) {
-        forwardMoves.push({ row: coordinates.row + direction, column: coordinates.column })
+    const forwardMoveOne = { row: coordinates.row + direction, column: coordinates.column }
+
+    if (isOnBoard(forwardMoveOne) && getBoardCell(board, forwardMoveOne) === undefined) {
+        forwardMoves.push(forwardMoveOne)
     }
 
-    if (!hasMoved && getBoardCell(board, { row: coordinates.row + (direction*2), column: coordinates.column }) === undefined) {
-        forwardMoves.push({ row: coordinates.row + (direction*2), column: coordinates.column })
+    const moveTwiceCoordinate = { row: coordinates.row + (direction * 2), column: coordinates.column }
+
+    if (isOnBoard(moveTwiceCoordinate) && !hasMoved && getBoardCell(board, { row: coordinates.row + (direction * 2), column: coordinates.column }) === undefined) {
+        forwardMoves.push({ row: coordinates.row + (direction * 2), column: coordinates.column })
     }
 
     return diagonalMoves.concat(forwardMoves)

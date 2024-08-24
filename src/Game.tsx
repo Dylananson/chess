@@ -1,13 +1,14 @@
 import { useState } from "react"
 
 import { PieceName } from "./pieces/PieceName"
-import { King } from "./pieces/King"
+import { createKing, King } from "./pieces/King"
 import { Knight } from "./pieces/Knight"
 import { Bishop } from "./pieces/Bishop"
 import { Rook } from "./pieces/Rook"
 import { Queen } from "./pieces/Queen"
-import { Pawn } from "./pieces/Pawn"
+import { createPawn, Pawn } from "./pieces/Pawn"
 import { Color, ActivePiece } from "./pieces/ActivePiece"
+//import { createGameState } from "./tests/movePiece.test"
 
 export const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
 
@@ -624,7 +625,7 @@ export function selectPiece(gameState: GameState, coordinate: Coordinate): GameS
 }
 
 
-export const initGameState = (): GameState => ({
+export const getInitGameState = (): GameState => ({
     get board() {
         return this.history[this.history.length - 1]
     },
@@ -642,13 +643,81 @@ const isDarkSquare = (row: number, column: number) => {
         return column % 2 === 1
     }
 }
-function Game() {
-    const [gameState, setGameState] = useState<GameState>(initGameState())
+
+type PromotionProps = {
+    handleClick: (name: PieceName) => void
+}
+
+//type MovesFunction = (board: Board<ActivePiece>, coorinates: Coordinate) => Array<Coordinate>
+
+const PromotionModal = ({ handleClick }: PromotionProps) => {
+    return (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-4 rounded-md">
+                <h2 className="text-2xl font-semibold">Promote pawn</h2>
+                <div className="flex justify-center">
+                    <button onClick={() => handleClick(PieceName.Queen)} className="m-2 p-2 bg-green-500 rounded-md">Queen</button>
+                    <button onClick={() => handleClick(PieceName.Rook)} className="m-2 p-2 bg-green-500 rounded-md">Rook</button>
+                    <button onClick={() => handleClick(PieceName.Bishop)} className="m-2 p-2 bg-green-500 rounded-md">Bishop</button>
+                    <button onClick={() => handleClick(PieceName.Knight)} className="m-2 p-2 bg-green-500 rounded-md">Knight</button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+
+export function Game({ initGameState }: { initGameState: GameState }) {
+    const [gameState, setGameState] = useState<GameState>(initGameState)
+    const [canPromote, setCanPromote] = useState<Coordinate | undefined>(undefined)
     const rows = [1, 2, 3, 4, 5, 6, 7, 8]
     const columns = [1, 2, 3, 4, 5, 6, 7, 8]
 
     if (gameState.selectedPiece) {
         //console.log(gameState.selectedPiece?.piece.piece.moves(gameState.board, gameState.selectedPiece.coordinates))
+    }
+
+    const handlePromotion = (name: PieceName) => {
+        console.log("Promoting to", name)
+
+        const newBoard = deepCopyBoard(gameState.board)
+        if (!canPromote) {
+            console.error("Cannot promote")
+            return
+        }
+
+        let newPiece;
+
+        switch (name) {
+            case PieceName.Queen:
+                newPiece = Queen
+                break;
+            case PieceName.Rook:
+                newPiece = Rook
+                break;
+            case PieceName.Bishop:
+                newPiece = Bishop
+                break;
+            case PieceName.Knight:
+                newPiece = Knight
+                break;
+            default:
+                console.error("Invalid piece")
+                return
+        }
+
+        newBoard[canPromote?.row - 1][canPromote?.column - 1] = {
+            id: "Promoted piece",
+            color: gameState.playerTurn === Color.Black ? Color.White : Color.Black,
+            piece: newPiece,
+            startingCoordinate: canPromote
+        }
+
+        setGameState({
+            ...gameState,
+            board: newBoard
+        })
+        setCanPromote(undefined)
     }
 
     const handleClick = (newCoordinates: Coordinate) => {
@@ -661,7 +730,16 @@ function Game() {
         if (!selectedPiece || getBoardCell(gameState.board, newCoordinates)?.color === gameState.playerTurn) {
             newGame = selectPiece(gameState, newCoordinates)
         } else {
+
+            const piece = gameState.selectedPiece?.piece
+
+            const isPawn = piece?.piece.name === PieceName.Pawn
+
             newGame = tryMovePiece(gameState, newCoordinates)
+
+            if (isPawn && (newCoordinates.row === 1 || newCoordinates.row === 8)) {
+                setCanPromote(newCoordinates)
+            }
         }
 
         console.log("Player turn", newGame.playerTurn)
@@ -675,7 +753,7 @@ function Game() {
             console.log("Checkmate")
             alert("Checkmate")
 
-            setGameState(initGameState())
+            setGameState(getInitGameState())
         }
 
     }
@@ -693,6 +771,8 @@ function Game() {
 
     return (
         <>
+            {canPromote ? <PromotionModal handleClick={handlePromotion} /> : <></>}
+
             <div className="b-4 contents-center center justify-center justify-items-center place-items-center">
                 {rows.reverse().map((row) => (
                     <div key={row} className="flex justify-items-center place-items-center">
@@ -723,8 +803,8 @@ function Game() {
                 {
                     //TODO: fix this stuff
                     gameState.historyIndex > 0 ?
-                    <button className="rounded-md bg-blue-500 p-2 font-semibold" onClick={handleShowPreviousState}> prev </button> :
-                    <button className="rounded-md bg-blue-100 p-2 font-semibold"> prev </button>}
+                        <button className="rounded-md bg-blue-500 p-2 font-semibold" onClick={handleShowPreviousState}> prev </button> :
+                        <button className="rounded-md bg-blue-100 p-2 font-semibold"> prev </button>}
 
                 {gameState.historyIndex < gameState.history.length - 1 ?
                     <button className="rounded-md bg-blue-500 p-2 font-semibold" onClick={handleShowNextState}> next </button> :
@@ -735,4 +815,33 @@ function Game() {
     )
 }
 
-export default Game
+export const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean, history?: Array<Board<ActivePiece>>): GameState => {
+    return {
+        board,
+        selectedPiece,
+        playerTurn,
+        inCheck,
+        history: history ?? [board],
+        historyIndex: 0
+    }
+}
+
+//const initGame = initGameState()
+//
+const pawn = createPawn(Color.White, { row: 7, column: 1 })
+const blackKing = createKing(Color.Black, { row: 8, column: 5 })
+const whiteKing = createKing(Color.White, { row: 1, column: 5 })
+
+const b = createBoard([pawn, blackKing, whiteKing])
+
+const initGame = createGameState(b, undefined, Color.White, false)
+
+export function InitGame() {
+    return (
+        <div>
+            <Game initGameState={initGame} />
+        </div>
+    )
+}
+
+export default InitGame

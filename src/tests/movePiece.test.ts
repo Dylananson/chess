@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { createBoard, type GameState, initGameState, tryMovePiece, selectPiece,  Board, Coordinate, SelectedPiece, getBoardCell } from "../Game";
+import { createBoard, type GameState, getInitGameState, tryMovePiece, selectPiece,  Board, Coordinate, SelectedPiece, getBoardCell } from "../Game";
 import { ActivePiece, Color } from "../pieces/ActivePiece";
 import { createBishop } from "../pieces/Bishop";
 import { createRook } from "../pieces/Rook";
@@ -379,7 +379,7 @@ test("move piece happy path rook", () => {
 
 
 test("move piece on own piece shouldn't move piece", () => {
-    const game = initGameState();
+    const game = getInitGameState();
 
     const gameWithSelectedPiece = selectPiece(game, { row: 1, column: 1 })
 
