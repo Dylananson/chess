@@ -535,8 +535,9 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
     }
 
     const newBoard = deepCopyBoard(gameState.board)
+
     newBoard[gameState.selectedPiece.coordinates?.row - 1][gameState.selectedPiece?.coordinates.column - 1] = undefined
-    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = gameState.selectedPiece.piece
+    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = {...gameState.selectedPiece.piece, hasMoved: true}
 
     const newGame = {
         ...gameState,

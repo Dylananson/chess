@@ -55,6 +55,7 @@ export function createPawn(color: Color, startingCoordinate: Coordinate): Active
         color: color,
         startingCoordinate: startingCoordinate,
         id: coordToKey(startingCoordinate),
+        hasMoved:false,
     }
 }
 

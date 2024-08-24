@@ -29,7 +29,7 @@ function assertPieceNotMoved(newGame: GameState, startCoordinate: Coordinate, en
 
 function assertPieceMovedCorrectly(newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece) {
     //piece shouldn't be in old coordinates for new board
-    expect(getBoardCell(newGame.board, endCoordinate)).toEqual(piece)
+    expect(getBoardCell(newGame.board, endCoordinate)).toEqual({...piece, hasMoved:true})
     //piece shouldn't be in old coordinates
     expect(getBoardCell(newGame.board, startCoordinate)).toEqual(undefined)
 }
@@ -226,7 +226,9 @@ test("pawn cant move twice if already moved", () => {
     const endCoordinate = { row: 6, column: 1 }
     const newGame = selectAndMovePiece(whiteTurnGame, startCoordinate, endCoordinate)
 
-    assertPieceNotMoved(newGame, nextCoordinate, endCoordinate, pawn)
+    const expectedPiece = {...pawn, hasMoved:true}
+    
+    assertPieceNotMoved(newGame, nextCoordinate, endCoordinate, expectedPiece)
 });
 
 
