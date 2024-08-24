@@ -544,13 +544,31 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
     const isCastleKingSideMove = isCastleKingSide(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
 
     if (isCastleKingSideMove && canCastleKingSide(gameState.board, gameState.selectedPiece.piece.color)) {
-        return { ...gameState, board: castleKingSide(gameState.board, gameState.selectedPiece.piece.color), selectedPiece: undefined, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White }
+        return {
+            ...gameState,
+            history: [...gameState.history, castleKingSide(gameState.board, gameState.selectedPiece.piece.color)],
+            get board(): Board<ActivePiece> {
+                return this.history[this.history.length - 1]
+            },
+            selectedPiece: undefined,
+            playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White,
+            historyIndex: gameState.historyIndex + 1,
+        }
     }
 
     const isCastleQueenSideMove = isCastleQueenSide(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
 
     if (isCastleQueenSideMove && canCastleQueenSide(gameState.board, gameState.selectedPiece.piece.color)) {
-        return { ...gameState, board: castleQueenSide(gameState.board, gameState.selectedPiece.piece.color), selectedPiece: undefined, playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White }
+        return {
+            ...gameState,
+            get board(): Board<ActivePiece> {
+                return this.history[this.history.length - 1]
+            },
+            history: [...gameState.history, castleQueenSide(gameState.board, gameState.selectedPiece.piece.color)],
+            selectedPiece: undefined,
+            playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White,
+            historyIndex: gameState.historyIndex + 1,
+        }
     }
 
     const canMove = isLegalMove(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
