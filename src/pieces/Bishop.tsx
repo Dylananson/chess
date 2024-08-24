@@ -1,20 +1,19 @@
 import { Board, Coordinate, getBoardCell, isOnBoard } from "../Game";
-import { ActivePiece, BaseActivePiece, Color, Piece } from "./ActivePiece";
+import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackBishopSvg from '../assets/Chess_bdt45.svg'
 import whiteBishopSvg from '../assets/Chess_blt45.svg'
 import { coordToKey } from '../Game'
 import { oppositeColor } from "./Rook";
 
-export const createBishop = (color: Color, startingCoordinates: Coordinate) :ActivePiece => {
-    return {
+export const createBishop = (color: Color, startingCoordinates: Coordinate): ActivePiece => {
+    return createActivePiece({
         piece: Bishop,
         color: color,
         id: coordToKey(startingCoordinates),
         startingCoordinate: startingCoordinates,
         hasMoved: false,
-        __proto__: BaseActivePiece
-    }
+    })
 }
 
 
@@ -37,7 +36,7 @@ export function BishopMoves(board: Board<ActivePiece>, coordinates: Coordinate) 
 
     const pieceColor = getBoardCell(board, coordinates)?.color
 
-    if(pieceColor === undefined) {
+    if (pieceColor === undefined) {
         throw new Error('No piece found on the board')
     }
 
@@ -47,12 +46,12 @@ export function BishopMoves(board: Board<ActivePiece>, coordinates: Coordinate) 
         currentCoordinate.column += c
 
         while (isOnBoard(currentCoordinate)) {
-            if(getBoardCell(board, currentCoordinate)?.color === pieceColor) {
+            if (getBoardCell(board, currentCoordinate)?.color === pieceColor) {
                 //there is a piece blocking the path
                 break
             }
 
-            if(getBoardCell(board, currentCoordinate)?.color === oppositeColor(pieceColor)) {
+            if (getBoardCell(board, currentCoordinate)?.color === oppositeColor(pieceColor)) {
                 //there is a piece blocking the path
                 res.push({ row: currentCoordinate.row, column: currentCoordinate.column })
                 break

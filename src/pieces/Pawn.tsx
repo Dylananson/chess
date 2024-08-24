@@ -1,5 +1,5 @@
 import { Board, compareCoordinates, Coordinate, getBoardCell, isOnBoard } from "../Game";
-import { ActivePiece, BaseActivePiece, Color, Piece } from "./ActivePiece";
+import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackPawnSvg from '../assets/Chess_pdt45.svg'
 import whitePawnSvg from '../assets/Chess_plt45.svg'
@@ -50,14 +50,13 @@ export function PawnMoves(board: Board<ActivePiece>, coordinates: Coordinate) {
 const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
 
 export function createPawn(color: Color, startingCoordinate: Coordinate): ActivePiece {
-    return {
+    return createActivePiece({
         piece: Pawn,
         color: color,
         startingCoordinate: startingCoordinate,
         id: coordToKey(startingCoordinate),
         hasMoved:false,
-        __proto__: BaseActivePiece
-    }
+    })
 }
 
 export const Pawn: Piece = {

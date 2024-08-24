@@ -135,8 +135,8 @@ test('castle queenside', () => {
 
     const newBoard = castleQueenSide(board, Color.White)
 
-    expect(newBoard[0][2]).toEqual(king)
-    expect(newBoard[0][3]).toEqual(rook)
+    expect(newBoard[0][2]).toEqual(king.move())
+    expect(newBoard[0][3]).toEqual(rook.move())
 })
 
 
@@ -149,8 +149,8 @@ test('castle kingside', () => {
 
     const newBoard = castleKingSide(board, Color.White)
 
-    expect(getBoardCell(newBoard, { row: 1, column: 7 })).toEqual(moveActivePiece(king))
-    expect(getBoardCell(newBoard, { row: 1, column: 6 })).toEqual(moveActivePiece(rook))
+    expect(getBoardCell(newBoard, { row: 1, column: 7 })).toEqual(king.move())
+    expect(getBoardCell(newBoard, { row: 1, column: 6 })).toEqual(rook.move())
 })
 
 

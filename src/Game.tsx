@@ -652,9 +652,9 @@ export const castleQueenSide = (board: Board<ActivePiece>, color: Color) => {
     }
 
     newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 2 - 1] = king
+    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 2 - 1] = king.move()
     newBoard[king.startingCoordinate.row - 1][1 - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][4 - 1] = rook
+    newBoard[king.startingCoordinate.row - 1][4 - 1] = rook.move()
 
     return newBoard
 }
@@ -683,15 +683,11 @@ export const castleKingSide = (board: Board<ActivePiece>, color: Color) => {
         return board
     }
 
-    const movedKing = { ...king, hasMoved: true }
-
-    const movedRook = { ...rook, hasMoved: true }
-
     newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column + 2 - 1] = movedKing
+    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column + 2 - 1] = king.move()
 
     newBoard[king.startingCoordinate.row - 1][8 - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][6 - 1] = movedRook
+    newBoard[king.startingCoordinate.row - 1][6 - 1] = rook.move()
 
     return newBoard
 }

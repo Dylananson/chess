@@ -4,17 +4,16 @@ import { PieceName } from "./PieceName";
 import { RookMoves } from "./Rook";
 import blackQueenSvg from '../assets/Chess_qdt45.svg'
 import whiteQueenSvg from '../assets/Chess_qlt45.svg'
-import { ActivePiece, BaseActivePiece, Color, Piece } from "./ActivePiece";
+import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 
 export const createQueen = (color: Color, startingCoordinate: Coordinate) :ActivePiece => {
-    return {
+    return createActivePiece({
         piece: Queen,
         color: color,
         id: coordToKey(startingCoordinate),
         startingCoordinate: startingCoordinate,
         hasMoved: false,
-        __proto__: BaseActivePiece
-    }
+    })
 }
 
 

@@ -1,19 +1,18 @@
 import { Board, compareCoordinates, Coordinate, coordToKey, getBoardCell, isOnBoard } from "../Game";
-import { ActivePiece, BaseActivePiece, Color, Piece } from "./ActivePiece";
+import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackRookSvg from '../assets/Chess_rdt45.svg'
 import whiteRookSvg from '../assets/Chess_rlt45.svg'
 
 
 export const createRook = (color: Color, coordinate: Coordinate):ActivePiece => {
-    return {
+    return createActivePiece({
         piece: Rook,
         color: color,
         id: coordToKey(coordinate),
         startingCoordinate: coordinate,
         hasMoved: false,
-        __proto__: BaseActivePiece
-    }
+    })
 }
 
 
