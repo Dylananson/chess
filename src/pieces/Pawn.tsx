@@ -1,6 +1,5 @@
-import { compareCoordinates} from "../Game";
 import { getBoardCell } from "../Board"
-import { Board, isOnBoard } from "../Board";
+import { compareCoordinates, Board, isOnBoard } from "../Board";
 import { Coordinate } from "../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";

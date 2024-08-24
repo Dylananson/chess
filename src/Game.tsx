@@ -7,9 +7,8 @@ import { createRook } from "./pieces/Rook"
 import { createQueen } from "./pieces/Queen"
 import { Color, ActivePiece } from "./pieces/ActivePiece"
 import { defaultGame } from "./utils/gameStates"
-import { emptyBoard, Board, isOnBoard, deepCopyBoard, getBoardCell } from "./Board"
+import { emptyBoard, Board, isOnBoard, deepCopyBoard, getBoardCell, isCheck, findKing, isAttacked } from "./Board"
 import { Coordinate } from "./Coordinate"
-
 
 function MoveMarker() {
     return (
@@ -38,75 +37,6 @@ export type GameState = {
     inCheck: boolean
     history: Array<Board<ActivePiece>>
     historyIndex: number
-}
-
-export function findKing(board: Board<ActivePiece>, color: Color) {
-    let king: ActivePiece | undefined;
-    let kingCoordinate: Coordinate | undefined;
-
-    for (let row = 0; row < board.length; row++) {
-        for (let col = 0; col < board.length; col++) {
-            const piece = board[row][col]
-            if (piece?.color === color && piece?.piece?.name === PieceName.King) {
-                king = piece
-                kingCoordinate = { row: row + 1, column: col + 1 }
-                break
-            }
-        }
-        if (king) break;
-    }
-
-    if (!king || !kingCoordinate) {
-        return undefined
-    }
-    return kingCoordinate
-}
-
-export function isAttacked(board: Board<ActivePiece>, color: Color, coordinate: Coordinate) {
-    let allMoves: Array<Coordinate> = [];
-
-    board.forEach((row, ri) => {
-        row.forEach((p, ci) => {
-            const coord = { row: ri + 1, column: ci + 1 }
-            if (p?.color !== color) {
-                const moves = p?.piece.moves(board, coord)
-                if (moves) {
-                    allMoves = allMoves.concat(moves)
-                }
-            }
-        })
-    })
-
-    return allMoves.some(move => compareCoordinates(move, coordinate))
-}
-
-export function isCheck(board: Board<ActivePiece>, color: Color) {
-    const kingCoordinate = findKing(board, color)
-
-    if (!kingCoordinate) {
-        console.error("King not found")
-        return false
-    }
-
-    let allMoves: Array<Coordinate> = [];
-
-    board.forEach((row, ri) => {
-        row.forEach((p, ci) => {
-            const coordinate = { row: ri + 1, column: ci + 1 }
-            if (p?.color !== color) {
-                const moves = p?.piece.moves(board, coordinate)
-                if (moves) {
-                    allMoves = allMoves.concat(moves)
-                }
-            }
-        })
-    })
-
-    return allMoves.some(move => compareCoordinates(move, kingCoordinate))
-}
-
-export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
-    return coord1.row === coord2.row && coord1.column === coord2.column
 }
 
 function bfs(startingCoordinate: Coordinate, validMoves: Array<Coordinate>, dirs: Array<Coordinate>, board: Board<ActivePiece>) {

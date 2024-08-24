@@ -1,5 +1,4 @@
-import { compareCoordinates } from "../Game";
-import { getBoardCell, coordToKey } from "../Board"
+import { compareCoordinates, getBoardCell, coordToKey } from "../Board"
 import { Coordinate } from "../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
@@ -8,7 +7,7 @@ import blackRookSvg from '../assets/Chess_rdt45.svg'
 import whiteRookSvg from '../assets/Chess_rlt45.svg'
 
 
-export const createRook = (color: Color, coordinate: Coordinate):ActivePiece => {
+export const createRook = (color: Color, coordinate: Coordinate): ActivePiece => {
     return createActivePiece({
         piece: Rook,
         color: color,
