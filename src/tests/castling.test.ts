@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import { Color } from '../pieces/ActivePiece'
 import { createRook, } from '../pieces/Rook'
-import { createBoard, canCastleQueenSide, canCastleKingSide } from '../Game'
+import { createBoard, canCastleQueenSide, canCastleKingSide, castleKingSide, castleQueenSide, getBoardCell } from '../Game'
 import { createKing } from '../pieces/King'
 import { createBishop } from '../pieces/Bishop'
 
@@ -124,4 +124,34 @@ test('cant while in check', () => {
 
     expect(canCastle).toEqual(false)
 })
+
+
+test('castle queenside', () => {
+    const king = createKing(Color.White, { row: 1, column: 5 })
+    const rook = createRook(Color.White, { row: 1, column: 1 })
+    const board = createBoard(
+        [king, rook]
+    )
+
+    const newBoard = castleQueenSide(board, Color.White)
+
+    expect(newBoard[0][2]).toEqual(king)
+    expect(newBoard[0][3]).toEqual(rook)
+})
+
+
+test('castle kingside', () => {
+    const king = createKing(Color.White, { row: 1, column: 5 })
+    const rook = createRook(Color.White, { row: 1, column: 8 })
+    const board = createBoard(
+        [king, rook]
+    )
+
+    const newBoard = castleKingSide(board, Color.White)
+
+    expect(getBoardCell(newBoard, { row: 1, column: 7 })).toEqual(king)
+    expect(getBoardCell(newBoard, { row: 1, column: 6 })).toEqual(rook)
+})
+
+
 
