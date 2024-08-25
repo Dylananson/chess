@@ -166,11 +166,11 @@ export function selectPiece(gameState: GameState, coordinate: Coordinate): GameS
     const pieceMoves = filterMovesOntopOfSameColor(gameState.board, filteredCheckMoves, selectedPiece.color)
 
     if (selectedPiece.piece.name === PieceName.King) {
-        if (canCastleQueenSide(gameState.board.board, selectedPiece.color)) {
+        if (gameState.board.canCastleQueenSide(selectedPiece.color)) {
             pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 3 })
         }
 
-        if (canCastleKingSide(gameState.board.board, selectedPiece.color)) {
+        if (gameState.board.canCastleKingSide(selectedPiece.color)) {
             console.log("Can castle king side")
             pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 7 })
         }
