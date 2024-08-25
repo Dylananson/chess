@@ -293,17 +293,15 @@ function isLegalMove(board: Board, oldCoordinates: Coordinate, newCoordinates: C
         return false
     }
 
-    const pieceMoves = piece.piece.moves(board.board, oldCoordinates)
-    const valid = pieceMoves.some(move => compareCoordinates(move, newCoordinates))
+    const valid = piece.piece.moves(board.board, oldCoordinates)
+        .some(move => compareCoordinates(move, newCoordinates))
 
     if(!valid) {
         console.error("Invalid move")
         return false
     }
 
-    const pieceAtNewCoordinates = board.getPiece(newCoordinates)
-
-    if (pieceAtNewCoordinates && pieceAtNewCoordinates.color === piece.color) {
+    if (board.getPiece(newCoordinates)?.color === piece.color) {
         console.log("Cannot move piece on top of piece of the same team")
         return false
     }
