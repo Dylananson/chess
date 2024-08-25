@@ -11,6 +11,7 @@ export type GameState = {
     history: Array<NewBoard>
     historyIndex: number
     movePiece: (newCoordinates: Coordinate) => GameState
+    getPiece: (coordinate: Coordinate) => ActivePiece | undefined
 }
 
 
@@ -36,6 +37,9 @@ export const createGameState = (
         historyIndex: 0,
         movePiece(newCoordinates: Coordinate) {
             return tryMovePiece(this, newCoordinates)
+        },
+        getPiece(coordinate: Coordinate) {
+            return this.board.getPiece(coordinate)
         },
         board : board
     }
