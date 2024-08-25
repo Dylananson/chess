@@ -10,6 +10,27 @@ import { createRook } from "../model/pieces/Rook"
 import { ColumnValues } from "../model/Board"
 import { createGameState, GameState } from "../model/GameState"
 
+export const enpassantGameState = () :  GameState => {
+    const blackPawn = createPawn(Color.Black, { row: 4, column: 4})
+    const whitePawnL = createPawn(Color.White, { row: 2, column: 3 })
+    const whitePawnR = createPawn(Color.White, { row: 2, column: 5 })
+
+    let game = createGameState(createBoardWithPieces([
+        blackPawn,
+        whitePawnL,
+        whitePawnR,
+    ]), undefined, Color.White)
+    return game
+}
+
+export const EnpassantGame = () => {
+    return (
+        <div>
+            <Game initGameState={enpassantGameState()} />
+        </div>
+    )
+}
+
 export const promotingPawnGameState = (): GameState => {
     const pawn = createPawn(Color.White, { row: 7, column: 1 })
     const blackKing = createKing(Color.Black, { row: 8, column: 5 })

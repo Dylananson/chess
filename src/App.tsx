@@ -3,7 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import Board from './Game'
-import { CastleKingSideGame, PromotingPawnGame } from './utils/gameStates'
+import { CastleKingSideGame, EnpassantGame, PromotingPawnGame } from './utils/gameStates'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -14,6 +14,7 @@ function App() {
         <Board />
         <PromotingPawnGame />
         <CastleKingSideGame />
+        <EnpassantGame />
       </div>
       <h1>Vite + React</h1>
       <div className="card">
