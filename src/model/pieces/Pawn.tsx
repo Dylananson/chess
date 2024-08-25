@@ -6,6 +6,43 @@ import blackPawnSvg from '@assets/Chess_pdt45.svg'
 import whitePawnSvg from '@assets/Chess_plt45.svg'
 import { oppositeColor } from "./Rook";
 
+export function unfilteredPawnAttackingMoves(board: BoardArray<ActivePiece>, coordinates: Coordinate) {
+    const piece = board[coordinates.row - 1][coordinates.column - 1]
+
+    if (!piece) {
+        console.error('Piece not found')
+        throw new Error('Piece not found')
+    }
+
+    const direction = piece.color === Color.White ? 1 : -1
+
+    return [
+        {row: coordinates.row + direction, column: coordinates.column + 1},
+        {row: coordinates.row + direction, column: coordinates.column - 1},
+    ]
+}
+
+
+
+export function UnfilteredPawnMoves(board: BoardArray<ActivePiece>, coordinates: Coordinate) {
+    const piece = board[coordinates.row - 1][coordinates.column - 1]
+
+    if (!piece) {
+        console.error('Piece not found')
+        throw new Error('Piece not found')
+    }
+
+    const direction = piece.color === Color.White ? 1 : -1
+
+    return [
+        {row: coordinates.row + direction, column: coordinates.column},
+        {row: coordinates.row + direction, column: coordinates.column + 1},
+        {row: coordinates.row + direction, column: coordinates.column - 1},
+        {row: coordinates.row + (2*direction), column: coordinates.column},
+    ]
+}
+
+
 export function PawnMoves(board: BoardArray<ActivePiece>, coordinates: Coordinate) {
     const forwardMoves = []
     const diagonalMoves = []

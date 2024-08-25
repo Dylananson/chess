@@ -41,11 +41,34 @@ export type Board = {
     hasLegalMove: (color: Color) => boolean
     promotePawn: (coordinates: Coordinate, newPiece: PieceName) => Board
     findKing: (color: Color) => Coordinate | undefined
+    captureEnpassant: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => Board
 }
 
 export function createBoard(board: BoardArray<ActivePiece>): Board {
     return {
         board: board,
+        captureEnpassant(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
+            const piece = this.getPiece(oldCoordinates)
+            if(piece?.piece.name !== PieceName.Pawn){
+                return this
+            }
+
+            const adj = this.getPiece({ row: oldCoordinates.row, column: newCoordinates.column })
+
+            if(!adj || adj.piece.name !== PieceName.Pawn || adj.color === piece.color) {
+                return this
+            }
+
+            if(Math.abs(oldCoordinates.row - newCoordinates.row) !== 1 || Math.abs(oldCoordinates.column - newCoordinates.column) !== 1){
+                return this
+            }
+
+            const newBoard = this.move(oldCoordinates, newCoordinates)
+
+            newBoard.board[oldCoordinates.row - 1][newCoordinates.column - 1] = undefined
+
+            return newBoard
+        },
         findKing(color: Color) {
             let king: ActivePiece | undefined;
             let kingCoordinate: Coordinate | undefined;
@@ -120,7 +143,7 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
             return createBoard(newBoard)
         },
         getPiece(coord: Coordinate) {
-            if(!isOnBoard(coord)) {
+            if (!isOnBoard(coord)) {
                 return undefined
             }
             return this.board[coord.row - 1][coord.column - 1]

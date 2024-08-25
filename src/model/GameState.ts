@@ -1,5 +1,6 @@
-import { emptyBoard, filterMovesOntopOfSameColor, getBoardCell, BoardArray, Board, Coordinate } from "./Board"
+import { emptyBoard, filterMovesOntopOfSameColor, getBoardCell, BoardArray, Board, Coordinate, compareCoordinates } from "./Board"
 import { ActivePiece, Color } from "./pieces/ActivePiece"
+import { UnfilteredPawnMoves as unfilteredPawnMoves } from "./pieces/Pawn"
 import { PieceName } from "./pieces/PieceName"
 
 export type GameState = {
@@ -14,6 +15,7 @@ export type GameState = {
     castleKingSide: (color: Color) => GameState
     castleQueenSide: (color: Color) => GameState
     promotePawn: (coordinate: Coordinate, pieceName: PieceName) => GameState
+    captureEnpassant: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => GameState
     with: (newBoard: Board) => GameState
     enpassant?: Coordinate
 }
@@ -38,6 +40,9 @@ export const createGameState = (
         history: history ?? [board],
         historyIndex: 0,
         enpassant: undefined,
+        captureEnpassant(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
+            return this.with(this.board.captureEnpassant(oldCoordinates, newCoordinates))
+        },
         promotePawn(coordinate: Coordinate, pieceName: PieceName) {
             const oldHistory = this.history.slice(0, this.historyIndex)
             return {
@@ -51,7 +56,53 @@ export const createGameState = (
             }
         },
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
-            return movePiece(this, oldCoordinates, newCoordinates)
+            if (!oldCoordinates) {
+                return this
+            }
+            const piece = this.getPiece(oldCoordinates)
+            if (!piece) {
+                console.log("Cannot move piece if no piece is selected");
+                return this
+            }
+
+            if (piece.color !== this.playerTurn) {
+                console.log("Cannot move piece on other players turn")
+                return this
+            }
+
+            if (isCastleKingSide(this.board.board, oldCoordinates, newCoordinates) && this.board.canCastleKingSide(piece.color)) {
+                return this.castleKingSide(piece.color)
+            }
+
+            if (isCastleQueenSide(this.board.board, oldCoordinates, newCoordinates) && this.board.canCastleQueenSide(piece.color)) {
+                return this.castleQueenSide(piece.color)
+            }
+
+            console.log("Moving piece")
+
+            if (piece.piece.name === PieceName.Pawn && this.enpassant !== undefined) {
+                console.log("Checking if enpassant is valid")
+                const valid = unfilteredPawnMoves(this.board.board, oldCoordinates).some(move => compareCoordinates(move, this.enpassant!))
+                if (valid) {
+                    console.log("Enpassant is valid")
+                    return this.captureEnpassant(oldCoordinates, newCoordinates)
+                }
+            }
+
+            console.log("Checking if move is legal")
+
+
+            const canMove = this.board.isLegalMove(oldCoordinates, newCoordinates)
+
+            if (!canMove) {
+                console.log("Cannot move piece")
+                return this
+            }
+
+            return {
+                ...this.with(this.board.move(oldCoordinates, newCoordinates)),
+                enpassant: checkEnpassant(piece, oldCoordinates, newCoordinates)
+            }
         },
         with(newBoard: Board) {
             return {
@@ -79,42 +130,6 @@ export const createGameState = (
         },
 
         board: board
-    }
-}
-
-function movePiece(gameState: GameState, oldCoordinates: Coordinate | undefined, newCoordinates: Coordinate): GameState {
-    if (!oldCoordinates) {
-        return gameState
-    }
-    const piece = gameState.getPiece(oldCoordinates)
-    if (!piece) {
-        console.log("Cannot move piece if no piece is selected");
-        return gameState
-    }
-
-    if (piece.color !== gameState.playerTurn) {
-        console.log("Cannot move piece on other players turn")
-        return gameState
-    }
-
-    if (isCastleKingSide(gameState.board.board, oldCoordinates, newCoordinates) && gameState.board.canCastleKingSide(piece.color)) {
-        return gameState.castleKingSide(piece.color)
-    }
-
-    if (isCastleQueenSide(gameState.board.board, oldCoordinates, newCoordinates) && gameState.board.canCastleQueenSide(piece.color)) {
-        return gameState.castleQueenSide(piece.color)
-    }
-
-    const canMove = gameState.board.isLegalMove(oldCoordinates, newCoordinates)
-
-    if (!canMove) {
-        console.log("Cannot move piece")
-        return gameState
-    }
-
-    return {
-        ...gameState.with(gameState.board.move(oldCoordinates, newCoordinates)),
-        enpassant: checkEnpassant(piece, oldCoordinates, newCoordinates)
     }
 }
 
