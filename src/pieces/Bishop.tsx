@@ -1,4 +1,4 @@
-import { coordToKey, Board, getBoardCell, isOnBoard } from "../Board";
+import { coordToKey, BoardArray, getBoardCell, isOnBoard } from "../Board";
 import { Coordinate } from "../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
@@ -30,7 +30,7 @@ export function BishopDisplay(color: Color) {
 }
 
 
-export function BishopMoves(board: Board<ActivePiece>, coordinates: Coordinate) {
+export function BishopMoves(board: BoardArray<ActivePiece>, coordinates: Coordinate) {
     const dirs = [[-1, -1], [1, 1], [-1, 1], [1, -1]]
     let res: Array<Coordinate> = []
 

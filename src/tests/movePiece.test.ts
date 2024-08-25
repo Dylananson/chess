@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { type GameState, selectPiece } from "../GameState";
-import { Coordinate, createBoard, getBoardCell } from "../Board";
+import { Coordinate, createBoardWithPieces, getBoardCell } from "../Board";
 import { createGameState } from "../GameState";
 import { defaultGame } from '../utils/gameStates';
 import { ActivePiece, Color } from "../pieces/ActivePiece";
@@ -39,7 +39,7 @@ test("cant move pinned piece", () => {
     const pinnedRook = createRook(Color.Black, { row: pinnedCoordinates.row, column: pinnedCoordinates.column })
     const rook = createRook(Color.White, { row: rookCoordinate.row, column: rookCoordinate.column })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         rook,
         pinnedRook
@@ -61,7 +61,7 @@ test("cant move other piece if in check", () => {
     const pawn = createKing(Color.Black, pawnCoordinate)
     const rook = createRook(Color.White, { row: rookCoordinate.row, column: rookCoordinate.column })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         rook,
         pawn
@@ -83,7 +83,7 @@ test("king cant move into check", () => {
     const king = createKing(Color.White, startCoordinate)
     const rook = createRook(Color.Black, { row: 2, column: 2 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         rook,
     ])
@@ -103,7 +103,7 @@ test("king cant move into check", () => {
     const king = createKing(Color.White, startCoordinate)
     const bishop = createRook(Color.Black, { row: 2, column: 2 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         bishop,
     ])
@@ -123,7 +123,7 @@ test("king can take enemy piece", () => {
     const king = createKing(Color.White, startCoordinate)
     const bishop = createBishop(Color.Black, { row: 1, column: 2 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         bishop,
     ])
@@ -142,7 +142,7 @@ test("king cant move on same color piece", () => {
     const king = createKing(Color.White, startCoordinate)
     const bishop = createBishop(Color.White, { row: 1, column: 2 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         bishop,
     ])
@@ -163,7 +163,7 @@ test("knight can move over pieces", () => {
     const bishop = createBishop(Color.White, { row: 1, column: 3 })
     const pawn = createPawn(Color.White, { row: 2, column: 2 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         knight,
         bishop,
         pawn
@@ -182,7 +182,7 @@ test("pawn can move twice if hasn't moved", () => {
 
     const pawn = createPawn(Color.White, startCoordinate)
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         pawn,
     ])
 
@@ -201,7 +201,7 @@ test("pawn cant move twice if already moved", () => {
     const pawn = createPawn(Color.White, startCoordinate)
     const blackPawn = createPawn(Color.Black, { row: 8, column: 1 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         pawn,
         blackPawn
     ])
@@ -228,7 +228,7 @@ test("pawn cant move ontop of another piece", () => {
     const pawn = createPawn(Color.White, startCoordinate)
     const rook = createRook(Color.Black, { row: 2, column: 1 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         pawn,
         rook
     ])
@@ -248,7 +248,7 @@ test("pawn can take enemy piece", () => {
     const pawn = createPawn(Color.White, startCoordinate)
     const rook = createRook(Color.Black, { row: endCoordinate.row, column: endCoordinate.column })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         pawn,
         rook
     ])
@@ -267,7 +267,7 @@ test("pawn cant take own piece", () => {
     const pawn = createPawn(Color.White, startCoordinate)
     const rook = createRook(Color.White, { row: 2, column: 2 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         pawn,
         rook
     ])
@@ -286,7 +286,7 @@ test("pawn cant move diagnoally without taking an enemy piece", () => {
 
     const pawn = createPawn(Color.White, startCoordinate)
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         pawn,
     ])
 
@@ -304,7 +304,7 @@ test("rook cant move through other pieces", () => {
     const rook = createRook(Color.White, { row: startCoordinate.row, column: startCoordinate.column })
     const bishop = createBishop(Color.White, { row: 1, column: 3 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         rook,
         bishop
     ])
@@ -324,7 +324,7 @@ test("bishop cant move through other pieces", () => {
     const bishop = createBishop(Color.White, { row: startCoordinate.row, column: startCoordinate.column })
     const rook = createRook(Color.White, { row: 3, column: 3 })
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         bishop,
         rook
     ])
@@ -342,7 +342,7 @@ test("move piece happy path bishop", () => {
     const startCoordinate = { row: 1, column: 1 }
     const bishop = createBishop(Color.White, startCoordinate)
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         bishop
     ])
 
@@ -361,7 +361,7 @@ test("move piece happy path rook", () => {
     const endCoordinate = { row: 6, column: 1 }
 
     const rook = createRook(Color.White, { row: startCoordinate.row, column: startCoordinate.column })
-    const board = createBoard([
+    const board = createBoardWithPieces([
         rook
     ])
     const game = createGameState(board, undefined, Color.White)

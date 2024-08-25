@@ -1,4 +1,4 @@
-import { coordToKey, Board, isOnBoard } from "../Board";
+import { coordToKey, BoardArray, isOnBoard } from "../Board";
 import { Coordinate } from "../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
@@ -20,7 +20,7 @@ export const createKing = (color: Color, startingCoordinate: Coordinate): Active
 }
 
 
-export function KingMoves(board: Board<ActivePiece>, coordinates: Coordinate) {
+export function KingMoves(board: BoardArray<ActivePiece>, coordinates: Coordinate) {
     const dirs = [
         [1, 0],   // move right
         [-1, 0],  // move left

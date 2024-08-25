@@ -6,7 +6,7 @@ import { RookMoves } from "./Rook";
 import blackQueenSvg from '../assets/Chess_qdt45.svg'
 import whiteQueenSvg from '../assets/Chess_qlt45.svg'
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
-import { Board } from "../Board";
+import { BoardArray } from "../Board";
 
 export const createQueen = (color: Color, startingCoordinate: Coordinate) :ActivePiece => {
     return createActivePiece({
@@ -28,7 +28,7 @@ export const Queen: Piece = {
 
 
 
-export function QueenMoves(board:Board<ActivePiece>, coordinates: Coordinate): Array<Coordinate> {
+export function QueenMoves(board:BoardArray<ActivePiece>, coordinates: Coordinate): Array<Coordinate> {
     return RookMoves(board, coordinates).concat(BishopMoves(board, coordinates))
 }
 

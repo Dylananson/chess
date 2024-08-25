@@ -1,4 +1,4 @@
-import { Board, coordToKey, isOnBoard } from "../Board";
+import { BoardArray, coordToKey, isOnBoard } from "../Board";
 import { Coordinate } from "../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
@@ -23,7 +23,7 @@ export const createKnight = (color: Color, startingCoordinate: Coordinate) : Act
 }
 
 
-export function KnightMoves(board: Board<ActivePiece>, coordinates: Coordinate): Array<Coordinate> {
+export function KnightMoves(board: BoardArray<ActivePiece>, coordinates: Coordinate): Array<Coordinate> {
     const dirs = [
         [2, 1],
         [2, -1],

@@ -24,10 +24,10 @@ export type Board = {
     hasLegalMove: (color: Color) => boolean
 }
 
-export function createNewBoard(board: BoardArray<ActivePiece>): Board {
+export function createBoard(board: BoardArray<ActivePiece>): Board {
     return {
         board: board,
-        copy: () => createNewBoard(deepCopyBoard(board)),
+        copy: () => createBoard(deepCopyBoard(board)),
         copyBoard: () => deepCopyBoard(board),
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
             const piece = this.getPiece(oldCoordinates)
@@ -35,7 +35,7 @@ export function createNewBoard(board: BoardArray<ActivePiece>): Board {
 
             newBoard[oldCoordinates?.row - 1][oldCoordinates.column - 1] = undefined
             newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = piece?.move()
-            return createNewBoard(newBoard)
+            return createBoard(newBoard)
         },
         getPiece(coord: Coordinate) {
             return getBoardCell(this.board, coord)
@@ -111,13 +111,13 @@ export function getBoardCell(board: BoardArray<ActivePiece>, coord: Coordinate) 
     return board[coord.row - 1][coord.column - 1]
 }
 
-export const createBoard = (pieces: Array<ActivePiece>): Board => {
+export const createBoardWithPieces = (pieces: Array<ActivePiece>): Board => {
     const board: BoardArray<ActivePiece> = emptyBoard()
     pieces.forEach(piece => {
         board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
     })
 
-    return createNewBoard(board)
+    return createBoard(board)
 }
 
 

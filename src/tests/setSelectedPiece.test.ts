@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import {
     selectPiece,
 } from "../GameState";
-import { createBoard } from "../Board";
+import { createBoardWithPieces } from "../Board";
 import { defaultGame } from '../utils/gameStates';
 import { PieceName } from "../pieces/PieceName";
 import { createGameState } from "../GameState";
@@ -23,11 +23,11 @@ test("set selected piece unselects if current is selected", () => {
 
 test("set selected happy path", () => {
     const bishop = createBishop(Color.White, { row: 1, column: 7 });
-    const board = createBoard([
+    const board = createBoardWithPieces([
         bishop
 
     ])
-    const state = createGameState(board, undefined, Color.Black, false)
+    const state = createGameState(board, undefined, Color.Black)
 
     const newState = selectPiece(state, { row: 1, column: 7 });
 

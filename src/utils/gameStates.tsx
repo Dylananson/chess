@@ -1,5 +1,5 @@
 import { Game } from "../Game"
-import { Board, createBoard, createNewBoard, emptyBoard } from "../Board"
+import { BoardArray, createBoardWithPieces, emptyBoard } from "../Board"
 import { ActivePiece, Color } from "../pieces/ActivePiece"
 import { createBishop } from "../pieces/Bishop"
 import { createKing } from "../pieces/King"
@@ -17,7 +17,7 @@ export const PromotingPawnGame = () => {
     const blackKing = createKing(Color.Black, { row: 8, column: 5 })
     const whiteKing = createKing(Color.White, { row: 1, column: 5 })
 
-    const b = createBoard([pawn, blackKing, whiteKing])
+    const b = createBoardWithPieces([pawn, blackKing, whiteKing])
 
     const game = createGameState(b, undefined, Color.White)
 
@@ -37,7 +37,7 @@ export const CastleKingSideGame = () => {
     const whiteKing = createKing(Color.White, { row: 1, column: 5 })
     const rook = createRook(Color.White, { row: 1, column: 8 })
     const lRook = createRook(Color.White, { row: 1, column: 1 })
-    const board = createBoard(
+    const board = createBoardWithPieces(
         [whiteKing, rook, blackKing, lRook]
     )
 
@@ -96,13 +96,5 @@ export const defaultGame = (): GameState => {
 
     const AllPieces = BlackPieces.concat(WhitePieces)
 
-    const initBoard = () => {
-        const board: Board<ActivePiece> = emptyBoard()
-        AllPieces.forEach((piece) => {
-            board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
-        })
-        return board
-    }
-
-    return createGameState(createNewBoard(initBoard()), undefined, Color.White)
+    return createGameState(createBoardWithPieces(AllPieces), undefined, Color.White)
 }

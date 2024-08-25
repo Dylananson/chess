@@ -1,4 +1,4 @@
-import { Board } from "../Board";
+import { BoardArray } from "../Board";
 import { Coordinate } from "../Coordinate";
 import { PieceName } from "./PieceName";
 
@@ -38,7 +38,7 @@ export type _ActivePiece =
     hasMoved: boolean;
 }
 
-type MovesFunction = (board: Board<ActivePiece>, coorinates: Coordinate) => Array<Coordinate>
+type MovesFunction = (board: BoardArray<ActivePiece>, coorinates: Coordinate) => Array<Coordinate>
 type DrawPieceFunction = (color: Color) => React.ReactNode
 
 export type Piece = {

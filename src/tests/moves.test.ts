@@ -3,13 +3,13 @@ import { createQueen } from "../pieces/Queen";
 import { createBishop } from "../pieces/Bishop";
 import { KnightMoves } from "../pieces/Knight";
 import { createRook } from "../pieces/Rook";
-import { emptyBoard, createBoard } from "../Board";
+import { emptyBoard, createBoardWithPieces } from "../Board";
 import { Color } from "../pieces/ActivePiece";
 
 test("bishop moves works", () => {
     const coordinates = { row: 1, column: 1 };
     const bishop = createBishop( Color.White,{row:coordinates.row,column: coordinates.column});
-    const board = createBoard([
+    const board = createBoardWithPieces([
         bishop
     ])
     const moves = bishop.piece.moves(board.board, coordinates)
@@ -63,7 +63,7 @@ test("knight moves works at starting pos 8,3", () => {
 test("rook moves works", () => {
     const coordinates = { row: 4, column: 4 };
     const rook = createRook(Color.White, { row: coordinates.row, column: coordinates.column });
-    const board = createBoard([
+    const board = createBoardWithPieces([
         rook
     ])
     const moves = rook.piece.moves(board.board, coordinates)
@@ -93,7 +93,7 @@ test("rook moves works", () => {
 test("queen moves works", () => {
     const coordinates = { row: 4, column: 4 };
     const queen = createQueen(Color.White, coordinates);
-    const board = createBoard([
+    const board = createBoardWithPieces([
         queen
     ])
     const moves = queen.piece.moves(board.board, coordinates)

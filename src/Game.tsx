@@ -7,7 +7,7 @@ import { createRook } from "./pieces/Rook"
 import { createQueen } from "./pieces/Queen"
 import { Color } from "./pieces/ActivePiece"
 import { defaultGame } from "./utils/gameStates"
-import { Coordinate, createNewBoard} from "./Board"
+import { Coordinate, createBoardWithPieces} from "./Board"
 import { GameState, selectPiece } from "./GameState"
 
 function MoveMarker() {
@@ -98,7 +98,7 @@ export function Game({ initGameState }: { initGameState: GameState }) {
 
         setGameState({
             ...gameState,
-            board: createNewBoard(newBoard)
+            board: createBoardWithPieces(newBoard)
         })
         setCanPromote(undefined)
     }

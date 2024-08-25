@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { createGameState, filterPieceMovesThatPutKingInCheck } from '../GameState';
-import { createBoard } from '../Board';
+import { createBoardWithPieces } from '../Board';
 import { createKing } from '../pieces/King';
 import { Color } from '../pieces/ActivePiece';
 import { createQueen } from '../pieces/Queen';
@@ -11,7 +11,7 @@ test("filter out moves that put king in check shouldnt filter ", () => {
     const king = createKing(Color.Black, { row: 1, column: 1 });
     const queen = createQueen(Color.Black, { row: 2, column: 1 });
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         queen
     ])
@@ -31,7 +31,7 @@ test("dont filter when king can take piece", () => {
     const king = createKing(Color.Black, kingCoordinate);
     const queen = createQueen(Color.White, { row: 2, column: 1 });
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         queen
     ])
@@ -52,7 +52,7 @@ test("filter out moves that put king in check happy path", () => {
     const queen = createQueen(Color.White, { row: 3, column: 1 });
     const queen2 = createQueen(Color.White, { row: 3, column: 2 });
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         queen,
         queen2
@@ -70,7 +70,7 @@ test("is in check happy path", () => {
     const king = createKing(Color.Black, { row: 1, column: 1 });
     const queen = createQueen(Color.White, { row: 2, column: 1 });
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         queen
     ])
@@ -89,7 +89,7 @@ test("not in check if hit by same color", () => {
     const king = createKing(Color.Black, { row: 1, column: 1 });
     const knight = createKnight(Color.Black, { row: 3, column: 2 });
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         knight,
     ])
@@ -112,7 +112,7 @@ test("in check if hit by knight with pieces in way", () => {
     const pawn2 = createPawn(Color.Black, { row: 2, column: 3 });
     const pawn3 = createPawn(Color.Black, { row: 1, column: 2 });
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         knight,
         pawn,
@@ -136,7 +136,7 @@ test("not in check if piece blocked", () => {
     const queen = createQueen(Color.White, { row: 3, column: 1 });
     const pawn = createPawn(Color.White, { row: 2, column: 1 });
 
-    const board = createBoard([
+    const board = createBoardWithPieces([
         king,
         queen,
         pawn

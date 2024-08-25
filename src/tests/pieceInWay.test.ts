@@ -1,11 +1,11 @@
 import { expect, test } from "vitest";
-import { isPieceInWay, Board, emptyBoard } from "../Board";
+import { isPieceInWay, BoardArray, emptyBoard } from "../Board";
 import { ActivePiece, Color } from "../pieces/ActivePiece";
 import { createRook } from "../pieces/Rook";
 import { createBishop } from "../pieces/Bishop";
 
 const createBoard = (pieces: Array<ActivePiece>) => {
-    const board: Board<ActivePiece> = emptyBoard()
+    const board: BoardArray<ActivePiece> = emptyBoard()
     pieces.forEach(piece => {
         board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
     })

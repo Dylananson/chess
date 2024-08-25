@@ -1,13 +1,13 @@
-import { Board, canCastleKingSide, canCastleQueenSide, emptyBoard, filterMovesOntopOfSameColor, getBoardCell, isCheck, NewBoard } from "./Board"
+import { BoardArray, canCastleKingSide, canCastleQueenSide, emptyBoard, filterMovesOntopOfSameColor, getBoardCell, isCheck, BoardArray } from "./Board"
 import { Coordinate } from "./Coordinate"
 import { ActivePiece, Color } from "./pieces/ActivePiece"
 import { PieceName } from "./pieces/PieceName"
 
 export type GameState = {
-    board: NewBoard,
+    board: BoardArray,
     selectedPiece?: SelectedPiece
     playerTurn: Color
-    history: Array<NewBoard>
+    history: Array<BoardArray>
     historyIndex: number
     move: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => GameState
     getPiece: (coordinate: Coordinate) => ActivePiece | undefined
@@ -16,22 +16,22 @@ export type GameState = {
     canCastleQueenSide: (color: Color) => boolean
     castleKingSide: (color: Color) => GameState
     castleQueenSide: (color: Color) => GameState
-    with: (newBoard: NewBoard) => GameState
+    with: (newBoard: BoardArray) => GameState
 }
 
 
 export type SelectedPiece = {
     piece: ActivePiece,
     coordinates: Coordinate,
-    moves: Board<boolean>
+    moves: BoardArray<boolean>
 }
 
 
 export const createGameState = (
-    board: NewBoard,
+    board: BoardArray,
     selectedPiece: SelectedPiece | undefined,
     playerTurn: Color,
-    history?: Array<NewBoard>
+    history?: Array<BoardArray>
 ): GameState => {
     return {
         selectedPiece,
@@ -41,10 +41,10 @@ export const createGameState = (
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
             return movePiece(this, oldCoordinates, newCoordinates)
         },
-        with(newBoard: NewBoard) {
+        with(newBoard: BoardArray) {
             return {
                 ...this,
-                get board(): NewBoard {
+                get board(): BoardArray {
                     return this.history[this.history.length - 1]
                 },
                 history: [...this.history, newBoard],
@@ -119,14 +119,14 @@ export function deselectPiece(gameState: GameState): GameState {
 }
 
 
-export const isCastleKingSide = (board: Board<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
+export const isCastleKingSide = (board: BoardArray<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
     if (getBoardCell(board, oldCoordinates)?.piece.name !== PieceName.King) {
         return false
     }
     return oldCoordinates.column === 5 && newCoordinates.column === 7
 }
 
-export const isCastleQueenSide = (board: Board<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
+export const isCastleQueenSide = (board: BoardArray<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
     if (getBoardCell(board, oldCoordinates)?.piece.name !== PieceName.King) {
         return false
     }
@@ -134,10 +134,7 @@ export const isCastleQueenSide = (board: Board<ActivePiece>, oldCoordinates: Coo
 }
 
 
-
-
-
-export function filterPieceMovesThatPutKingInCheck(board: NewBoard, coordinate: Coordinate, moves: Array<Coordinate>) {
+export function filterPieceMovesThatPutKingInCheck(board: BoardArray, coordinate: Coordinate, moves: Array<Coordinate>) {
     const piece = board.getPiece(coordinate)
 
     if (!piece) {
@@ -179,7 +176,7 @@ export function selectPiece(gameState: GameState, coordinate: Coordinate): GameS
         console.log("Piece already selected")
         return { ...gameState, selectedPiece: undefined }
     }
-    const board: Board<boolean> = emptyBoard()
+    const board: BoardArray<boolean> = emptyBoard()
 
     pieceMoves.forEach((move: Coordinate) => {
         board[move.row - 1][move.column - 1] = true
