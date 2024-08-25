@@ -67,16 +67,16 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
 
             switch (pieceName) {
                 case PieceName.Queen:
-                    newPiece = { ...createQueen(pawn.color , coordinates), hasMoved: true }
+                    newPiece = { ...createQueen(pawn.color, coordinates), hasMoved: true }
                     break;
                 case PieceName.Rook:
-                    newPiece = { ...createRook(pawn.color , coordinates), hasMoved: true }
+                    newPiece = { ...createRook(pawn.color, coordinates), hasMoved: true }
                     break;
                 case PieceName.Bishop:
-                    newPiece = { ...createBishop(pawn.color , coordinates), hasMoved: true }
+                    newPiece = { ...createBishop(pawn.color, coordinates), hasMoved: true }
                     break;
                 case PieceName.Knight:
-                    newPiece = { ...createKnight(pawn.color , coordinates), hasMoved: true }
+                    newPiece = { ...createKnight(pawn.color, coordinates), hasMoved: true }
                     break;
                 default:
                     console.error("Invalid piece")
@@ -98,7 +98,7 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
             return createBoard(newBoard)
         },
         getPiece(coord: Coordinate) {
-            return getBoardCell(this.board, coord)
+            return this.board[coord.row - 1][coord.column - 1]
         },
         isCheck(color: Color) {
             return isCheck(this.board, color)
@@ -110,10 +110,10 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
             return isStalemate(this, color)
         },
         canCastleKingSide(color: Color) {
-            return canCastleKingSide(this.board, color)
+            return canCastleKingSide(this, color)
         },
         canCastleQueenSide(color: Color) {
-            return canCastleQueenSide(this.board, color)
+            return canCastleQueenSide(this, color)
         },
         castleKingSide(color: Color) {
             return castleKingSide(this, color)
@@ -220,21 +220,7 @@ export function isCheck(board: BoardArray<ActivePiece>, color: Color) {
         return false
     }
 
-    let allMoves: Array<Coordinate> = [];
-
-    board.forEach((row, ri) => {
-        row.forEach((p, ci) => {
-            const coordinate = { row: ri + 1, column: ci + 1 }
-            if (p?.color !== color) {
-                const moves = p?.piece.moves(board, coordinate)
-                if (moves) {
-                    allMoves = allMoves.concat(moves)
-                }
-            }
-        })
-    })
-
-    return allMoves.some(move => compareCoordinates(move, kingCoordinate))
+    return isAttacked(board, color, kingCoordinate) 
 }
 
 
@@ -292,7 +278,7 @@ function isLegalMove(board: Board, oldCoordinates: Coordinate, newCoordinates: C
     const validMove = piece.piece.moves(board.board, oldCoordinates)
         .some(move => compareCoordinates(move, newCoordinates))
 
-    if(!validMove) {
+    if (!validMove) {
         console.error("Invalid move")
         return false
     }
@@ -359,23 +345,23 @@ export function isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coor
     }
 }
 
-const canCastleQueenSide = (board: BoardArray<ActivePiece>, color: Color) => {
-    if (isCheck(board, color)) {
+const canCastleQueenSide = (board: Board, color: Color) => {
+    if (board.isCheck(color)) {
         return false
     }
-    const kingCoordinates = findKing(board, color)
+    const kingCoordinates = findKing(board.board, color)
 
     if (!kingCoordinates) {
         return false
     }
 
-    const king = getBoardCell(board, kingCoordinates)
+    const king = board.getPiece(kingCoordinates)
 
     if (!king) {
         return false
     }
 
-    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 1 })
+    const rook = board.getPiece({ row: king.startingCoordinate.row, column: 1 })
 
     if (!rook) {
         return false
@@ -386,10 +372,10 @@ const canCastleQueenSide = (board: BoardArray<ActivePiece>, color: Color) => {
     }
 
     for (let i = king.startingCoordinate.column - 1; i > rook.startingCoordinate.column; i--) {
-        if (board[king.startingCoordinate.row - 1][i - 1]) {
+        if (board.getPiece({ row: king.startingCoordinate.row, column: i })) {
             return false
         }
-        if (isAttacked(board, king.color, { row: king.startingCoordinate.row, column: i })) {
+        if (isAttacked(board.board, king.color, { row: king.startingCoordinate.row, column: i })) {
             return false
         }
     }
@@ -398,23 +384,23 @@ const canCastleQueenSide = (board: BoardArray<ActivePiece>, color: Color) => {
 }
 
 
-const canCastleKingSide = (board: BoardArray<ActivePiece>, color: Color) => {
-    if (isCheck(board, color)) {
+const canCastleKingSide = (board: Board, color: Color) => {
+    if (board.isCheck(color)) {
         return false
     }
-    const kingCoordinates = findKing(board, color)
+    const kingCoordinates = findKing(board.board, color)
 
     if (!kingCoordinates) {
         return false
     }
 
-    const king = getBoardCell(board, kingCoordinates)
+    const king = board.getPiece(kingCoordinates)
 
     if (!king) {
         return false
     }
 
-    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 8 })
+    const rook = board.getPiece({ row: king.startingCoordinate.row, column: 8 })
 
     if (!rook) {
         return false
@@ -425,10 +411,10 @@ const canCastleKingSide = (board: BoardArray<ActivePiece>, color: Color) => {
     }
 
     for (let i = king.startingCoordinate.column + 1; i < rook.startingCoordinate.column; i++) {
-        if (board[king.startingCoordinate.row - 1][i - 1]) {
+        if (board.getPiece({ row: king.startingCoordinate.row, column: i })) {
             return false
         }
-        if (isAttacked(board, king.color, { row: king.startingCoordinate.row, column: i })) {
+        if (isAttacked(board.board, king.color, { row: king.startingCoordinate.row, column: i })) {
             return false
         }
     }
