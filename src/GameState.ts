@@ -1,4 +1,4 @@
-import { Board, canCastleKingSide, canCastleQueenSide, deepCopyBoard, emptyBoard, filterMovesOntopOfSameColor, getBoardCell, isCheck, NewBoard } from "./Board"
+import { Board, canCastleKingSide, canCastleQueenSide, emptyBoard, filterMovesOntopOfSameColor, getBoardCell, isCheck, NewBoard } from "./Board"
 import { Coordinate } from "./Coordinate"
 import { ActivePiece, Color } from "./pieces/ActivePiece"
 import { PieceName } from "./pieces/PieceName"
