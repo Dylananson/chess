@@ -7,7 +7,6 @@ export type GameState = {
     board: NewBoard,
     selectedPiece?: SelectedPiece
     playerTurn: Color
-    inCheck: boolean
     history: Array<NewBoard>
     historyIndex: number
     move: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => GameState
@@ -32,13 +31,11 @@ export const createGameState = (
     board: NewBoard,
     selectedPiece: SelectedPiece | undefined,
     playerTurn: Color,
-    inCheck: boolean,
     history?: Array<NewBoard>
 ): GameState => {
     return {
         selectedPiece,
         playerTurn,
-        inCheck,
         history: history ?? [board],
         historyIndex: 0,
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
