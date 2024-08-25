@@ -1,8 +1,7 @@
 import { expect, test } from "vitest";
-import { type GameState, tryMovePiece, selectPiece } from "../GameState";
-import { createBoard, getBoardCell } from "../Board";
+import { type GameState, selectPiece } from "../GameState";
+import { Coordinate, createBoard, getBoardCell } from "../Board";
 import { createGameState } from "../GameState";
-import { Coordinate } from "../Coordinate";
 import { defaultGame } from '../utils/gameStates';
 import { ActivePiece, Color } from "../pieces/ActivePiece";
 import { createBishop } from "../pieces/Bishop";
@@ -28,9 +27,7 @@ function assertPieceMovedCorrectly(newGame: GameState, startCoordinate: Coordina
 }
 
 export function selectAndMovePiece(game: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate) {
-    const gameWithSelectedPiece = selectPiece(game, startCoordinate)
-
-    return tryMovePiece(gameWithSelectedPiece, endCoordinate);
+    return game.move(startCoordinate, endCoordinate)
 }
 
 test("cant move pinned piece", () => {
@@ -375,23 +372,19 @@ test("move piece happy path rook", () => {
 
 test("move piece on own piece shouldn't move piece", () => {
     const game = defaultGame();
-
-    const gameWithSelectedPiece = selectPiece(game, { row: 1, column: 1 })
-
-    const otherPieceId = gameWithSelectedPiece.board.getPiece({ row: 1, column: 2 })?.id
-
+    const otherPieceId = game.getPiece({ row: 1, column: 2 })?.id
     expect(otherPieceId).toBeTruthy()
 
-    const newGame = tryMovePiece(gameWithSelectedPiece, { row: 1, column: 2 });
+    const newGame = game.move({ row: 1, column: 1 }, { row: 1, column: 2 })
 
     //piece shoudn't be in new coordinates
     expect(newGame.getPiece({ row: 6, column: 1 })).toEqual(undefined)
 
     //other piece should still be there
-    expect(newGame.getPiece({row:1,column:2})?.id).toEqual(otherPieceId)
+    expect(newGame.getPiece({ row: 1, column: 2 })?.id).toEqual(otherPieceId)
 
     //piece shouldn't have moved from old coordinates
-    expect(newGame.getPiece({row:1,column:1})?.id).toEqual("11")
+    expect(newGame.getPiece({ row: 1, column: 1 })?.id).toEqual("11")
 });
 
 

@@ -1,9 +1,9 @@
-import { Coordinate } from './Coordinate'
 import { filterPieceMovesThatPutKingInCheck } from './GameState'
 import { ActivePiece, Color } from './pieces/ActivePiece'
 import { PieceName } from './pieces/PieceName'
 
 export type Board<T> = Array<Array<undefined | T>>
+export type Coordinate = { row: number; column: number };
 
 export type NewBoard = {
     board: Board<ActivePiece>

@@ -7,8 +7,7 @@ import { createRook } from "./pieces/Rook"
 import { createQueen } from "./pieces/Queen"
 import { Color } from "./pieces/ActivePiece"
 import { defaultGame } from "./utils/gameStates"
-import { createNewBoard} from "./Board"
-import { Coordinate } from "./Coordinate"
+import { Coordinate, createNewBoard} from "./Board"
 import { GameState, selectPiece } from "./GameState"
 
 function MoveMarker() {
@@ -36,8 +35,6 @@ const isDarkSquare = (row: number, column: number) => {
 type PromotionProps = {
     handleClick: (name: PieceName) => void
 }
-
-//type MovesFunction = (board: Board<ActivePiece>, coorinates: Coordinate) => Array<Coordinate>
 
 const PromotionModal = ({ handleClick }: PromotionProps) => {
     return (
@@ -121,7 +118,7 @@ export function Game({ initGameState }: { initGameState: GameState }) {
 
             const isPawn = piece?.piece.name === PieceName.Pawn
 
-            newGame = gameState.movePiece(newCoordinates)
+            newGame = gameState.move(gameState.selectedPiece!?.coordinates, newCoordinates)
 
             if (isPawn && (newCoordinates.row === 1 || newCoordinates.row === 8)) {
                 setCanPromote(newCoordinates)

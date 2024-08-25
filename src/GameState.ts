@@ -4,15 +4,20 @@ import { ActivePiece, Color } from "./pieces/ActivePiece"
 import { PieceName } from "./pieces/PieceName"
 
 export type GameState = {
-    board:  NewBoard,
+    board: NewBoard,
     selectedPiece?: SelectedPiece
     playerTurn: Color
     inCheck: boolean
     history: Array<NewBoard>
     historyIndex: number
-    movePiece: (newCoordinates: Coordinate) => GameState
+    move: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => GameState
     getPiece: (coordinate: Coordinate) => ActivePiece | undefined
-    selectPiece: (coordinate: Coordinate) => GameState
+    selectPiece: (coordinate: Coordinate) => GameState,
+    canCastleKingSide: (color: Color) => boolean
+    canCastleQueenSide: (color: Color) => boolean
+    castleKingSide: (color: Color) => GameState
+    castleQueenSide: (color: Color) => GameState
+    with: (newBoard: NewBoard) => GameState
 }
 
 
@@ -36,8 +41,20 @@ export const createGameState = (
         inCheck,
         history: history ?? [board],
         historyIndex: 0,
-        movePiece(newCoordinates: Coordinate) {
-            return tryMovePiece(this, newCoordinates)
+        move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
+            return movePiece(this, oldCoordinates, newCoordinates)
+        },
+        with(newBoard: NewBoard) {
+            return {
+                ...this,
+                get board(): NewBoard {
+                    return this.history[this.history.length - 1]
+                },
+                history: [...this.history, newBoard],
+                selectedPiece: undefined,
+                playerTurn: this.playerTurn === Color.White ? Color.Black : Color.White,
+                historyIndex: this.historyIndex + 1,
+            }
         },
         getPiece(coordinate: Coordinate) {
             return this.board.getPiece(coordinate)
@@ -45,10 +62,99 @@ export const createGameState = (
         selectPiece(coordinate: Coordinate) {
             return selectPiece(this, coordinate)
         },
-        board : board
+        canCastleKingSide(color: Color) {
+            return this.board.canCastleKingSide(color)
+        },
+        canCastleQueenSide(color: Color) {
+            return this.board.canCastleQueenSide(color)
+        },
+        castleKingSide(color: Color) {
+            return this.with(this.board.castleKingSide(color))
+        },
+        castleQueenSide(color: Color) {
+            return this.with(this.board.castleQueenSide(color))
+        },
+
+        board: board
     }
 }
 
+export function movePiece(gameState: GameState, oldCoordinates: Coordinate | undefined, newCoordinates: Coordinate): GameState {
+    if(!oldCoordinates){
+        return gameState
+    }
+    const piece = gameState.getPiece(oldCoordinates)
+    if (!piece) {
+        console.log("Cannot move piece if no piece is selected");
+        return gameState
+    }
+
+    if (piece.color !== gameState.playerTurn) {
+        console.log("Cannot move piece on other players turn")
+        return gameState
+    }
+
+    const isCastleKingSideMove = isCastleKingSide(gameState.board.board, oldCoordinates, newCoordinates)
+
+    if (isCastleKingSideMove && gameState.canCastleKingSide(piece.color)) {
+        return gameState.castleKingSide(piece.color)
+    }
+
+    const isCastleQueenSideMove = isCastleQueenSide(gameState.board.board, oldCoordinates, newCoordinates)
+
+    if (isCastleQueenSideMove && gameState.canCastleQueenSide(piece.color)) {
+        return gameState.castleQueenSide(piece.color)
+    }
+
+    const canMove = gameState.board.isLegalMove(oldCoordinates, newCoordinates)
+
+    if (!canMove) {
+        console.log("Cannot move piece")
+        return gameState
+    }
+
+    return gameState.with(gameState.board.move(oldCoordinates, newCoordinates))
+}
+
+
+// export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
+//     if (!gameState.selectedPiece) {
+//         console.log("Cannot move piece if no piece is selected");
+//         return gameState
+//     }
+//
+//     if (gameState.selectedPiece.piece.color !== gameState.playerTurn) {
+//         console.log("Cannot move piece on other players turn")
+//         return gameState
+//     }
+//
+//     if (!gameState.selectedPiece) {
+//         console.error("No piece selected")
+//         return gameState
+//     }
+//
+//     const isCastleKingSideMove = isCastleKingSide(gameState.board.board, gameState.selectedPiece.coordinates, newCoordinates)
+//
+//     if (isCastleKingSideMove && gameState.canCastleKingSide(gameState.selectedPiece.piece.color)) {
+//         return gameState.castleKingSide(gameState.selectedPiece.piece.color)
+//     }
+//
+//     const isCastleQueenSideMove = isCastleQueenSide(gameState.board.board, gameState.selectedPiece.coordinates, newCoordinates)
+//
+//     if (isCastleQueenSideMove && gameState.canCastleQueenSide(gameState.selectedPiece.piece.color)) {
+//         return gameState.castleQueenSide(gameState.selectedPiece.piece.color)
+//     }
+//
+//     const canMove = gameState.board.isLegalMove(gameState.selectedPiece.coordinates, newCoordinates)
+//
+//     if (!canMove) {
+//         console.log("Cannot move piece")
+//         return gameState
+//     }
+//
+//     return gameState.move(gameState.selectedPiece.coordinates, newCoordinates)
+// }
+//
 
 export function deselectPiece(gameState: GameState): GameState {
     return { ...gameState, selectedPiece: undefined }
@@ -70,72 +176,6 @@ export const isCastleQueenSide = (board: Board<ActivePiece>, oldCoordinates: Coo
 }
 
 
-export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
-    if (!gameState.selectedPiece) {
-        console.log("Cannot move piece if no piece is selected");
-        return gameState
-    }
-
-    if (gameState.selectedPiece.piece.color !== gameState.playerTurn) {
-        console.log("Cannot move piece on other players turn")
-        return gameState
-    }
-
-    if (!gameState.selectedPiece) {
-        console.error("No piece selected")
-        return gameState
-    }
-
-    const isCastleKingSideMove = isCastleKingSide(gameState.board.board, gameState.selectedPiece.coordinates, newCoordinates)
-
-    if (isCastleKingSideMove && canCastleKingSide(gameState.board.board, gameState.selectedPiece.piece.color)) {
-        return {
-            ...gameState,
-            history: [...gameState.history, gameState.board.castleKingSide(gameState.selectedPiece.piece.color)],
-            get board(): NewBoard {
-                return this.history[this.history.length - 1]
-            },
-            selectedPiece: undefined,
-            playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White,
-            historyIndex: gameState.historyIndex + 1,
-        }
-    }
-
-    const isCastleQueenSideMove = isCastleQueenSide(gameState.board.board, gameState.selectedPiece.coordinates, newCoordinates)
-
-    if (isCastleQueenSideMove && gameState.board.canCastleQueenSide(gameState.selectedPiece.piece.color)) {
-        return {
-            ...gameState,
-            get board(): NewBoard {
-                return this.history[this.history.length - 1]
-            },
-            history: [...gameState.history, gameState.board.castleQueenSide(gameState.selectedPiece.piece.color)],
-            selectedPiece: undefined,
-            playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White,
-            historyIndex: gameState.historyIndex + 1,
-        }
-    }
-
-    const canMove = gameState.board.isLegalMove(gameState.selectedPiece.coordinates, newCoordinates)
-
-    if (!canMove) {
-        console.log("Cannot move piece")
-        return gameState
-    }
-
-    const newGame = {
-        ...gameState,
-        get board(): NewBoard {
-            return this.history[this.history.length - 1]
-        },
-        selectedPiece: undefined,
-        playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White,
-        historyIndex: gameState.historyIndex + 1,
-        history: [...gameState.history, gameState.board.move(gameState.selectedPiece.coordinates, newCoordinates)],
-    }
-
-    return newGame
-}
 
 
 
