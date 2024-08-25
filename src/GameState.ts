@@ -48,7 +48,7 @@ export const createGameState = (
                 },
                 history: [...oldHistory, this.board.promotePawn(coordinate, pieceName)],
                 selectedPiece: undefined,
-                historyIndex: this.historyIndex ,
+                historyIndex: this.historyIndex,
             }
         },
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
@@ -90,7 +90,7 @@ export const createGameState = (
 }
 
 export function movePiece(gameState: GameState, oldCoordinates: Coordinate | undefined, newCoordinates: Coordinate): GameState {
-    if(!oldCoordinates){
+    if (!oldCoordinates) {
         return gameState
     }
     const piece = gameState.getPiece(oldCoordinates)
