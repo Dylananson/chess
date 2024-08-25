@@ -40,11 +40,33 @@ export type Board = {
     isPieceInWay: (startingCoordinate: Coordinate, endCoordinate: Coordinate) => boolean,
     hasLegalMove: (color: Color) => boolean
     promotePawn: (coordinates: Coordinate, newPiece: PieceName) => Board
+    findKing: (color: Color) => Coordinate | undefined
 }
 
 export function createBoard(board: BoardArray<ActivePiece>): Board {
     return {
         board: board,
+        findKing(color: Color) {
+            let king: ActivePiece | undefined;
+            let kingCoordinate: Coordinate | undefined;
+
+            for (let row = 0; row < board.length; row++) {
+                for (let col = 0; col < board.length; col++) {
+                    const piece = board[row][col]
+                    if (piece?.color === color && piece?.piece?.name === PieceName.King) {
+                        king = piece
+                        kingCoordinate = { row: row + 1, column: col + 1 }
+                        break
+                    }
+                }
+                if (king) break;
+            }
+
+            if (!king || !kingCoordinate) {
+                return undefined
+            }
+            return kingCoordinate
+        },
         promotePawn(coordinates: Coordinate, pieceName: PieceName) {
             //assumes pawn is in promotion square
             const newBoard = deepCopyBoard(this.board)
@@ -101,7 +123,7 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
             return this.board[coord.row - 1][coord.column - 1]
         },
         isCheck(color: Color) {
-            return isCheck(this.board, color)
+            return isCheck(this, color)
         },
         isCheckMate(color: Color) {
             return isCheckMate(this, color)
@@ -172,28 +194,6 @@ export const createBoardWithPieces = (pieces: Array<ActivePiece>): Board => {
 
 export const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
 
-export function findKing(board: BoardArray<ActivePiece>, color: Color) {
-    let king: ActivePiece | undefined;
-    let kingCoordinate: Coordinate | undefined;
-
-    for (let row = 0; row < board.length; row++) {
-        for (let col = 0; col < board.length; col++) {
-            const piece = board[row][col]
-            if (piece?.color === color && piece?.piece?.name === PieceName.King) {
-                king = piece
-                kingCoordinate = { row: row + 1, column: col + 1 }
-                break
-            }
-        }
-        if (king) break;
-    }
-
-    if (!king || !kingCoordinate) {
-        return undefined
-    }
-    return kingCoordinate
-}
-
 export function isAttacked(board: BoardArray<ActivePiece>, color: Color, coordinate: Coordinate) {
     let allMoves: Array<Coordinate> = [];
 
@@ -212,15 +212,15 @@ export function isAttacked(board: BoardArray<ActivePiece>, color: Color, coordin
     return allMoves.some(move => compareCoordinates(move, coordinate))
 }
 
-export function isCheck(board: BoardArray<ActivePiece>, color: Color) {
-    const kingCoordinate = findKing(board, color)
+export function isCheck(board: Board, color: Color) {
+    const kingCoordinate = board.findKing(color)
 
     if (!kingCoordinate) {
         console.error("King not found")
         return false
     }
 
-    return isAttacked(board, color, kingCoordinate) 
+    return isAttacked(board.board, color, kingCoordinate)
 }
 
 
@@ -349,7 +349,7 @@ const canCastleQueenSide = (board: Board, color: Color) => {
     if (board.isCheck(color)) {
         return false
     }
-    const kingCoordinates = findKing(board.board, color)
+    const kingCoordinates = board.findKing(color)
 
     if (!kingCoordinates) {
         return false
@@ -388,7 +388,7 @@ const canCastleKingSide = (board: Board, color: Color) => {
     if (board.isCheck(color)) {
         return false
     }
-    const kingCoordinates = findKing(board.board, color)
+    const kingCoordinates = board.findKing(color)
 
     if (!kingCoordinates) {
         return false
@@ -424,7 +424,7 @@ const canCastleKingSide = (board: Board, color: Color) => {
 
 
 const castleQueenSide = (board: Board, color: Color) => {
-    const kingCoordinates = findKing(board.board, color)
+    const kingCoordinates = board.findKing(color)
 
     if (!kingCoordinates) {
         return board
@@ -447,7 +447,7 @@ const castleQueenSide = (board: Board, color: Color) => {
 
 
 const castleKingSide = (board: Board, color: Color) => {
-    const kingCoordinates = findKing(board.board, color)
+    const kingCoordinates = board.findKing(color)
 
     if (!kingCoordinates) {
         return board
