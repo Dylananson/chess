@@ -12,7 +12,7 @@ import { Color } from "../pieces/ActivePiece";
 test("set selected piece unselects if current is selected", () => {
     const state = defaultGame();
 
-    const bishop = state.board.getPiece({row:1, column:6});
+    const bishop = state.getPiece({row:1, column:6});
     expect(bishop?.piece.name).toEqual(PieceName.Bishop);
 
     const newState = selectPiece(state, { row: 1, column: 2 });

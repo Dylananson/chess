@@ -159,7 +159,7 @@ export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, co
 }
 
 export function selectPiece(gameState: GameState, coordinate: Coordinate): GameState {
-    const selectedPiece = gameState.board.getPiece(coordinate)
+    const selectedPiece = gameState.getPiece(coordinate)
 
     if (!selectedPiece) {
         return { ...gameState, selectedPiece: undefined }
@@ -181,8 +181,7 @@ export function selectPiece(gameState: GameState, coordinate: Coordinate): GameS
         }
     }
 
-
-    if (gameState?.selectedPiece?.piece.id === gameState.board.getPiece(coordinate)?.id) {
+    if (gameState?.selectedPiece?.piece.id === gameState.getPiece(coordinate)?.id) {
         console.log("Piece already selected")
         return { ...gameState, selectedPiece: undefined }
     }
