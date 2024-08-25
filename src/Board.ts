@@ -270,3 +270,149 @@ export function isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coor
 //
 //     return newBoard
 // }
+//
+//
+//
+export const canCastleQueenSide = (board: Board<ActivePiece>, color: Color) => {
+    if (isCheck(board, color)) {
+        return false
+    }
+    const kingCoordinates = findKing(board, color)
+
+    if (!kingCoordinates) {
+        return false
+    }
+
+    const king = getBoardCell(board, kingCoordinates)
+
+    if (!king) {
+        return false
+    }
+
+    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 1 })
+
+    if (!rook) {
+        return false
+    }
+
+    if (king.hasMoved || rook.hasMoved) {
+        return false
+    }
+
+    for (let i = king.startingCoordinate.column - 1; i > rook.startingCoordinate.column; i--) {
+        if (board[king.startingCoordinate.row - 1][i - 1]) {
+            return false
+        }
+        if (isAttacked(board, king.color, { row: king.startingCoordinate.row, column: i })) {
+            return false
+        }
+    }
+
+    return true
+}
+
+
+export const canCastleKingSide = (board: Board<ActivePiece>, color: Color) => {
+    if (isCheck(board, color)) {
+        return false
+    }
+    const kingCoordinates = findKing(board, color)
+
+    if (!kingCoordinates) {
+        return false
+    }
+
+    const king = getBoardCell(board, kingCoordinates)
+
+    if (!king) {
+        return false
+    }
+
+    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 8 })
+
+    if (!rook) {
+        return false
+    }
+
+    if (king.hasMoved || rook.hasMoved) {
+        return false
+    }
+
+    for (let i = king.startingCoordinate.column + 1; i < rook.startingCoordinate.column; i++) {
+        if (board[king.startingCoordinate.row - 1][i - 1]) {
+            return false
+        }
+        if (isAttacked(board, king.color, { row: king.startingCoordinate.row, column: i })) {
+            return false
+        }
+    }
+
+    return true
+}
+
+
+export const castleQueenSide = (board: Board<ActivePiece>, color: Color) => {
+    const newBoard = deepCopyBoard(board)
+    const kingCoordinates = findKing(board, color)
+
+    if (!kingCoordinates) {
+        return board
+    }
+
+    const king = getBoardCell(board, kingCoordinates)
+
+    if (!king) {
+        return board
+    }
+
+    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 1 })
+
+    if (!rook) {
+        return board
+    }
+
+    if (!canCastleQueenSide(board, color)) {
+        return board
+    }
+
+    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 1] = undefined
+    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 2 - 1] = king.move()
+    newBoard[king.startingCoordinate.row - 1][1 - 1] = undefined
+    newBoard[king.startingCoordinate.row - 1][4 - 1] = rook.move()
+
+    return newBoard
+}
+
+export const castleKingSide = (board: Board<ActivePiece>, color: Color) => {
+    const newBoard = deepCopyBoard(board)
+    const kingCoordinates = findKing(board, color)
+
+    if (!kingCoordinates) {
+        return board
+    }
+
+    const king = getBoardCell(board, kingCoordinates)
+
+    if (!king) {
+        return board
+    }
+
+    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 8 })
+
+    if (!rook) {
+        return board
+    }
+
+    if (!canCastleKingSide(board, color)) {
+        return board
+    }
+
+    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 1] = undefined
+    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column + 2 - 1] = king.move()
+
+    newBoard[king.startingCoordinate.row - 1][8 - 1] = undefined
+    newBoard[king.startingCoordinate.row - 1][6 - 1] = rook.move()
+
+    return newBoard
+}
+
