@@ -11,8 +11,6 @@ export type GameState = {
     move: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => GameState
     getPiece: (coordinate: Coordinate) => ActivePiece | undefined
     selectPiece: (coordinate: Coordinate) => GameState,
-    canCastleKingSide: (color: Color) => boolean
-    canCastleQueenSide: (color: Color) => boolean
     castleKingSide: (color: Color) => GameState
     castleQueenSide: (color: Color) => GameState
     promotePawn: (coordinate: Coordinate, pieceName: PieceName) => GameState
@@ -71,12 +69,6 @@ export const createGameState = (
         selectPiece(coordinate: Coordinate) {
             return selectPiece(this, coordinate)
         },
-        canCastleKingSide(color: Color) {
-            return this.board.canCastleKingSide(color)
-        },
-        canCastleQueenSide(color: Color) {
-            return this.board.canCastleQueenSide(color)
-        },
         castleKingSide(color: Color) {
             return this.with(this.board.castleKingSide(color))
         },
@@ -105,13 +97,13 @@ export function movePiece(gameState: GameState, oldCoordinates: Coordinate | und
 
     const isCastleKingSideMove = isCastleKingSide(gameState.board.board, oldCoordinates, newCoordinates)
 
-    if (isCastleKingSideMove && gameState.canCastleKingSide(piece.color)) {
+    if (isCastleKingSideMove && gameState.board.canCastleKingSide(piece.color)) {
         return gameState.castleKingSide(piece.color)
     }
 
     const isCastleQueenSideMove = isCastleQueenSide(gameState.board.board, oldCoordinates, newCoordinates)
 
-    if (isCastleQueenSideMove && gameState.canCastleQueenSide(piece.color)) {
+    if (isCastleQueenSideMove && gameState.board.canCastleQueenSide(piece.color)) {
         return gameState.castleQueenSide(piece.color)
     }
 
