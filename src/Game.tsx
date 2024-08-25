@@ -39,68 +39,6 @@ export type GameState = {
     historyIndex: number
 }
 
-function bfs(startingCoordinate: Coordinate, validMoves: Array<Coordinate>, dirs: Array<Coordinate>, board: Board<ActivePiece>) {
-    const queue = [startingCoordinate]
-    const blockedDirs: Set<string> = new Set([])
-    const seen: Board<boolean> = emptyBoard()
-    const out: Array<Coordinate> = []
-    let x = 0
-
-    while (queue.length) {
-        x += 1
-        const coord = queue.pop()
-
-        if (!coord) {
-            console.error("this shouldnt happend")
-            return
-        }
-
-        dirs.forEach(dir => {
-            x += 1
-            if (!blockedDirs.has(`${dir.row}${dir.column}`)) {
-                const nextCoord = { row: coord.row - dir.row, column: coord.column - dir.column }
-
-
-                if (validMoves.some(x => x.row === nextCoord.row && x.column === nextCoord.column) && isOnBoard(nextCoord) &&
-                    !seen[nextCoord.row - 1][nextCoord.column - 1]
-                ) {
-
-                    if (getBoardCell(board, nextCoord)) {
-                        blockedDirs.add(`${dir.row}${dir.column}`)
-                    }
-                    else {
-                        out.push(nextCoord)
-                        queue.push(nextCoord)
-                        seen[nextCoord.row - 1][nextCoord.column - 1] = true
-                    }
-                }
-            }
-
-        })
-    }
-
-    return out
-
-}
-
-export function filterBlockingMoves(startingCoordinate: Coordinate, validMoves: Array<Coordinate>, board: Board<ActivePiece>) {
-
-    const filtered = bfs(startingCoordinate, validMoves, [
-        { row: 1, column: 0 },
-        { row: 0, column: 1 },
-        { row: -1, column: 0 },
-        { row: 0, column: -1 },
-
-        { row: 1, column: 1 },
-        { row: -1, column: -1 },
-        { row: 1, column: -1 },
-        { row: -1, column: 1 },
-    ], board)
-
-
-    return filtered
-}
-
 export function isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coordinate, board: Board<ActivePiece>): boolean {
     const isOccupied = (row: number, column: number) => {
         console.log(row)
