@@ -16,7 +16,7 @@ export type GameState = {
     canCastleQueenSide: (color: Color) => boolean
     castleKingSide: (color: Color) => GameState
     castleQueenSide: (color: Color) => GameState
-    with: (newBoard: NewBoard) => GameState
+    withBoard: (newBoard: NewBoard) => GameState
 }
 
 
@@ -41,7 +41,7 @@ export const createGameState = (
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
             return movePiece(this, oldCoordinates, newCoordinates)
         },
-        with(newBoard: NewBoard) {
+        withBoard(newBoard: NewBoard) {
             return {
                 ...this,
                 get board(): NewBoard {
@@ -66,10 +66,10 @@ export const createGameState = (
             return this.board.canCastleQueenSide(color)
         },
         castleKingSide(color: Color) {
-            return this.with(this.board.castleKingSide(color))
+            return this.withBoard(this.board.castleKingSide(color))
         },
         castleQueenSide(color: Color) {
-            return this.with(this.board.castleQueenSide(color))
+            return this.withBoard(this.board.castleQueenSide(color))
         },
 
         board: board
@@ -110,48 +110,9 @@ export function movePiece(gameState: GameState, oldCoordinates: Coordinate | und
         return gameState
     }
 
-    return gameState.with(gameState.board.move(oldCoordinates, newCoordinates))
+    return gameState.withBoard(gameState.board.move(oldCoordinates, newCoordinates))
 }
 
-
-// export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): GameState {
-//     if (!gameState.selectedPiece) {
-//         console.log("Cannot move piece if no piece is selected");
-//         return gameState
-//     }
-//
-//     if (gameState.selectedPiece.piece.color !== gameState.playerTurn) {
-//         console.log("Cannot move piece on other players turn")
-//         return gameState
-//     }
-//
-//     if (!gameState.selectedPiece) {
-//         console.error("No piece selected")
-//         return gameState
-//     }
-//
-//     const isCastleKingSideMove = isCastleKingSide(gameState.board.board, gameState.selectedPiece.coordinates, newCoordinates)
-//
-//     if (isCastleKingSideMove && gameState.canCastleKingSide(gameState.selectedPiece.piece.color)) {
-//         return gameState.castleKingSide(gameState.selectedPiece.piece.color)
-//     }
-//
-//     const isCastleQueenSideMove = isCastleQueenSide(gameState.board.board, gameState.selectedPiece.coordinates, newCoordinates)
-//
-//     if (isCastleQueenSideMove && gameState.canCastleQueenSide(gameState.selectedPiece.piece.color)) {
-//         return gameState.castleQueenSide(gameState.selectedPiece.piece.color)
-//     }
-//
-//     const canMove = gameState.board.isLegalMove(gameState.selectedPiece.coordinates, newCoordinates)
-//
-//     if (!canMove) {
-//         console.log("Cannot move piece")
-//         return gameState
-//     }
-//
-//     return gameState.move(gameState.selectedPiece.coordinates, newCoordinates)
-// }
-//
 
 export function deselectPiece(gameState: GameState): GameState {
     return { ...gameState, selectedPiece: undefined }
@@ -171,9 +132,6 @@ export const isCastleQueenSide = (board: Board<ActivePiece>, oldCoordinates: Coo
     }
     return oldCoordinates.column === 5 && newCoordinates.column === 3
 }
-
-
-
 
 
 export function filterPieceMovesThatPutKingInCheck(board: NewBoard, coordinate: Coordinate, moves: Array<Coordinate>) {
