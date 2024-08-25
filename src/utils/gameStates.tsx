@@ -1,5 +1,5 @@
 import { Game } from "../Game"
-import { Board, createBoard, emptyBoard } from "../Board"
+import { Board, createBoard, createNewBoard, emptyBoard } from "../Board"
 import { ActivePiece, Color } from "../pieces/ActivePiece"
 import { createBishop } from "../pieces/Bishop"
 import { createKing } from "../pieces/King"
@@ -104,5 +104,5 @@ export const defaultGame = (): GameState => {
         return board
     }
 
-    return createGameState(initBoard(), undefined, Color.White, false)
+    return createGameState(createNewBoard(initBoard()), undefined, Color.White, false)
 }

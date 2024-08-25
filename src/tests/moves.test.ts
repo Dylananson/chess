@@ -12,7 +12,7 @@ test("bishop moves works", () => {
     const board = createBoard([
         bishop
     ])
-    const moves = bishop.piece.moves(board, coordinates)
+    const moves = bishop.piece.moves(board.board, coordinates)
 
     expect(moves).toEqual([
         { row: 2, column: 2 },
@@ -66,7 +66,7 @@ test("rook moves works", () => {
     const board = createBoard([
         rook
     ])
-    const moves = rook.piece.moves(board, coordinates)
+    const moves = rook.piece.moves(board.board, coordinates)
 
     const expected = [
         { row: 1, column: 4 },
@@ -96,7 +96,7 @@ test("queen moves works", () => {
     const board = createBoard([
         queen
     ])
-    const moves = queen.piece.moves(board, coordinates)
+    const moves = queen.piece.moves(board.board, coordinates)
 
     const expected = [
         { row: 1, column: 1 },

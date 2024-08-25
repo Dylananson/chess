@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { isCheckMate, createBoard } from '../Board';
+import { createBoard } from '../Board';
 import { createKing } from '../pieces/King';
 import { Color } from '../pieces/ActivePiece';
 import { createQueen } from '../pieces/Queen';
@@ -15,7 +15,7 @@ test("checkmate happy path", () => {
         queen2
     ])
 
-    const checkmate = isCheckMate(board, Color.Black)
+    const checkmate = board.isCheckMate(Color.Black)
 
     expect(checkmate).toEqual(true);
 })
@@ -30,7 +30,7 @@ test("not checkmate if can take", () => {
         queen,
     ])
 
-    const checkmate = isCheckMate(board, Color.Black)
+    const checkmate = board.isCheckMate(Color.Black)
 
     expect(checkmate).toEqual(false);
 })
@@ -48,7 +48,7 @@ test("checkmate if checking piece protected", () => {
         queen2
     ])
 
-    const checkmate = isCheckMate(board, Color.Black)
+    const checkmate = board.isCheckMate(Color.Black)
 
     expect(checkmate).toEqual(true);
 })

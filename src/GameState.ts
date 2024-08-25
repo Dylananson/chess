@@ -1,14 +1,14 @@
-import { Board, canCastleKingSide, canCastleQueenSide, castleKingSide, castleQueenSide, deepCopyBoard, emptyBoard, filterMovesOntopOfSameColor, getBoardCell,  isCheck, isLegalMove } from "./Board"
+import { Board, canCastleKingSide, canCastleQueenSide, deepCopyBoard, emptyBoard, filterMovesOntopOfSameColor, getBoardCell, isCheck, NewBoard } from "./Board"
 import { Coordinate } from "./Coordinate"
 import { ActivePiece, Color } from "./pieces/ActivePiece"
 import { PieceName } from "./pieces/PieceName"
 
 export type GameState = {
-    board: Board<ActivePiece>
+    board:  NewBoard,
     selectedPiece?: SelectedPiece
     playerTurn: Color
     inCheck: boolean
-    history: Array<Board<ActivePiece>>
+    history: Array<NewBoard>
     historyIndex: number
     movePiece: (newCoordinates: Coordinate) => GameState
 }
@@ -21,9 +21,14 @@ export type SelectedPiece = {
 }
 
 
-export const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean, history?: Array<Board<ActivePiece>>): GameState => {
+export const createGameState = (
+    board: NewBoard,
+    selectedPiece: SelectedPiece | undefined,
+    playerTurn: Color,
+    inCheck: boolean,
+    history?: Array<NewBoard>
+): GameState => {
     return {
-        board,
         selectedPiece,
         playerTurn,
         inCheck,
@@ -31,7 +36,8 @@ export const createGameState = (board: Board<ActivePiece>, selectedPiece: Select
         historyIndex: 0,
         movePiece(newCoordinates: Coordinate) {
             return tryMovePiece(this, newCoordinates)
-        }
+        },
+        board : board
     }
 }
 
@@ -72,13 +78,13 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         return gameState
     }
 
-    const isCastleKingSideMove = isCastleKingSide(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
+    const isCastleKingSideMove = isCastleKingSide(gameState.board.board, gameState.selectedPiece.coordinates, newCoordinates)
 
-    if (isCastleKingSideMove && canCastleKingSide(gameState.board, gameState.selectedPiece.piece.color)) {
+    if (isCastleKingSideMove && canCastleKingSide(gameState.board.board, gameState.selectedPiece.piece.color)) {
         return {
             ...gameState,
-            history: [...gameState.history, castleKingSide(gameState.board, gameState.selectedPiece.piece.color)],
-            get board(): Board<ActivePiece> {
+            history: [...gameState.history, gameState.board.castleKingSide(gameState.selectedPiece.piece.color)],
+            get board(): NewBoard {
                 return this.history[this.history.length - 1]
             },
             selectedPiece: undefined,
@@ -87,42 +93,37 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
         }
     }
 
-    const isCastleQueenSideMove = isCastleQueenSide(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
+    const isCastleQueenSideMove = isCastleQueenSide(gameState.board.board, gameState.selectedPiece.coordinates, newCoordinates)
 
-    if (isCastleQueenSideMove && canCastleQueenSide(gameState.board, gameState.selectedPiece.piece.color)) {
+    if (isCastleQueenSideMove && gameState.board.canCastleQueenSide(gameState.selectedPiece.piece.color)) {
         return {
             ...gameState,
-            get board(): Board<ActivePiece> {
+            get board(): NewBoard {
                 return this.history[this.history.length - 1]
             },
-            history: [...gameState.history, castleQueenSide(gameState.board, gameState.selectedPiece.piece.color)],
+            history: [...gameState.history, gameState.board.castleQueenSide(gameState.selectedPiece.piece.color)],
             selectedPiece: undefined,
             playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White,
             historyIndex: gameState.historyIndex + 1,
         }
     }
 
-    const canMove = isLegalMove(gameState.board, gameState.selectedPiece.coordinates, newCoordinates)
+    const canMove = gameState.board.isLegalMove(gameState.selectedPiece.coordinates, newCoordinates)
 
     if (!canMove) {
         console.log("Cannot move piece")
         return gameState
     }
 
-    const newBoard = deepCopyBoard(gameState.board)
-
-    newBoard[gameState.selectedPiece.coordinates?.row - 1][gameState.selectedPiece?.coordinates.column - 1] = undefined
-    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = { ...gameState.selectedPiece.piece, hasMoved: true }
-
     const newGame = {
         ...gameState,
-        get board(): Board<ActivePiece> {
+        get board(): NewBoard {
             return this.history[this.history.length - 1]
         },
         selectedPiece: undefined,
         playerTurn: gameState.playerTurn === Color.White ? Color.Black : Color.White,
         historyIndex: gameState.historyIndex + 1,
-        history: [...gameState.history, newBoard],
+        history: [...gameState.history, gameState.board.move(gameState.selectedPiece.coordinates, newCoordinates)],
     }
 
     return newGame
@@ -154,30 +155,30 @@ export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, co
 }
 
 export function selectPiece(gameState: GameState, coordinate: Coordinate): GameState {
-    const selectedPiece = gameState.board[coordinate.row - 1][coordinate.column - 1]
+    const selectedPiece = gameState.board.getPiece(coordinate)
 
     if (!selectedPiece) {
         return { ...gameState, selectedPiece: undefined }
     }
     console.log("Selecting piece")
 
-    const filteredCheckMoves = filterPieceMovesThatPutKingInCheck(gameState.board, coordinate, selectedPiece.piece.moves(gameState.board, coordinate))
+    const filteredCheckMoves = filterPieceMovesThatPutKingInCheck(gameState.board.board, coordinate, selectedPiece.piece.moves(gameState.board.board, coordinate))
 
-    const pieceMoves = filterMovesOntopOfSameColor(gameState.board, filteredCheckMoves, selectedPiece.color)
+    const pieceMoves = filterMovesOntopOfSameColor(gameState.board.board, filteredCheckMoves, selectedPiece.color)
 
     if (selectedPiece.piece.name === PieceName.King) {
-        if (canCastleQueenSide(gameState.board, selectedPiece.color)) {
+        if (canCastleQueenSide(gameState.board.board, selectedPiece.color)) {
             pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 3 })
         }
 
-        if (canCastleKingSide(gameState.board, selectedPiece.color)) {
+        if (canCastleKingSide(gameState.board.board, selectedPiece.color)) {
             console.log("Can castle king side")
             pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 7 })
         }
     }
 
 
-    if (gameState?.selectedPiece?.piece.id === gameState.board[coordinate.row - 1][coordinate.column - 1]?.id) {
+    if (gameState?.selectedPiece?.piece.id === gameState.board.getPiece(coordinate)?.id) {
         console.log("Piece already selected")
         return { ...gameState, selectedPiece: undefined }
     }

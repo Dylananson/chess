@@ -13,9 +13,7 @@ test("stalemate happy path", () => {
         createKing(Color.White, { row: 3, column: 1 }),
     ])
 
-    const stalemate = isStalemate(board, Color.Black)
-
-    expect(stalemate).toEqual(true);
+    expect(board.isStalemate(Color.Black)).toEqual(true);
 })
 
 
@@ -27,8 +25,6 @@ test("not stalemate if checked", () => {
         createKing(Color.White, { row: 3, column: 1 }),
     ])
 
-    const stalemate = isStalemate(board, Color.Black)
-
-    expect(stalemate).toEqual(false);
+    expect(board.isStalemate(Color.Black)).toEqual(false);
 })
 

@@ -14,6 +14,7 @@ export type ActivePiece = {
     id: string;
     hasMoved: boolean;
     move: () => ActivePiece
+    copy: () => ActivePiece
 }  
 
 export function createActivePiece (piece:_ActivePiece) : ActivePiece {
@@ -21,6 +22,9 @@ export function createActivePiece (piece:_ActivePiece) : ActivePiece {
         ...piece, 
         move () {
             return {...this, hasMoved: true}
+        },
+        copy () {
+            return {...this}
         }
     }
 }

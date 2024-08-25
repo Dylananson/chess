@@ -16,13 +16,11 @@ test("filter out moves that put king in check shouldnt filter ", () => {
         queen
     ])
 
-    const gameState = createGameState(board, undefined, Color.Black, false)
-
     const coordinate = { row: 1, column: 1 }
 
-    const moves = king.piece.moves(gameState.board, coordinate)
+    const moves = king.piece.moves(board.board, coordinate)
     
-    const filteredMoves = filterPieceMovesThatPutKingInCheck(gameState.board, coordinate, moves)
+    const filteredMoves = filterPieceMovesThatPutKingInCheck(board.board, coordinate, moves)
 
     expect(filteredMoves.length).toEqual(moves.length);
 })
@@ -38,11 +36,9 @@ test("dont filter when king can take piece", () => {
         queen
     ])
 
-    const gameState = createGameState(board, undefined, Color.Black, false)
-
-    const moves = king.piece.moves(gameState.board, kingCoordinate)
+    const moves = king.piece.moves(board.board, kingCoordinate)
     
-    const filteredMoves = filterPieceMovesThatPutKingInCheck(board, kingCoordinate, moves)
+    const filteredMoves = filterPieceMovesThatPutKingInCheck(board.board, kingCoordinate, moves)
 
     expect(filteredMoves.length).toEqual(1);
     expect(filteredMoves[0].row).toEqual(2);
@@ -62,11 +58,9 @@ test("filter out moves that put king in check happy path", () => {
         queen2
     ])
 
-    const gameState = createGameState(board, undefined, Color.Black, false)
-
-    const moves = king.piece.moves(gameState.board, kingCoordinate)
+    const moves = king.piece.moves(board.board, kingCoordinate)
     
-    const filteredMoves = filterPieceMovesThatPutKingInCheck(board, kingCoordinate, moves)
+    const filteredMoves = filterPieceMovesThatPutKingInCheck(board.board, kingCoordinate, moves)
 
     expect(filteredMoves.length).toEqual(0);
 })
@@ -86,7 +80,7 @@ test("is in check happy path", () => {
 
     game.playerTurn = Color.Black
 
-    const checked = isCheck(game.board, Color.Black)
+    const checked = game.board.isCheck( Color.Black)
 
     expect(checked).toEqual(true);
 });
@@ -104,7 +98,7 @@ test("not in check if hit by same color", () => {
 
     game.playerTurn = Color.Black
 
-    const checked = isCheck(game.board, Color.Black)
+    const checked = game.board.isCheck( Color.Black)
 
     expect(checked).toEqual(false);
 });
@@ -131,7 +125,7 @@ test("in check if hit by knight with pieces in way", () => {
 
     game.playerTurn = Color.Black
 
-    const checked = isCheck(game.board, Color.Black)
+    const checked = game.board.isCheck( Color.Black)
 
     expect(checked).toEqual(true);
 });
@@ -153,7 +147,7 @@ test("not in check if piece blocked", () => {
 
     game.playerTurn = Color.Black
 
-    const checked = isCheck(game.board, Color.Black)
+    const checked = game.board.isCheck( Color.Black)
 
     expect(checked).toEqual(false);
 });

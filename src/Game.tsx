@@ -7,7 +7,7 @@ import { createRook } from "./pieces/Rook"
 import { createQueen } from "./pieces/Queen"
 import { Color } from "./pieces/ActivePiece"
 import { defaultGame } from "./utils/gameStates"
-import { deepCopyBoard, getBoardCell, isCheck, hasLegalMove, isStalemate, getLegalMoves, isCheckMate} from "./Board"
+import { createNewBoard} from "./Board"
 import { Coordinate } from "./Coordinate"
 import { GameState, selectPiece } from "./GameState"
 
@@ -69,7 +69,7 @@ export function Game({ initGameState }: { initGameState: GameState }) {
     const handlePromotion = (name: PieceName) => {
         console.log("Promoting to", name)
 
-        const newBoard = deepCopyBoard(gameState.board)
+        const newBoard = gameState.board.copyBoard() //deepCopyBoard(gameState.board)
         if (!canPromote) {
             console.error("Cannot promote")
             return
@@ -97,9 +97,11 @@ export function Game({ initGameState }: { initGameState: GameState }) {
 
         newBoard[canPromote?.row - 1][canPromote?.column - 1] = newPiece
 
+
+
         setGameState({
             ...gameState,
-            board: newBoard
+            board: createNewBoard(newBoard)
         })
         setCanPromote(undefined)
     }
@@ -111,7 +113,7 @@ export function Game({ initGameState }: { initGameState: GameState }) {
         const selectedPiece = gameState.selectedPiece
         let newGame;
 
-        if (!selectedPiece || getBoardCell(gameState.board, newCoordinates)?.color === gameState.playerTurn) {
+        if (!selectedPiece || gameState.board.getPiece(newCoordinates)?.color === gameState.playerTurn) {
             newGame = selectPiece(gameState, newCoordinates)
         } else {
 
@@ -127,17 +129,15 @@ export function Game({ initGameState }: { initGameState: GameState }) {
         }
 
         console.log("Player turn", newGame.playerTurn)
-        console.log("Check", isCheck(newGame.board, newGame.playerTurn))
-        console.log("has legal move", hasLegalMove(newGame.board, newGame.playerTurn))
-        console.log("stalemate", isStalemate(newGame.board, newGame.playerTurn))
-        console.log("legal moves", getLegalMoves(newGame.board, newGame.playerTurn))
+        // console.log("Check", isCheck(newGame.board, newGame.playerTurn))
+        // console.log("has legal move", hasLegalMove(newGame.board, newGame.playerTurn))
+        // console.log("stalemate", isStalemate(newGame.board, newGame.playerTurn))
+        // console.log("legal moves", getLegalMoves(newGame.board, newGame.playerTurn))
         setGameState(newGame)
 
-        if (isCheckMate(newGame.board, newGame.playerTurn)) {
+        if(newGame.board.isCheckMate(newGame.playerTurn)){
             console.log("Checkmate")
             alert("Checkmate")
-
-            setGameState(defaultGame())
         }
 
     }
@@ -163,9 +163,9 @@ export function Game({ initGameState }: { initGameState: GameState }) {
                         {columns.map((column) => {
                             let p;
                             if (gameState.historyIndex !== gameState.history.length - 1) {
-                                p = gameState.history[gameState.historyIndex][row - 1][column - 1]
+                                p = gameState.history[gameState.historyIndex].board[row - 1][column - 1]
                             } else {
-                                p = gameState.board[row - 1][column - 1]
+                                p = gameState.board.board[row - 1][column - 1]
                             }
 
                             const validMove = gameState.selectedPiece?.moves[row - 1][column - 1] ?? false

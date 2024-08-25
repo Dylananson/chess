@@ -1,9 +1,27 @@
 import { Coordinate } from './Coordinate'
-import { filterPieceMovesThatPutKingInCheck } from './GameState'
+import { filterPieceMovesThatPutKingInCheck, tryMovePiece } from './GameState'
 import { ActivePiece, Color } from './pieces/ActivePiece'
 import { PieceName } from './pieces/PieceName'
 
 export type Board<T> = Array<Array<undefined | T>>
+
+export type NewBoard = {
+    board: Board<ActivePiece>
+    move: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => NewBoard
+    copy: () => NewBoard
+    copyBoard: () => Board<ActivePiece>
+    getPiece: (coordinates: Coordinate) => ActivePiece | undefined
+    isCheck: (color: Color) => boolean
+    isCheckMate: (color: Color) => boolean
+    isStalemate: (color: Color) => boolean
+    canCastleKingSide: (color: Color) => boolean
+    canCastleQueenSide: (color: Color) => boolean
+    castleKingSide: (color: Color) => NewBoard
+    castleQueenSide: (color: Color) => NewBoard
+    getLegalMoves: (color: Color) => Array<Coordinate>
+    isLegalMove: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => boolean
+    isPieceInWay: (startingCoordinate: Coordinate, endCoordinate: Coordinate) => boolean
+}
 
 export const emptyRow = (): Row<undefined> => {
     return Array.from(Array(8))
@@ -26,7 +44,6 @@ export const isOnBoard = (coordinate: Coordinate) => {
 }
 
 
-
 export function deepCopyBoard<T>(board: Board<T>): Board<T> {
     return board.map(arr => arr.slice())
 }
@@ -40,12 +57,64 @@ export function getBoardCell(board: Board<ActivePiece>, coord: Coordinate) {
 }
 
 
-export const createBoard = (pieces: Array<ActivePiece>) => {
+export function createNewBoard(board: Board<ActivePiece>): NewBoard {
+    return {
+        board: board,
+        copy: () => createNewBoard(deepCopyBoard(board)),
+        copyBoard: () => deepCopyBoard(board),
+        move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
+            const piece = this.getPiece(oldCoordinates)
+            const newBoard = this.copyBoard()
+          
+            newBoard[oldCoordinates?.row - 1][oldCoordinates.column - 1] = undefined
+            newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = piece?.move()
+            return createNewBoard(newBoard)
+        },
+        getPiece(coord: Coordinate) {
+            return getBoardCell(this.board, coord)
+        },
+        isCheck(color: Color) {
+            return isCheck(this.board, color)
+        },
+        isCheckMate(color: Color) {
+            return isCheckMate(this.board, color)
+        },
+        isStalemate(color: Color) {
+            return isStalemate(this.board, color)
+        },
+        canCastleKingSide(color: Color) {
+            return canCastleKingSide(this.board, color)
+        },
+        canCastleQueenSide(color: Color) {
+            return canCastleQueenSide(this.board, color)
+        },
+        castleKingSide(color: Color) {
+            return createNewBoard(castleKingSide(this.board, color))
+        },
+        castleQueenSide(color: Color) {
+            return createNewBoard(castleQueenSide(this.board, color))
+        },
+        getLegalMoves(color: Color) {
+            return getLegalMoves(this.board, color)
+        },
+        isLegalMove(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
+            return isLegalMove(this.board, oldCoordinates, newCoordinates)
+        },
+        isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coordinate) {
+            return isPieceInWay(startingCoordinate, endCoordinate, this.board)
+        }
+    }
+}
+
+
+
+export const createBoard = (pieces: Array<ActivePiece>): NewBoard => {
     const board: Board<ActivePiece> = emptyBoard()
     pieces.forEach(piece => {
         board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
     })
-    return board
+
+    return createNewBoard(board)
 }
 
 
@@ -263,13 +332,6 @@ export function isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coor
 }
 
 //
-// export function movePiece(board: Board<ActivePiece>, selectedPiece: SelectedPiece, newCoordinates: Coordinate): Board<ActivePiece> {
-//     const newBoard = deepCopyBoard(board)
-//     newBoard[selectedPiece.coordinates?.row - 1][selectedPiece?.coordinates.column - 1] = undefined
-//     newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = selectedPiece.piece
-//
-//     return newBoard
-// }
 //
 //
 //

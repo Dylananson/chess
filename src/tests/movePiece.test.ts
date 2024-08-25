@@ -14,17 +14,17 @@ import { createKing } from "../pieces/King";
 
 function assertPieceNotMoved(newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece, expectedPiece?: ActivePiece) {
     //piece shouldnt have moved
-    expect(getBoardCell(newGame.board, endCoordinate)).toEqual(expectedPiece)
-    expect(getBoardCell(newGame.board, startCoordinate)).toEqual(piece)
+    expect(newGame.board.getPiece(endCoordinate)).toEqual(expectedPiece)
+    expect(newGame.board.getPiece(startCoordinate)).toEqual(piece)
     expect(newGame.playerTurn).toEqual(piece.color)
 }
 
 
 function assertPieceMovedCorrectly(newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece) {
     //piece shouldn't be in old coordinates for new board
-    expect(getBoardCell(newGame.board, endCoordinate)).toEqual({ ...piece, hasMoved: true })
+    expect(newGame.board.getPiece(endCoordinate)).toEqual({ ...piece, hasMoved: true })
     //piece shouldn't be in old coordinates
-    expect(getBoardCell(newGame.board, startCoordinate)).toEqual(undefined)
+    expect(newGame.board.getPiece(startCoordinate)).toEqual(undefined)
 }
 
 export function selectAndMovePiece(game: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate) {
@@ -378,20 +378,20 @@ test("move piece on own piece shouldn't move piece", () => {
 
     const gameWithSelectedPiece = selectPiece(game, { row: 1, column: 1 })
 
-    const otherPieceId = gameWithSelectedPiece.board[0][1]?.id
+    const otherPieceId = gameWithSelectedPiece.board.getPiece({ row: 1, column: 2 })?.id
 
     expect(otherPieceId).toBeTruthy()
 
     const newGame = tryMovePiece(gameWithSelectedPiece, { row: 1, column: 2 });
 
     //piece shoudn't be in new coordinates
-    expect(newGame.board[5][0]).toEqual(undefined)
+    expect(newGame.board.getPiece({ row: 6, column: 1 })).toEqual(undefined)
 
     //other piece should still be there
-    expect(newGame.board[0][1]?.id).toEqual(otherPieceId)
+    expect(newGame.board.getPiece({row:1,column:2})?.id).toEqual(otherPieceId)
 
     //piece shouldn't have moved from old coordinates
-    expect(newGame.board[0][0]?.id).toEqual("11")
+    expect(newGame.board.getPiece({row:1,column:1})?.id).toEqual("11")
 });
 
 
