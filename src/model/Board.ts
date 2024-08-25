@@ -9,6 +9,19 @@ import { createRook } from './pieces/Rook';
 export type BoardArray<T> = Array<Array<undefined | T>>
 export type Coordinate = { row: number; column: number };
 
+export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
+    return coord1.row === coord2.row && coord1.column === coord2.column
+}
+
+export const emptyRow = (): Row<undefined> => {
+    return Array.from(Array(8))
+}
+export const emptyBoard = (): BoardArray<undefined> => {
+    return Array.from(Array(8)).map(emptyRow);
+}
+
+type Row<T> = Array<T>
+
 export type Board = {
     board: BoardArray<ActivePiece>
     move: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => Board
@@ -112,7 +125,7 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
             return getLegalMoves(this, color)
         },
         isLegalMove(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
-            return isLegalMove(this.board, oldCoordinates, newCoordinates)
+            return isLegalMove(this, oldCoordinates, newCoordinates)
         },
         isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coordinate) {
             return isPieceInWay(startingCoordinate, endCoordinate, this.board)
@@ -122,17 +135,6 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
         }
     }
 }
-
-
-
-export const emptyRow = (): Row<undefined> => {
-    return Array.from(Array(8))
-}
-export const emptyBoard = (): BoardArray<undefined> => {
-    return Array.from(Array(8)).map(emptyRow);
-}
-
-type Row<T> = Array<T>
 
 export const printBoard = (board: BoardArray<ActivePiece>) => {
     const s = board.map((row: any) => row.map((cell: any) => cell?.piece?.name || '_').join('|').concat('|')).reverse().join('\n')
@@ -146,7 +148,7 @@ export const isOnBoard = (coordinate: Coordinate) => {
 }
 
 
-export function deepCopyBoard<T>(board: BoardArray<T>): BoardArray<T> {
+function deepCopyBoard<T>(board: BoardArray<T>): BoardArray<T> {
     return board.map(arr => arr.slice())
 }
 
@@ -235,9 +237,6 @@ export function isCheck(board: BoardArray<ActivePiece>, color: Color) {
     return allMoves.some(move => compareCoordinates(move, kingCoordinate))
 }
 
-export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
-    return coord1.row === coord2.row && coord1.column === coord2.column
-}
 
 export function filterMovesOntopOfSameColor(board: Board, moves: Array<Coordinate>, color: Color) {
     return moves.filter(move => {
@@ -247,11 +246,11 @@ export function filterMovesOntopOfSameColor(board: Board, moves: Array<Coordinat
     })
 }
 
-export function hasLegalMove(board: Board, color: Color) {
+function hasLegalMove(board: Board, color: Color) {
     return board.getLegalMoves(color).length > 0
 }
 
-export function getLegalMoves(board: Board, color: Color) {
+function getLegalMoves(board: Board, color: Color) {
     const legalMoves: Array<Coordinate> = []
 
     for (let row = 1; row <= board.board.length; row++) {
@@ -274,27 +273,27 @@ export function getLegalMoves(board: Board, color: Color) {
 }
 
 
-export function isCheckMate(board: Board, color: Color) {
+function isCheckMate(board: Board, color: Color) {
     console.log(board.isCheck(color))
     console.log(!board.getLegalMoves(color))
     return board.isCheck(color) && !board.hasLegalMove(color);
 }
 
-export function isStalemate(board: Board, color: Color) {
+function isStalemate(board: Board, color: Color) {
     const checked = board.isCheck(color)
 
     return !checked && !board.hasLegalMove(color);
 }
 
-export function isLegalMove(board: BoardArray<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate): boolean {
-    const piece = getBoardCell(board, oldCoordinates)
+function isLegalMove(board: Board, oldCoordinates: Coordinate, newCoordinates: Coordinate): boolean {
+    const piece = board.getPiece(oldCoordinates)
 
     if (!piece) {
         console.error("Piece not found")
         return false
     }
 
-    const pieceMoves = piece.piece.moves(board, oldCoordinates)
+    const pieceMoves = piece.piece.moves(board.board, oldCoordinates)
     const moves: BoardArray<boolean> = emptyBoard()
 
     pieceMoves.forEach((move: Coordinate) => {
@@ -306,23 +305,14 @@ export function isLegalMove(board: BoardArray<ActivePiece>, oldCoordinates: Coor
         return false
     }
 
-    const pieceAtNewCoordinates = board[newCoordinates.row - 1][newCoordinates.column - 1]
+    const pieceAtNewCoordinates = board.getPiece(newCoordinates)
 
     if (pieceAtNewCoordinates && pieceAtNewCoordinates.color === piece.color) {
         console.log("Cannot move piece on top of piece of the same team")
         return false
     }
 
-    const newBoard = deepCopyBoard(board)
-    newBoard[oldCoordinates?.row - 1][oldCoordinates.column - 1] = undefined
-    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = piece
-
-    if (isCheck(newBoard, piece.color)) {
-        console.log("Cannot move piece in check")
-        return false
-    }
-
-    return true
+    return !board.move(oldCoordinates, newCoordinates).isCheck(piece.color)
 }
 
 
@@ -379,7 +369,7 @@ export function isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coor
     }
 }
 
-export const canCastleQueenSide = (board: BoardArray<ActivePiece>, color: Color) => {
+const canCastleQueenSide = (board: BoardArray<ActivePiece>, color: Color) => {
     if (isCheck(board, color)) {
         return false
     }
@@ -418,7 +408,7 @@ export const canCastleQueenSide = (board: BoardArray<ActivePiece>, color: Color)
 }
 
 
-export const canCastleKingSide = (board: BoardArray<ActivePiece>, color: Color) => {
+const canCastleKingSide = (board: BoardArray<ActivePiece>, color: Color) => {
     if (isCheck(board, color)) {
         return false
     }
@@ -457,7 +447,7 @@ export const canCastleKingSide = (board: BoardArray<ActivePiece>, color: Color) 
 }
 
 
-export const castleQueenSide = (board: Board, color: Color) => {
+const castleQueenSide = (board: Board, color: Color) => {
     const kingCoordinates = findKing(board.board, color)
 
     if (!kingCoordinates) {
@@ -480,7 +470,7 @@ export const castleQueenSide = (board: Board, color: Color) => {
 }
 
 
-export const castleKingSide = (board: Board, color: Color) => {
+const castleKingSide = (board: Board, color: Color) => {
     const kingCoordinates = findKing(board.board, color)
 
     if (!kingCoordinates) {
