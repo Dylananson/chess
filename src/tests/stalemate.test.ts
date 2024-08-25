@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest';
-import { isStalemate, createBoardWithPieces } from '../Board';
+import { isStalemate, createBoardWithPieces } from '../model/Board';
 
-import { createKing } from '../pieces/King';
-import { Color } from '../pieces/ActivePiece';
-import { createRook } from '../pieces/Rook';
+import { createKing } from '../model/pieces/King';
+import { Color } from '../model/pieces/ActivePiece';
+import { createRook } from '../model/pieces/Rook';
 
 test("stalemate happy path", () => {
 

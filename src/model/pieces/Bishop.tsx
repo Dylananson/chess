@@ -1,9 +1,9 @@
 import { coordToKey, BoardArray, getBoardCell, isOnBoard } from "../Board";
-import { Coordinate } from "../Coordinate";
+import { Coordinate } from "../../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
-import blackBishopSvg from '../assets/Chess_bdt45.svg'
-import whiteBishopSvg from '../assets/Chess_blt45.svg'
+import blackBishopSvg from '@assets/Chess_bdt45.svg'
+import whiteBishopSvg from '@assets/Chess_blt45.svg'
 import { oppositeColor } from "./Rook";
 
 export const createBishop = (color: Color, startingCoordinates: Coordinate): ActivePiece => {

@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest'
-import { Color } from '../pieces/ActivePiece'
-import { createRook, } from '../pieces/Rook'
-import { createKing } from '../pieces/King'
-import { createBishop } from '../pieces/Bishop'
-import { createBoardWithPieces } from '../Board'
+import { Color } from '../model/pieces/ActivePiece'
+import { createRook, } from '../model/pieces/Rook'
+import { createKing } from '../model/pieces/King'
+import { createBishop } from '../model/pieces/Bishop'
+import { createBoardWithPieces } from '../model/Board'
 
 test('black castle rights king side', () => {
     const king = createKing(Color.Black, { row: 8, column: 5 })

@@ -1,5 +1,5 @@
 import { canCastleKingSide, canCastleQueenSide, emptyBoard, filterMovesOntopOfSameColor, getBoardCell, BoardArray, Board } from "./Board"
-import { Coordinate } from "./Coordinate"
+import { Coordinate } from "../Coordinate"
 import { ActivePiece, Color } from "./pieces/ActivePiece"
 import { PieceName } from "./pieces/PieceName"
 

@@ -1,8 +1,8 @@
 import { expect, test } from 'vitest';
-import { createBoardWithPieces } from '../Board';
-import { createKing } from '../pieces/King';
-import { Color } from '../pieces/ActivePiece';
-import { createQueen } from '../pieces/Queen';
+import { createBoardWithPieces } from '../model/Board';
+import { createKing } from '../model/pieces/King';
+import { Color } from '../model/pieces/ActivePiece';
+import { createQueen } from '../model/pieces/Queen';
 
 test("checkmate happy path", () => {
     const king = createKing(Color.Black, { row: 1, column: 1 });

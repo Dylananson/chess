@@ -1,13 +1,13 @@
 import { expect, test } from "vitest";
 import {
     selectPiece,
-} from "../GameState";
-import { createBoardWithPieces } from "../Board";
+} from "../model/GameState";
+import { createBoardWithPieces } from "../model/Board";
 import { defaultGame } from '../utils/gameStates';
-import { PieceName } from "../pieces/PieceName";
-import { createGameState } from "../GameState";
-import { createBishop } from "../pieces/Bishop";
-import { Color } from "../pieces/ActivePiece";
+import { PieceName } from "../model/pieces/PieceName";
+import { createGameState } from "../model/GameState";
+import { createBishop } from "../model/pieces/Bishop";
+import { Color } from "../model/pieces/ActivePiece";
 
 test("set selected piece unselects if current is selected", () => {
     const state = defaultGame();

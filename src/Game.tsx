@@ -1,14 +1,14 @@
 import { useState } from "react"
 
-import { PieceName } from "./pieces/PieceName"
-import { createKnight } from "./pieces/Knight"
-import { createBishop } from "./pieces/Bishop"
-import { createRook } from "./pieces/Rook"
-import { createQueen } from "./pieces/Queen"
-import { Color } from "./pieces/ActivePiece"
+import { PieceName } from "./model/pieces/PieceName"
+import { createKnight } from "./model/pieces/Knight"
+import { createBishop } from "./model/pieces/Bishop"
+import { createRook } from "./model/pieces/Rook"
+import { createQueen } from "./model/pieces/Queen"
+import { Color } from "./model/pieces/ActivePiece"
 import { defaultGame } from "./utils/gameStates"
-import { Coordinate, createBoardWithPieces } from "./Board"
-import { GameState, selectPiece } from "./GameState"
+import { Coordinate, createBoardWithPieces } from "./model/Board"
+import { GameState, selectPiece } from "./model/GameState"
 
 function MoveMarker() {
     return (

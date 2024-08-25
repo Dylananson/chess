@@ -1,14 +1,14 @@
 import { expect, test } from "vitest";
-import { type GameState, selectPiece } from "../GameState";
-import { Coordinate, createBoardWithPieces, getBoardCell } from "../Board";
-import { createGameState } from "../GameState";
+import { type GameState, selectPiece } from "../model/GameState";
+import { Coordinate, createBoardWithPieces, getBoardCell } from "../model/Board";
+import { createGameState } from "../model/GameState";
 import { defaultGame } from '../utils/gameStates';
-import { ActivePiece, Color } from "../pieces/ActivePiece";
-import { createBishop } from "../pieces/Bishop";
-import { createRook } from "../pieces/Rook";
-import { createPawn } from "../pieces/Pawn";
-import { createKnight } from "../pieces/Knight";
-import { createKing } from "../pieces/King";
+import { ActivePiece, Color } from "../model/pieces/ActivePiece";
+import { createBishop } from "../model/pieces/Bishop";
+import { createRook } from "../model/pieces/Rook";
+import { createPawn } from "../model/pieces/Pawn";
+import { createKnight } from "../model/pieces/Knight";
+import { createKing } from "../model/pieces/King";
 
 
 function assertPieceNotMoved(newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece, expectedPiece?: ActivePiece) {

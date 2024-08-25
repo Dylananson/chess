@@ -1,10 +1,10 @@
 import { expect, test } from "vitest";
-import { createQueen } from "../pieces/Queen";
-import { createBishop } from "../pieces/Bishop";
-import { KnightMoves } from "../pieces/Knight";
-import { createRook } from "../pieces/Rook";
-import { emptyBoard, createBoardWithPieces } from "../Board";
-import { Color } from "../pieces/ActivePiece";
+import { createQueen } from "../model/pieces/Queen";
+import { createBishop } from "../model/pieces/Bishop";
+import { KnightMoves } from "../model/pieces/Knight";
+import { createRook } from "../model/pieces/Rook";
+import { emptyBoard, createBoardWithPieces } from "../model/Board";
+import { Color } from "../model/pieces/ActivePiece";
 
 test("bishop moves works", () => {
     const coordinates = { row: 1, column: 1 };

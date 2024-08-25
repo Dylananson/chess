@@ -1,10 +1,10 @@
 import { getBoardCell } from "../Board"
 import { compareCoordinates, BoardArray, isOnBoard } from "../Board";
-import { Coordinate } from "../Coordinate";
+import { Coordinate } from "../../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
-import blackPawnSvg from '../assets/Chess_pdt45.svg'
-import whitePawnSvg from '../assets/Chess_plt45.svg'
+import blackPawnSvg from '@assets/Chess_pdt45.svg'
+import whitePawnSvg from '@assets/Chess_plt45.svg'
 import { oppositeColor } from "./Rook";
 
 export function PawnMoves(board: BoardArray<ActivePiece>, coordinates: Coordinate) {

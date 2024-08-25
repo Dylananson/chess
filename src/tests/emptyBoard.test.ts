@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { emptyBoard } from "../Board";
+import { emptyBoard } from "../model/Board";
 
 test("board creation works", () => {
   const board = emptyBoard();

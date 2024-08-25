@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
-import { isPieceInWay, BoardArray, emptyBoard } from "../Board";
-import { ActivePiece, Color } from "../pieces/ActivePiece";
-import { createRook } from "../pieces/Rook";
-import { createBishop } from "../pieces/Bishop";
+import { isPieceInWay, BoardArray, emptyBoard } from "../model/Board";
+import { ActivePiece, Color } from "../model/pieces/ActivePiece";
+import { createRook } from "../model/pieces/Rook";
+import { createBishop } from "../model/pieces/Bishop";
 
 const createBoard = (pieces: Array<ActivePiece>) => {
     const board: BoardArray<ActivePiece> = emptyBoard()

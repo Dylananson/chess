@@ -1,9 +1,9 @@
 import { BoardArray, coordToKey, isOnBoard } from "../Board";
-import { Coordinate } from "../Coordinate";
+import { Coordinate } from "../../Coordinate";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
-import blackKnightSvg from '../assets/Chess_ndt45.svg'
-import whiteKnightSvg from '../assets/Chess_nlt45.svg'
+import blackKnightSvg from '@assets/Chess_ndt45.svg'
+import whiteKnightSvg from '@assets/Chess_nlt45.svg'
 
 export const Knight: Piece = {
     name: PieceName.Knight,

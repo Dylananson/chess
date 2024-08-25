@@ -1,11 +1,11 @@
 import { expect, test } from 'vitest';
-import { createGameState, filterPieceMovesThatPutKingInCheck } from '../GameState';
-import { createBoardWithPieces } from '../Board';
-import { createKing } from '../pieces/King';
-import { Color } from '../pieces/ActivePiece';
-import { createQueen } from '../pieces/Queen';
-import { createPawn } from '../pieces/Pawn';
-import { createKnight } from '../pieces/Knight';
+import { createGameState, filterPieceMovesThatPutKingInCheck } from '../model/GameState';
+import { createBoardWithPieces } from '../model/Board';
+import { createKing } from '../model/pieces/King';
+import { Color } from '../model/pieces/ActivePiece';
+import { createQueen } from '../model/pieces/Queen';
+import { createPawn } from '../model/pieces/Pawn';
+import { createKnight } from '../model/pieces/Knight';
 
 test("filter out moves that put king in check shouldnt filter ", () => {
     const king = createKing(Color.Black, { row: 1, column: 1 });

@@ -1,5 +1,5 @@
 import { BoardArray } from "../Board";
-import { Coordinate } from "../Coordinate";
+import { Coordinate } from "../../Coordinate";
 import { PieceName } from "./PieceName";
 
 export enum Color {

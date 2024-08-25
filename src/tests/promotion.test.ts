@@ -1,10 +1,10 @@
 import { test, expect } from 'vitest'
-import { createPawn } from '../pieces/Pawn'
-import { createKing } from '../pieces/King'
-import { Color } from '../pieces/ActivePiece'
-import { createBoardWithPieces } from '../Board'
-import { createGameState } from '../GameState'
-import { PieceName } from '../pieces/PieceName'
+import { createPawn } from '../model/pieces/Pawn'
+import { createKing } from '../model/pieces/King'
+import { Color } from '../model/pieces/ActivePiece'
+import { createBoardWithPieces } from '../model/Board'
+import { createGameState } from '../model/GameState'
+import { PieceName } from '../model/pieces/PieceName'
 
 test('promotion happy path black', () => {
     const pawn = createPawn(Color.Black, { row: 2, column: 1 })
