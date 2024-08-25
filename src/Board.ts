@@ -1,5 +1,5 @@
 import { Coordinate } from './Coordinate'
-import { filterPieceMovesThatPutKingInCheck, tryMovePiece } from './GameState'
+import { filterPieceMovesThatPutKingInCheck } from './GameState'
 import { ActivePiece, Color } from './pieces/ActivePiece'
 import { PieceName } from './pieces/PieceName'
 
@@ -20,7 +20,8 @@ export type NewBoard = {
     castleQueenSide: (color: Color) => NewBoard
     getLegalMoves: (color: Color) => Array<Coordinate>
     isLegalMove: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => boolean
-    isPieceInWay: (startingCoordinate: Coordinate, endCoordinate: Coordinate) => boolean
+    isPieceInWay: (startingCoordinate: Coordinate, endCoordinate: Coordinate) => boolean,
+    hasLegalMove: (color: Color) => boolean
 }
 
 export const emptyRow = (): Row<undefined> => {
@@ -65,7 +66,7 @@ export function createNewBoard(board: Board<ActivePiece>): NewBoard {
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
             const piece = this.getPiece(oldCoordinates)
             const newBoard = this.copyBoard()
-          
+
             newBoard[oldCoordinates?.row - 1][oldCoordinates.column - 1] = undefined
             newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = piece?.move()
             return createNewBoard(newBoard)
@@ -77,10 +78,10 @@ export function createNewBoard(board: Board<ActivePiece>): NewBoard {
             return isCheck(this.board, color)
         },
         isCheckMate(color: Color) {
-            return isCheckMate(this.board, color)
+            return isCheckMate(this, color)
         },
         isStalemate(color: Color) {
-            return isStalemate(this.board, color)
+            return isStalemate(this, color)
         },
         canCastleKingSide(color: Color) {
             return canCastleKingSide(this.board, color)
@@ -95,13 +96,16 @@ export function createNewBoard(board: Board<ActivePiece>): NewBoard {
             return createNewBoard(castleQueenSide(this.board, color))
         },
         getLegalMoves(color: Color) {
-            return getLegalMoves(this.board, color)
+            return getLegalMoves(this, color)
         },
         isLegalMove(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
             return isLegalMove(this.board, oldCoordinates, newCoordinates)
         },
         isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coordinate) {
             return isPieceInWay(startingCoordinate, endCoordinate, this.board)
+        },
+        hasLegalMove(color: Color) {
+            return hasLegalMove(this, color)
         }
     }
 }
@@ -189,28 +193,28 @@ export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
     return coord1.row === coord2.row && coord1.column === coord2.column
 }
 
-export function filterMovesOntopOfSameColor(board: Board<ActivePiece>, moves: Array<Coordinate>, color: Color) {
+export function filterMovesOntopOfSameColor(board: NewBoard, moves: Array<Coordinate>, color: Color) {
     return moves.filter(move => {
-        const piece = getBoardCell(board, move)
+        const piece = board.getPiece(move)
 
         return !piece || piece.color !== color
     })
 }
 
-export function hasLegalMove(board: Board<ActivePiece>, color: Color) {
-    return getLegalMoves(board, color).length > 0
+export function hasLegalMove(board: NewBoard, color: Color) {
+    return board.getLegalMoves(color).length > 0
 }
 
-export function getLegalMoves(board: Board<ActivePiece>, color: Color) {
+export function getLegalMoves(board: NewBoard, color: Color) {
     const legalMoves: Array<Coordinate> = []
 
-    for (let row = 0; row < board.length; row++) {
-        for (let col = 0; col < board.length; col++) {
-            const piece = board[row][col]
+    for (let row = 1; row <= board.board.length; row++) {
+        for (let column = 1; column <= board.board.length; column++) {
+            const piece = board.getPiece({ row, column })
             if (piece?.color === color) {
-                const moves = piece?.piece.moves(board, { row: row + 1, column: col + 1 })
+                const moves = piece?.piece.moves(board.board, { row, column })
                 if (moves) {
-                    const nonCheckedMoves = filterPieceMovesThatPutKingInCheck(board, { row: row + 1, column: col + 1 }, moves)
+                    const nonCheckedMoves = filterPieceMovesThatPutKingInCheck(board, { row, column }, moves)
                     const validMoves = filterMovesOntopOfSameColor(board, nonCheckedMoves, color)
 
                     validMoves.forEach(move => {
@@ -224,18 +228,16 @@ export function getLegalMoves(board: Board<ActivePiece>, color: Color) {
 }
 
 
-export function isCheckMate(board: Board<ActivePiece>, color: Color) {
-    const checked = isCheck(board, color)
-
-    const hasLegalMoves = hasLegalMove(board, color)
-
-    return checked && !hasLegalMoves;
+export function isCheckMate(board: NewBoard, color: Color) {
+    console.log(board.isCheck(color))
+    console.log(!board.getLegalMoves(color))
+    return board.isCheck(color) && !board.hasLegalMove(color);
 }
 
-export function isStalemate(board: Board<ActivePiece>, color: Color) {
-    const checked = isCheck(board, color)
+export function isStalemate(board: NewBoard, color: Color) {
+    const checked = board.isCheck(color)
 
-    return !checked && !hasLegalMove(board, color);
+    return !checked && !board.hasLegalMove(color);
 }
 
 export function isLegalMove(board: Board<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate): boolean {

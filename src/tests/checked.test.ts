@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { createGameState, filterPieceMovesThatPutKingInCheck } from '../GameState';
-import { isCheck, createBoard } from '../Board';
+import { createBoard } from '../Board';
 import { createKing } from '../pieces/King';
 import { Color } from '../pieces/ActivePiece';
 import { createQueen } from '../pieces/Queen';
@@ -20,7 +20,7 @@ test("filter out moves that put king in check shouldnt filter ", () => {
 
     const moves = king.piece.moves(board.board, coordinate)
     
-    const filteredMoves = filterPieceMovesThatPutKingInCheck(board.board, coordinate, moves)
+    const filteredMoves = filterPieceMovesThatPutKingInCheck(board, coordinate, moves)
 
     expect(filteredMoves.length).toEqual(moves.length);
 })
@@ -38,7 +38,7 @@ test("dont filter when king can take piece", () => {
 
     const moves = king.piece.moves(board.board, kingCoordinate)
     
-    const filteredMoves = filterPieceMovesThatPutKingInCheck(board.board, kingCoordinate, moves)
+    const filteredMoves = filterPieceMovesThatPutKingInCheck(board, kingCoordinate, moves)
 
     expect(filteredMoves.length).toEqual(1);
     expect(filteredMoves[0].row).toEqual(2);
@@ -60,7 +60,7 @@ test("filter out moves that put king in check happy path", () => {
 
     const moves = king.piece.moves(board.board, kingCoordinate)
     
-    const filteredMoves = filterPieceMovesThatPutKingInCheck(board.board, kingCoordinate, moves)
+    const filteredMoves = filterPieceMovesThatPutKingInCheck(board, kingCoordinate, moves)
 
     expect(filteredMoves.length).toEqual(0);
 })

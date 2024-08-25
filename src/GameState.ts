@@ -12,6 +12,7 @@ export type GameState = {
     historyIndex: number
     movePiece: (newCoordinates: Coordinate) => GameState
     getPiece: (coordinate: Coordinate) => ActivePiece | undefined
+    selectPiece: (coordinate: Coordinate) => GameState
 }
 
 
@@ -40,6 +41,9 @@ export const createGameState = (
         },
         getPiece(coordinate: Coordinate) {
             return this.board.getPiece(coordinate)
+        },
+        selectPiece(coordinate: Coordinate) {
+            return selectPiece(this, coordinate)
         },
         board : board
     }
@@ -135,10 +139,8 @@ export function tryMovePiece(gameState: GameState, newCoordinates: Coordinate): 
 
 
 
-export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, coordinate: Coordinate, moves: Array<Coordinate>) {
-    const newBoard = deepCopyBoard(board)
-
-    const piece = getBoardCell(newBoard, coordinate)
+export function filterPieceMovesThatPutKingInCheck(board: NewBoard, coordinate: Coordinate, moves: Array<Coordinate>) {
+    const piece = board.getPiece(coordinate)
 
     if (!piece) {
         console.error("Piece not found")
@@ -146,13 +148,7 @@ export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, co
     }
 
     const validMoves = moves.filter(move => {
-        const newBoard = deepCopyBoard(board)
-        newBoard[coordinate.row - 1][coordinate.column - 1] = undefined
-        newBoard[move.row - 1][move.column - 1] = piece
-
-        const checked = isCheck(newBoard, piece.color)
-
-        return !checked
+        return !board.move(coordinate, move).isCheck(piece.color)
     })
 
     return validMoves
@@ -166,9 +162,9 @@ export function selectPiece(gameState: GameState, coordinate: Coordinate): GameS
     }
     console.log("Selecting piece")
 
-    const filteredCheckMoves = filterPieceMovesThatPutKingInCheck(gameState.board.board, coordinate, selectedPiece.piece.moves(gameState.board.board, coordinate))
+    const filteredCheckMoves = filterPieceMovesThatPutKingInCheck(gameState.board, coordinate, selectedPiece.piece.moves(gameState.board.board, coordinate))
 
-    const pieceMoves = filterMovesOntopOfSameColor(gameState.board.board, filteredCheckMoves, selectedPiece.color)
+    const pieceMoves = filterMovesOntopOfSameColor(gameState.board, filteredCheckMoves, selectedPiece.color)
 
     if (selectedPiece.piece.name === PieceName.King) {
         if (canCastleQueenSide(gameState.board.board, selectedPiece.color)) {
