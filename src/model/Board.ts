@@ -120,6 +120,9 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
             return createBoard(newBoard)
         },
         getPiece(coord: Coordinate) {
+            if(!isOnBoard(coord)) {
+                return undefined
+            }
             return this.board[coord.row - 1][coord.column - 1]
         },
         isCheck(color: Color) {

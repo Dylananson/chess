@@ -15,6 +15,7 @@ export type GameState = {
     castleQueenSide: (color: Color) => GameState
     promotePawn: (coordinate: Coordinate, pieceName: PieceName) => GameState
     with: (newBoard: Board) => GameState
+    enpassant?: Coordinate
 }
 
 
@@ -36,6 +37,7 @@ export const createGameState = (
         playerTurn,
         history: history ?? [board],
         historyIndex: 0,
+        enpassant: undefined,
         promotePawn(coordinate: Coordinate, pieceName: PieceName) {
             const oldHistory = this.history.slice(0, this.historyIndex)
             return {
@@ -110,7 +112,19 @@ function movePiece(gameState: GameState, oldCoordinates: Coordinate | undefined,
         return gameState
     }
 
-    return gameState.with(gameState.board.move(oldCoordinates, newCoordinates))
+    return {
+        ...gameState.with(gameState.board.move(oldCoordinates, newCoordinates)),
+        enpassant: checkEnpassant(piece, oldCoordinates, newCoordinates)
+    }
+}
+
+export function checkEnpassant(piece: ActivePiece, oldCoordinates: Coordinate, newCoordinates: Coordinate): Coordinate | undefined {
+    if (piece?.piece.name === PieceName.Pawn) {
+        if (Math.abs(oldCoordinates.row - newCoordinates.row) === 2) {
+            //then moved twice
+            return { row: (oldCoordinates.row + newCoordinates.row) / 2, column: oldCoordinates.column }
+        }
+    }
 }
 
 
