@@ -40,14 +40,15 @@ export const createGameState = (
         history: history ?? [board],
         historyIndex: 0,
         promotePawn(coordinate: Coordinate, pieceName: PieceName) {
+            const oldHistory = this.history.slice(0, this.historyIndex)
             return {
                 ...this,
                 get board(): Board {
                     return this.history[this.history.length - 1]
                 },
-                history: [...this.history, this.board.promotePawn(coordinate, pieceName)],
+                history: [...oldHistory, this.board.promotePawn(coordinate, pieceName)],
                 selectedPiece: undefined,
-                historyIndex: this.historyIndex + 1,
+                historyIndex: this.historyIndex ,
             }
         },
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {

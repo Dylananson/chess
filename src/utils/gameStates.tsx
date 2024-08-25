@@ -10,20 +10,21 @@ import { createRook } from "../pieces/Rook"
 import { ColumnValues } from "../Board"
 import { GameState ,createGameState } from "../GameState"
 
-export const PromotingPawnGame = () => {
-    //const initGame = initGameState()
-    //
+export const promotingPawnGameState = (): GameState => {
     const pawn = createPawn(Color.White, { row: 7, column: 1 })
     const blackKing = createKing(Color.Black, { row: 8, column: 5 })
     const whiteKing = createKing(Color.White, { row: 1, column: 5 })
 
     const b = createBoardWithPieces([pawn, blackKing, whiteKing])
 
-    const game = createGameState(b, undefined, Color.White)
+    return createGameState(b, undefined, Color.White)
+}
+
+export const PromotingPawnGame = () => {
 
     return (
         <div>
-            <Game initGameState={game} />
+            <Game initGameState={promotingPawnGameState()} />
         </div>
     )
 }
