@@ -194,8 +194,12 @@ export const createBoardWithPieces = (pieces: Array<ActivePiece>): Board => {
 
 export const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
 
-function isAttacked(board: BoardArray<ActivePiece>, color: Color, coordinate: Coordinate) {
+function isAttacked(board: BoardArray<ActivePiece>, color: Color, coordinate: Coordinate | undefined) {
     let allMoves: Array<Coordinate> = [];
+
+    if (!coordinate || !isOnBoard(coordinate)) {
+        return false
+    }
 
     board.forEach((row, ri) => {
         row.forEach((p, ci) => {
@@ -213,14 +217,7 @@ function isAttacked(board: BoardArray<ActivePiece>, color: Color, coordinate: Co
 }
 
 export function isCheck(board: Board, color: Color) {
-    const kingCoordinate = board.findKing(color)
-
-    if (!kingCoordinate) {
-        console.error("King not found")
-        return false
-    }
-
-    return isAttacked(board.board, color, kingCoordinate)
+    return isAttacked(board.board, color, board.findKing(color))
 }
 
 
