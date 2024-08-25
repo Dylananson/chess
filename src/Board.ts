@@ -5,10 +5,10 @@ import { PieceName } from './pieces/PieceName'
 export type BoardArray<T> = Array<Array<undefined | T>>
 export type Coordinate = { row: number; column: number };
 
-export type NewBoard = {
+export type Board = {
     board: BoardArray<ActivePiece>
-    move: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => NewBoard
-    copy: () => NewBoard
+    move: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => Board
+    copy: () => Board
     copyBoard: () => BoardArray<ActivePiece>
     getPiece: (coordinates: Coordinate) => ActivePiece | undefined
     isCheck: (color: Color) => boolean
@@ -16,15 +16,15 @@ export type NewBoard = {
     isStalemate: (color: Color) => boolean
     canCastleKingSide: (color: Color) => boolean
     canCastleQueenSide: (color: Color) => boolean
-    castleKingSide: (color: Color) => NewBoard
-    castleQueenSide: (color: Color) => NewBoard
+    castleKingSide: (color: Color) => Board
+    castleQueenSide: (color: Color) => Board
     getLegalMoves: (color: Color) => Array<Coordinate>
     isLegalMove: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => boolean
     isPieceInWay: (startingCoordinate: Coordinate, endCoordinate: Coordinate) => boolean,
     hasLegalMove: (color: Color) => boolean
 }
 
-export function createNewBoard(board: BoardArray<ActivePiece>): NewBoard {
+export function createNewBoard(board: BoardArray<ActivePiece>): Board {
     return {
         board: board,
         copy: () => createNewBoard(deepCopyBoard(board)),
@@ -111,7 +111,7 @@ export function getBoardCell(board: BoardArray<ActivePiece>, coord: Coordinate) 
     return board[coord.row - 1][coord.column - 1]
 }
 
-export const createBoard = (pieces: Array<ActivePiece>): NewBoard => {
+export const createBoard = (pieces: Array<ActivePiece>): Board => {
     const board: BoardArray<ActivePiece> = emptyBoard()
     pieces.forEach(piece => {
         board[piece.startingCoordinate.row - 1][piece.startingCoordinate.column - 1] = piece
@@ -192,7 +192,7 @@ export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
     return coord1.row === coord2.row && coord1.column === coord2.column
 }
 
-export function filterMovesOntopOfSameColor(board: NewBoard, moves: Array<Coordinate>, color: Color) {
+export function filterMovesOntopOfSameColor(board: Board, moves: Array<Coordinate>, color: Color) {
     return moves.filter(move => {
         const piece = board.getPiece(move)
 
@@ -200,11 +200,11 @@ export function filterMovesOntopOfSameColor(board: NewBoard, moves: Array<Coordi
     })
 }
 
-export function hasLegalMove(board: NewBoard, color: Color) {
+export function hasLegalMove(board: Board, color: Color) {
     return board.getLegalMoves(color).length > 0
 }
 
-export function getLegalMoves(board: NewBoard, color: Color) {
+export function getLegalMoves(board: Board, color: Color) {
     const legalMoves: Array<Coordinate> = []
 
     for (let row = 1; row <= board.board.length; row++) {
@@ -227,13 +227,13 @@ export function getLegalMoves(board: NewBoard, color: Color) {
 }
 
 
-export function isCheckMate(board: NewBoard, color: Color) {
+export function isCheckMate(board: Board, color: Color) {
     console.log(board.isCheck(color))
     console.log(!board.getLegalMoves(color))
     return board.isCheck(color) && !board.hasLegalMove(color);
 }
 
-export function isStalemate(board: NewBoard, color: Color) {
+export function isStalemate(board: Board, color: Color) {
     const checked = board.isCheck(color)
 
     return !checked && !board.hasLegalMove(color);
@@ -410,7 +410,7 @@ export const canCastleKingSide = (board: BoardArray<ActivePiece>, color: Color) 
 }
 
 
-export const castleQueenSide = (board: NewBoard, color: Color) => {
+export const castleQueenSide = (board: Board, color: Color) => {
     const kingCoordinates = findKing(board.board, color)
 
     if (!kingCoordinates) {
@@ -433,7 +433,7 @@ export const castleQueenSide = (board: NewBoard, color: Color) => {
 }
 
 
-export const castleKingSide = (board: NewBoard, color: Color) => {
+export const castleKingSide = (board: Board, color: Color) => {
     const kingCoordinates = findKing(board.board, color)
 
     if (!kingCoordinates) {
