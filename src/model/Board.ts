@@ -294,14 +294,10 @@ function isLegalMove(board: Board, oldCoordinates: Coordinate, newCoordinates: C
     }
 
     const pieceMoves = piece.piece.moves(board.board, oldCoordinates)
-    const moves: BoardArray<boolean> = emptyBoard()
+    const valid = pieceMoves.some(move => compareCoordinates(move, newCoordinates))
 
-    pieceMoves.forEach((move: Coordinate) => {
-        moves[move.row - 1][move.column - 1] = true
-    })
-
-    if (!moves[newCoordinates.row - 1][newCoordinates.column - 1]) {
-        console.log("Cannot move piece to invalid spot")
+    if(!valid) {
+        console.error("Invalid move")
         return false
     }
 
