@@ -1,4 +1,5 @@
 import { Coordinate } from './Coordinate'
+import { filterPieceMovesThatPutKingInCheck } from './Game'
 import { ActivePiece, Color } from './pieces/ActivePiece'
 import { PieceName } from './pieces/PieceName'
 
@@ -119,3 +120,51 @@ export function compareCoordinates(coord1: Coordinate, coord2: Coordinate) {
     return coord1.row === coord2.row && coord1.column === coord2.column
 }
 
+export function filterMovesOntopOfSameColor(board: Board<ActivePiece>, moves: Array<Coordinate>, color: Color) {
+    return moves.filter(move => {
+        const piece = getBoardCell(board, move)
+
+        return !piece || piece.color !== color
+    })
+}
+
+export function hasLegalMove(board: Board<ActivePiece>, color: Color) {
+    return getLegalMoves(board, color).length > 0
+}
+
+export function getLegalMoves(board: Board<ActivePiece>, color: Color) {
+    const legalMoves: Array<Coordinate> = []
+
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board.length; col++) {
+            const piece = board[row][col]
+            if (piece?.color === color) {
+                const moves = piece?.piece.moves(board, { row: row + 1, column: col + 1 })
+                if (moves) {
+                    const nonCheckedMoves = filterPieceMovesThatPutKingInCheck(board, { row: row + 1, column: col + 1 }, moves)
+                    const validMoves = filterMovesOntopOfSameColor(board, nonCheckedMoves, color)
+
+                    validMoves.forEach(move => {
+                        legalMoves.push(move)
+                    })
+                }
+            }
+        }
+    }
+    return legalMoves
+}
+
+
+export function isCheckMate(board: Board<ActivePiece>, color: Color) {
+    const checked = isCheck(board, color)
+
+    const hasLegalMoves = hasLegalMove(board, color)
+
+    return checked && !hasLegalMoves;
+}
+
+export function isStalemate(board: Board<ActivePiece>, color: Color) {
+    const checked = isCheck(board, color)
+
+    return !checked && !hasLegalMove(board, color);
+}

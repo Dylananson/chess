@@ -7,7 +7,7 @@ import { createRook } from "./pieces/Rook"
 import { createQueen } from "./pieces/Queen"
 import { Color, ActivePiece } from "./pieces/ActivePiece"
 import { defaultGame } from "./utils/gameStates"
-import { emptyBoard, Board, isOnBoard, deepCopyBoard, getBoardCell, isCheck, findKing, isAttacked } from "./Board"
+import { emptyBoard, Board, isOnBoard, deepCopyBoard, getBoardCell, isCheck, findKing, isAttacked, filterMovesOntopOfSameColor, hasLegalMove, isStalemate, getLegalMoves, isCheckMate } from "./Board"
 import { Coordinate } from "./Coordinate"
 
 function MoveMarker() {
@@ -318,55 +318,6 @@ export function filterPieceMovesThatPutKingInCheck(board: Board<ActivePiece>, co
     return validMoves
 }
 
-export function filterMovesOntopOfSameColor(board: Board<ActivePiece>, moves: Array<Coordinate>, color: Color) {
-    return moves.filter(move => {
-        const piece = getBoardCell(board, move)
-
-        return !piece || piece.color !== color
-    })
-}
-
-export function hasLegalMove(board: Board<ActivePiece>, color: Color) {
-    return getLegalMoves(board, color).length > 0
-}
-
-export function getLegalMoves(board: Board<ActivePiece>, color: Color) {
-    const legalMoves: Array<Coordinate> = []
-
-    for (let row = 0; row < board.length; row++) {
-        for (let col = 0; col < board.length; col++) {
-            const piece = board[row][col]
-            if (piece?.color === color) {
-                const moves = piece?.piece.moves(board, { row: row + 1, column: col + 1 })
-                if (moves) {
-                    const nonCheckedMoves = filterPieceMovesThatPutKingInCheck(board, { row: row + 1, column: col + 1 }, moves)
-                    const validMoves = filterMovesOntopOfSameColor(board, nonCheckedMoves, color)
-
-                    validMoves.forEach(move => {
-                        legalMoves.push(move)
-                    })
-                }
-            }
-        }
-    }
-    return legalMoves
-}
-
-
-export function isCheckMate(board: Board<ActivePiece>, color: Color) {
-    const checked = isCheck(board, color)
-
-    const hasLegalMoves = hasLegalMove(board, color)
-
-    return checked && !hasLegalMoves;
-}
-
-export function isStaleMate(board: Board<ActivePiece>, color: Color) {
-    const checked = isCheck(board, color)
-
-    return !checked && !hasLegalMove(board, color);
-}
-
 export function selectPiece(gameState: GameState, coordinate: Coordinate): GameState {
     const selectedPiece = gameState.board[coordinate.row - 1][coordinate.column - 1]
 
@@ -652,7 +603,7 @@ export function Game({ initGameState }: { initGameState: GameState }) {
         console.log("Player turn", newGame.playerTurn)
         console.log("Check", isCheck(newGame.board, newGame.playerTurn))
         console.log("has legal move", hasLegalMove(newGame.board, newGame.playerTurn))
-        console.log("stalemate", isStaleMate(newGame.board, newGame.playerTurn))
+        console.log("stalemate", isStalemate(newGame.board, newGame.playerTurn))
         console.log("legal moves", getLegalMoves(newGame.board, newGame.playerTurn))
         setGameState(newGame)
 
