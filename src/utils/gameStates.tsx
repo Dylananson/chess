@@ -19,7 +19,7 @@ export const PromotingPawnGame = () => {
 
     const b = createBoard([pawn, blackKing, whiteKing])
 
-    const game = createGameState(b, undefined, Color.White, false)
+    const game = createGameState(b, undefined, Color.White)
 
     return (
         <div>
@@ -41,7 +41,7 @@ export const CastleKingSideGame = () => {
         [whiteKing, rook, blackKing, lRook]
     )
 
-    const game = createGameState(board, undefined, Color.White, false)
+    const game = createGameState(board, undefined, Color.White)
 
     return (
         <div>
@@ -104,5 +104,5 @@ export const defaultGame = (): GameState => {
         return board
     }
 
-    return createGameState(createNewBoard(initBoard()), undefined, Color.White, false)
+    return createGameState(createNewBoard(initBoard()), undefined, Color.White)
 }

@@ -16,7 +16,7 @@ export type GameState = {
     canCastleQueenSide: (color: Color) => boolean
     castleKingSide: (color: Color) => GameState
     castleQueenSide: (color: Color) => GameState
-    withBoard: (newBoard: NewBoard) => GameState
+    with: (newBoard: NewBoard) => GameState
 }
 
 
@@ -41,7 +41,7 @@ export const createGameState = (
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
             return movePiece(this, oldCoordinates, newCoordinates)
         },
-        withBoard(newBoard: NewBoard) {
+        with(newBoard: NewBoard) {
             return {
                 ...this,
                 get board(): NewBoard {
@@ -66,10 +66,10 @@ export const createGameState = (
             return this.board.canCastleQueenSide(color)
         },
         castleKingSide(color: Color) {
-            return this.withBoard(this.board.castleKingSide(color))
+            return this.with(this.board.castleKingSide(color))
         },
         castleQueenSide(color: Color) {
-            return this.withBoard(this.board.castleQueenSide(color))
+            return this.with(this.board.castleQueenSide(color))
         },
 
         board: board
@@ -110,7 +110,7 @@ export function movePiece(gameState: GameState, oldCoordinates: Coordinate | und
         return gameState
     }
 
-    return gameState.withBoard(gameState.board.move(oldCoordinates, newCoordinates))
+    return gameState.with(gameState.board.move(oldCoordinates, newCoordinates))
 }
 
 
@@ -132,6 +132,9 @@ export const isCastleQueenSide = (board: Board<ActivePiece>, oldCoordinates: Coo
     }
     return oldCoordinates.column === 5 && newCoordinates.column === 3
 }
+
+
+
 
 
 export function filterPieceMovesThatPutKingInCheck(board: NewBoard, coordinate: Coordinate, moves: Array<Coordinate>) {
