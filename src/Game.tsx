@@ -3,7 +3,7 @@ import { useState } from "react"
 import { PieceName } from "./model/pieces/PieceName"
 import { defaultGame } from "./utils/gameStates"
 import { Coordinate} from "./model/Board"
-import { GameState, selectPiece } from "./model/GameState"
+import { GameState } from "./model/GameState"
 
 function MoveMarker() {
     return (
@@ -77,7 +77,7 @@ export function Game({ initGameState }: { initGameState: GameState }) {
         const selectedPiece = gameState.selectedPiece
 
         if (!selectedPiece || gameState.board.getPiece(newCoordinates)?.color === gameState.playerTurn) {
-            setGameState(selectPiece(gameState, newCoordinates))
+            setGameState(gameState.selectPiece(newCoordinates))
         } else {
 
             const piece = gameState.selectedPiece?.piece

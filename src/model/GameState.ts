@@ -80,7 +80,7 @@ export const createGameState = (
     }
 }
 
-export function movePiece(gameState: GameState, oldCoordinates: Coordinate | undefined, newCoordinates: Coordinate): GameState {
+function movePiece(gameState: GameState, oldCoordinates: Coordinate | undefined, newCoordinates: Coordinate): GameState {
     if (!oldCoordinates) {
         return gameState
     }
@@ -118,19 +118,19 @@ export function movePiece(gameState: GameState, oldCoordinates: Coordinate | und
 }
 
 
-export function deselectPiece(gameState: GameState): GameState {
+function deselectPiece(gameState: GameState): GameState {
     return { ...gameState, selectedPiece: undefined }
 }
 
 
-export const isCastleKingSide = (board: BoardArray<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
+const isCastleKingSide = (board: BoardArray<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
     if (getBoardCell(board, oldCoordinates)?.piece.name !== PieceName.King) {
         return false
     }
     return oldCoordinates.column === 5 && newCoordinates.column === 7
 }
 
-export const isCastleQueenSide = (board: BoardArray<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
+const isCastleQueenSide = (board: BoardArray<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate) => {
     if (getBoardCell(board, oldCoordinates)?.piece.name !== PieceName.King) {
         return false
     }
@@ -153,7 +153,7 @@ export function filterPieceMovesThatPutKingInCheck(board: Board, coordinate: Coo
     return validMoves
 }
 
-export function selectPiece(gameState: GameState, coordinate: Coordinate): GameState {
+function selectPiece(gameState: GameState, coordinate: Coordinate): GameState {
     const selectedPiece = gameState.getPiece(coordinate)
 
     if (!selectedPiece) {
