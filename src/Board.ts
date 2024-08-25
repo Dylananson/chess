@@ -134,7 +134,7 @@ export const emptyBoard = (): BoardArray<undefined> => {
 
 type Row<T> = Array<T>
 
-const printBoard = (board: any) => {
+export const printBoard = (board: BoardArray<ActivePiece>) => {
     const s = board.map((row: any) => row.map((cell: any) => cell?.piece?.name || '_').join('|').concat('|')).reverse().join('\n')
     console.log()
     console.log(s)
