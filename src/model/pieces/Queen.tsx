@@ -1,12 +1,11 @@
 import { BishopMoves } from "./Bishop";
 import { coordToKey } from "../Board";
-import { Coordinate } from "../../Coordinate";
 import { PieceName } from "./PieceName";
 import { RookMoves } from "./Rook";
 import blackQueenSvg from '@assets/Chess_qdt45.svg'
 import whiteQueenSvg from '@assets/Chess_qlt45.svg'
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
-import { BoardArray } from "../Board";
+import { Coordinate ,BoardArray } from "../Board";
 
 export const createQueen = (color: Color, startingCoordinate: Coordinate) :ActivePiece => {
     return createActivePiece({

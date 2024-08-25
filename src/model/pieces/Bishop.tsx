@@ -1,5 +1,4 @@
-import { coordToKey, BoardArray, getBoardCell, isOnBoard } from "../Board";
-import { Coordinate } from "../../Coordinate";
+import { Coordinate, coordToKey, BoardArray, getBoardCell, isOnBoard } from "../Board";
 import { ActivePiece, Color, createActivePiece, Piece } from "./ActivePiece";
 import { PieceName } from "./PieceName";
 import blackBishopSvg from '@assets/Chess_bdt45.svg'
