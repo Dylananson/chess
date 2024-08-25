@@ -90,10 +90,10 @@ export function createNewBoard(board: Board<ActivePiece>): NewBoard {
             return canCastleQueenSide(this.board, color)
         },
         castleKingSide(color: Color) {
-            return createNewBoard(castleKingSide(this.board, color))
+            return castleKingSide(this, color)
         },
         castleQueenSide(color: Color) {
-            return createNewBoard(castleQueenSide(this.board, color))
+            return castleQueenSide(this, color)
         },
         getLegalMoves(color: Color) {
             return getLegalMoves(this, color)
@@ -333,10 +333,6 @@ export function isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coor
     }
 }
 
-//
-//
-//
-//
 export const canCastleQueenSide = (board: Board<ActivePiece>, color: Color) => {
     if (isCheck(board, color)) {
         return false
@@ -415,68 +411,48 @@ export const canCastleKingSide = (board: Board<ActivePiece>, color: Color) => {
 }
 
 
-export const castleQueenSide = (board: Board<ActivePiece>, color: Color) => {
-    const newBoard = deepCopyBoard(board)
-    const kingCoordinates = findKing(board, color)
+export const castleQueenSide = (board: NewBoard, color: Color) => {
+    const kingCoordinates = findKing(board.board, color)
 
     if (!kingCoordinates) {
         return board
     }
 
-    const king = getBoardCell(board, kingCoordinates)
-
-    if (!king) {
-        return board
-    }
-
-    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 1 })
+    const rook = board.getPiece({ row: kingCoordinates.row, column: 1 })
 
     if (!rook) {
         return board
     }
 
-    if (!canCastleQueenSide(board, color)) {
+    if (!board.canCastleQueenSide(color)) {
         return board
     }
 
-    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 2 - 1] = king.move()
-    newBoard[king.startingCoordinate.row - 1][1 - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][4 - 1] = rook.move()
-
-    return newBoard
+    return board
+        .move(kingCoordinates, { row: kingCoordinates.row, column: 3 })
+        .move({ row: kingCoordinates.row, column: 1 }, { row: kingCoordinates.row, column: 4 })
 }
 
-export const castleKingSide = (board: Board<ActivePiece>, color: Color) => {
-    const newBoard = deepCopyBoard(board)
-    const kingCoordinates = findKing(board, color)
+
+export const castleKingSide = (board: NewBoard, color: Color) => {
+    const kingCoordinates = findKing(board.board, color)
 
     if (!kingCoordinates) {
         return board
     }
 
-    const king = getBoardCell(board, kingCoordinates)
-
-    if (!king) {
-        return board
-    }
-
-    const rook = getBoardCell(board, { row: king.startingCoordinate.row, column: 8 })
+    const rook = board.getPiece({ row: kingCoordinates.row, column: 8 })
 
     if (!rook) {
         return board
     }
 
-    if (!canCastleKingSide(board, color)) {
+    if (!board.canCastleKingSide(color)) {
         return board
     }
 
-    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][king.startingCoordinate.column + 2 - 1] = king.move()
-
-    newBoard[king.startingCoordinate.row - 1][8 - 1] = undefined
-    newBoard[king.startingCoordinate.row - 1][6 - 1] = rook.move()
-
-    return newBoard
+    return board
+        .move(kingCoordinates, { row: kingCoordinates.row, column: 7 })
+        .move({ row: kingCoordinates.row, column: 8 }, { row: kingCoordinates.row, column: 6 })
 }
 
