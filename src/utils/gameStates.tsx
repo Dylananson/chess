@@ -1,4 +1,4 @@
-import { Game, SelectedPiece, GameState } from "../Game"
+import { Game } from "../Game"
 import { Board, createBoard, emptyBoard } from "../Board"
 import { ActivePiece, Color } from "../pieces/ActivePiece"
 import { createBishop } from "../pieces/Bishop"
@@ -8,17 +8,7 @@ import { createPawn } from "../pieces/Pawn"
 import { createQueen } from "../pieces/Queen"
 import { createRook } from "../pieces/Rook"
 import { ColumnValues } from "../Board"
-
-export const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean, history?: Array<Board<ActivePiece>>): GameState => {
-    return {
-        board,
-        selectedPiece,
-        playerTurn,
-        inCheck,
-        history: history ?? [board],
-        historyIndex: 0
-    }
-}
+import { GameState ,createGameState } from "../GameState"
 
 export const PromotingPawnGame = () => {
     //const initGame = initGameState()
@@ -61,7 +51,7 @@ export const CastleKingSideGame = () => {
 }
 
 
-export const defaultGame = () :GameState=> {
+export const defaultGame = (): GameState => {
     const BlackKing: ActivePiece = createKing(Color.Black, { row: 8, column: ColumnValues.E })
     const WhiteKing = createKing(Color.White, { row: 1, column: ColumnValues.E })
     const WhiteQueen = createQueen(Color.White, { row: 1, column: ColumnValues.D })
@@ -114,15 +104,5 @@ export const defaultGame = () :GameState=> {
         return board
     }
 
-
-    return {
-        get board() {
-            return this.history[this.history.length - 1]
-        },
-        playerTurn: Color.White,
-        selectedPiece: undefined,
-        inCheck: false,
-        history: [initBoard()],
-        historyIndex: 0
-    }
+    return createGameState(initBoard(), undefined, Color.White, false)
 }

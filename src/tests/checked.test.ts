@@ -1,9 +1,8 @@
 import { expect, test } from 'vitest';
-import { filterPieceMovesThatPutKingInCheck } from '../Game';
+import { createGameState, filterPieceMovesThatPutKingInCheck } from '../GameState';
 import { isCheck, createBoard } from '../Board';
 import { createKing } from '../pieces/King';
 import { Color } from '../pieces/ActivePiece';
-import { createGameState } from './movePiece.test';
 import { createQueen } from '../pieces/Queen';
 import { createPawn } from '../pieces/Pawn';
 import { createKnight } from '../pieces/Knight';

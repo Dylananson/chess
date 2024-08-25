@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
-import { type GameState, tryMovePiece, selectPiece, SelectedPiece } from "../Game";
-import { createBoard, Board, getBoardCell } from "../Board";
-
+import { type GameState, tryMovePiece, selectPiece } from "../GameState";
+import { createBoard, getBoardCell } from "../Board";
+import { createGameState } from "../GameState";
 import { Coordinate } from "../Coordinate";
 import { defaultGame } from '../utils/gameStates';
 import { ActivePiece, Color } from "../pieces/ActivePiece";
@@ -11,17 +11,6 @@ import { createPawn } from "../pieces/Pawn";
 import { createKnight } from "../pieces/Knight";
 import { createKing } from "../pieces/King";
 
-
-export const createGameState = (board: Board<ActivePiece>, selectedPiece: SelectedPiece | undefined, playerTurn: Color, inCheck: boolean, history?: Array<Board<ActivePiece>>): GameState => {
-    return {
-        board,
-        selectedPiece,
-        playerTurn,
-        inCheck,
-        history: history ?? [board],
-        historyIndex: 0
-    }
-}
 
 function assertPieceNotMoved(newGame: GameState, startCoordinate: Coordinate, endCoordinate: Coordinate, piece: ActivePiece, expectedPiece?: ActivePiece) {
     //piece shouldnt have moved

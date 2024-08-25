@@ -1,6 +1,5 @@
 import { expect, test } from "vitest";
-import { Board, emptyBoard } from "../Board";
-import { isPieceInWay } from "../Game";
+import { isPieceInWay, Board, emptyBoard } from "../Board";
 import { ActivePiece, Color } from "../pieces/ActivePiece";
 import { createRook } from "../pieces/Rook";
 import { createBishop } from "../pieces/Bishop";

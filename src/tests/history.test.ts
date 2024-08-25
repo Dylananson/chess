@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { selectPiece as selectPiece, tryMovePiece } from '../Game';
+import { selectPiece as selectPiece, tryMovePiece } from '../GameState';
 import {defaultGame} from '../utils/gameStates';
 
 test('moving piece updates history', () => {

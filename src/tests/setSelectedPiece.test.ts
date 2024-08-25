@@ -1,11 +1,11 @@
 import { expect, test } from "vitest";
 import {
     selectPiece,
-} from "../Game";
+} from "../GameState";
 import { createBoard } from "../Board";
 import { defaultGame } from '../utils/gameStates';
 import { PieceName } from "../pieces/PieceName";
-import { createGameState } from "./movePiece.test";
+import { createGameState } from "../GameState";
 import { createBishop } from "../pieces/Bishop";
 import { Color } from "../pieces/ActivePiece";
 

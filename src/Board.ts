@@ -1,5 +1,5 @@
 import { Coordinate } from './Coordinate'
-import { filterPieceMovesThatPutKingInCheck } from './Game'
+import { filterPieceMovesThatPutKingInCheck } from './GameState'
 import { ActivePiece, Color } from './pieces/ActivePiece'
 import { PieceName } from './pieces/PieceName'
 
@@ -168,3 +168,105 @@ export function isStalemate(board: Board<ActivePiece>, color: Color) {
 
     return !checked && !hasLegalMove(board, color);
 }
+
+export function isLegalMove(board: Board<ActivePiece>, oldCoordinates: Coordinate, newCoordinates: Coordinate): boolean {
+    const piece = getBoardCell(board, oldCoordinates)
+
+    if (!piece) {
+        console.error("Piece not found")
+        return false
+    }
+
+    const pieceMoves = piece.piece.moves(board, oldCoordinates)
+    const moves: Board<boolean> = emptyBoard()
+
+    pieceMoves.forEach((move: Coordinate) => {
+        moves[move.row - 1][move.column - 1] = true
+    })
+
+    if (!moves[newCoordinates.row - 1][newCoordinates.column - 1]) {
+        console.log("Cannot move piece to invalid spot")
+        return false
+    }
+
+    const pieceAtNewCoordinates = board[newCoordinates.row - 1][newCoordinates.column - 1]
+
+    if (pieceAtNewCoordinates && pieceAtNewCoordinates.color === piece.color) {
+        console.log("Cannot move piece on top of piece of the same team")
+        return false
+    }
+
+    const newBoard = deepCopyBoard(board)
+    newBoard[oldCoordinates?.row - 1][oldCoordinates.column - 1] = undefined
+    newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = piece
+
+    if (isCheck(newBoard, piece.color)) {
+        console.log("Cannot move piece in check")
+        return false
+    }
+
+    return true
+}
+
+
+export function isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coordinate, board: Board<ActivePiece>): boolean {
+    const isOccupied = (row: number, column: number) => {
+        console.log(row)
+        return board[row - 1][column - 1] !== undefined;
+    }
+
+    const checkPath = (startingCoordinate: Coordinate, endCoordinate: Coordinate, rowStep: number, colStep: number) => {
+        const startRow = startingCoordinate.row
+        const startCol = startingCoordinate.column
+
+        const endRow = endCoordinate.row
+        const endCol = endCoordinate.column
+
+        for (let r = startRow + rowStep, c = startCol + colStep;
+            r !== endRow || c !== endCol;
+            r += rowStep, c += colStep) {
+            if (!isOnBoard({ row: r, column: c })) {
+                return false;
+            }
+            if (isOccupied(r, c)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    if (startingCoordinate.row === endCoordinate.row) {
+        // Moving horizontally
+        if (startingCoordinate.column < endCoordinate.column) {
+            // Moving right
+            return checkPath(startingCoordinate, endCoordinate, 0, 1);
+        } else {
+            // Moving left
+            return checkPath(startingCoordinate, endCoordinate, 0, -1);
+        }
+    } else if (startingCoordinate.column === endCoordinate.column) {
+        // Moving vertically
+        if (startingCoordinate.row < endCoordinate.row) {
+            // Moving up
+            return checkPath(startingCoordinate, endCoordinate, 1, 0);
+        } else {
+            // Moving down
+            return checkPath(startingCoordinate, endCoordinate, -1, 0);
+        }
+    } else {
+        // Moving diagonally
+        const rowStep = startingCoordinate.row < endCoordinate.row ? 1 : -1;
+        const colStep = startingCoordinate.column < endCoordinate.column ? 1 : -1;
+
+        return checkPath(startingCoordinate, endCoordinate, rowStep, colStep);
+    }
+}
+
+//
+// export function movePiece(board: Board<ActivePiece>, selectedPiece: SelectedPiece, newCoordinates: Coordinate): Board<ActivePiece> {
+//     const newBoard = deepCopyBoard(board)
+//     newBoard[selectedPiece.coordinates?.row - 1][selectedPiece?.coordinates.column - 1] = undefined
+//     newBoard[newCoordinates.row - 1][newCoordinates.column - 1] = selectedPiece.piece
+//
+//     return newBoard
+// }
