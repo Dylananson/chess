@@ -274,8 +274,6 @@ function getLegalMoves(board: Board, color: Color) {
 
 
 function isCheckMate(board: Board, color: Color) {
-    console.log(board.isCheck(color))
-    console.log(!board.getLegalMoves(color))
     return board.isCheck(color) && !board.hasLegalMove(color);
 }
 
@@ -293,10 +291,10 @@ function isLegalMove(board: Board, oldCoordinates: Coordinate, newCoordinates: C
         return false
     }
 
-    const valid = piece.piece.moves(board.board, oldCoordinates)
+    const validMove = piece.piece.moves(board.board, oldCoordinates)
         .some(move => compareCoordinates(move, newCoordinates))
 
-    if(!valid) {
+    if(!validMove) {
         console.error("Invalid move")
         return false
     }

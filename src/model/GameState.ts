@@ -95,15 +95,11 @@ function movePiece(gameState: GameState, oldCoordinates: Coordinate | undefined,
         return gameState
     }
 
-    const isCastleKingSideMove = isCastleKingSide(gameState.board.board, oldCoordinates, newCoordinates)
-
-    if (isCastleKingSideMove && gameState.board.canCastleKingSide(piece.color)) {
+    if (isCastleKingSide(gameState.board.board, oldCoordinates, newCoordinates) && gameState.board.canCastleKingSide(piece.color)) {
         return gameState.castleKingSide(piece.color)
     }
 
-    const isCastleQueenSideMove = isCastleQueenSide(gameState.board.board, oldCoordinates, newCoordinates)
-
-    if (isCastleQueenSideMove && gameState.board.canCastleQueenSide(piece.color)) {
+    if (isCastleQueenSide(gameState.board.board, oldCoordinates, newCoordinates) && gameState.board.canCastleQueenSide(piece.color)) {
         return gameState.castleQueenSide(piece.color)
     }
 
