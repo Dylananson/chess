@@ -59,10 +59,11 @@ test('shouldnt promote if not at end', () => {
     expect(game.history.length).toEqual(1)
 
     game = game
-        .move({ row: 7, column: 1 }, { row: 8, column: 1 })
+        .move({ row: 6, column: 1 }, { row: 7, column: 1 })
         .promotePawn({ row: 8, column: 1 }, PieceName.Queen)
 
-    expect(game.getPiece({ row: 8, column: 1 })?.piece.name).toEqual(PieceName.Queen)
-    expect(game.history.length).toEqual(2)
-    expect(game.historyIndex).toEqual(1)
+    expect(game.getPiece({ row: 7, column: 1 })?.piece.name).toEqual(PieceName.Pawn)
+    expect(game.getPiece({ row: 8, column: 1 })?.piece.name).toBeFalsy()
+    expect(game.history.length).toEqual(1)
+    expect(game.historyIndex).toEqual(0)
 })
