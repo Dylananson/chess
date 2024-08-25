@@ -194,7 +194,7 @@ export const createBoardWithPieces = (pieces: Array<ActivePiece>): Board => {
 
 export const coordToKey = (coord: Coordinate) => `${coord.row}${coord.column}`
 
-export function isAttacked(board: BoardArray<ActivePiece>, color: Color, coordinate: Coordinate) {
+function isAttacked(board: BoardArray<ActivePiece>, color: Color, coordinate: Coordinate) {
     let allMoves: Array<Coordinate> = [];
 
     board.forEach((row, ri) => {
