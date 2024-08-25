@@ -7,7 +7,7 @@ import { createRook } from "./pieces/Rook"
 import { createQueen } from "./pieces/Queen"
 import { Color } from "./pieces/ActivePiece"
 import { defaultGame } from "./utils/gameStates"
-import { Coordinate, createBoardWithPieces} from "./Board"
+import { Coordinate, createBoardWithPieces } from "./Board"
 import { GameState, selectPiece } from "./GameState"
 
 function MoveMarker() {
@@ -64,42 +64,14 @@ export function Game({ initGameState }: { initGameState: GameState }) {
     }
 
     const handlePromotion = (name: PieceName) => {
-        console.log("Promoting to", name)
-
-        const newBoard = gameState.board.copyBoard() //deepCopyBoard(gameState.board)
         if (!canPromote) {
             console.error("Cannot promote")
             return
         }
 
-        let newPiece;
+        const g = gameState.promotePawn(canPromote, name)
+        setGameState(g)
 
-        switch (name) {
-            case PieceName.Queen:
-                newPiece = { ...createQueen(gameState.playerTurn === Color.Black ? Color.White : Color.Black, canPromote), hasMoved: true }
-                break;
-            case PieceName.Rook:
-                newPiece = { ...createRook(gameState.playerTurn === Color.Black ? Color.White : Color.Black, canPromote), hasMoved: true }
-                break;
-            case PieceName.Bishop:
-                newPiece = { ...createBishop(gameState.playerTurn === Color.Black ? Color.White : Color.Black, canPromote), hasMoved: true }
-                break;
-            case PieceName.Knight:
-                newPiece = { ...createKnight(gameState.playerTurn === Color.Black ? Color.White : Color.Black, canPromote), hasMoved: true }
-                break;
-            default:
-                console.error("Invalid piece")
-                return
-        }
-
-        newBoard[canPromote?.row - 1][canPromote?.column - 1] = newPiece
-
-
-
-        setGameState({
-            ...gameState,
-            board: createBoardWithPieces(newBoard)
-        })
         setCanPromote(undefined)
     }
 
@@ -108,34 +80,35 @@ export function Game({ initGameState }: { initGameState: GameState }) {
             return
         }
         const selectedPiece = gameState.selectedPiece
-        let newGame;
 
         if (!selectedPiece || gameState.board.getPiece(newCoordinates)?.color === gameState.playerTurn) {
-            newGame = selectPiece(gameState, newCoordinates)
+            setGameState(selectPiece(gameState, newCoordinates))
         } else {
 
             const piece = gameState.selectedPiece?.piece
 
             const isPawn = piece?.piece.name === PieceName.Pawn
 
-            newGame = gameState.move(gameState.selectedPiece!?.coordinates, newCoordinates)
+            const newGame = gameState.move(gameState.selectedPiece!?.coordinates, newCoordinates)
+
+            setGameState(newGame)
 
             if (isPawn && (newCoordinates.row === 1 || newCoordinates.row === 8)) {
                 setCanPromote(newCoordinates)
             }
+
+            if (newGame.board.isCheckMate(newGame.playerTurn)) {
+                console.log("Checkmate")
+                alert("Checkmate")
+            }
+
         }
 
-        console.log("Player turn", newGame.playerTurn)
+        //console.log("Player turn", newGame.playerTurn)
         // console.log("Check", isCheck(newGame.board, newGame.playerTurn))
         // console.log("has legal move", hasLegalMove(newGame.board, newGame.playerTurn))
         // console.log("stalemate", isStalemate(newGame.board, newGame.playerTurn))
         // console.log("legal moves", getLegalMoves(newGame.board, newGame.playerTurn))
-        setGameState(newGame)
-
-        if(newGame.board.isCheckMate(newGame.playerTurn)){
-            console.log("Checkmate")
-            alert("Checkmate")
-        }
 
     }
 

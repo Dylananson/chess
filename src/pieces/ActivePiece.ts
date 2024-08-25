@@ -3,8 +3,8 @@ import { Coordinate } from "../Coordinate";
 import { PieceName } from "./PieceName";
 
 export enum Color {
-    White,
-    Black
+    White = "White",
+    Black = "Black"
 }
 
 export type ActivePiece = {

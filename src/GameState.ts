@@ -1,13 +1,13 @@
-import { BoardArray, canCastleKingSide, canCastleQueenSide, emptyBoard, filterMovesOntopOfSameColor, getBoardCell, isCheck, BoardArray } from "./Board"
+import { canCastleKingSide, canCastleQueenSide, emptyBoard, filterMovesOntopOfSameColor, getBoardCell, isCheck, BoardArray, Board } from "./Board"
 import { Coordinate } from "./Coordinate"
 import { ActivePiece, Color } from "./pieces/ActivePiece"
 import { PieceName } from "./pieces/PieceName"
 
 export type GameState = {
-    board: BoardArray,
+    board: Board,
     selectedPiece?: SelectedPiece
     playerTurn: Color
-    history: Array<BoardArray>
+    history: Array<Board>
     historyIndex: number
     move: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => GameState
     getPiece: (coordinate: Coordinate) => ActivePiece | undefined
@@ -16,7 +16,8 @@ export type GameState = {
     canCastleQueenSide: (color: Color) => boolean
     castleKingSide: (color: Color) => GameState
     castleQueenSide: (color: Color) => GameState
-    with: (newBoard: BoardArray) => GameState
+    promotePawn: (coordinate: Coordinate, pieceName: PieceName) => GameState
+    with: (newBoard: Board) => GameState
 }
 
 
@@ -28,23 +29,34 @@ export type SelectedPiece = {
 
 
 export const createGameState = (
-    board: BoardArray,
+    board: Board,
     selectedPiece: SelectedPiece | undefined,
     playerTurn: Color,
-    history?: Array<BoardArray>
+    history?: Array<Board>
 ): GameState => {
     return {
         selectedPiece,
         playerTurn,
         history: history ?? [board],
         historyIndex: 0,
+        promotePawn(coordinate: Coordinate, pieceName: PieceName) {
+            return {
+                ...this,
+                get board(): Board {
+                    return this.history[this.history.length - 1]
+                },
+                history: [...this.history, this.board.promotePawn(coordinate, pieceName)],
+                selectedPiece: undefined,
+                historyIndex: this.historyIndex + 1,
+            }
+        },
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
             return movePiece(this, oldCoordinates, newCoordinates)
         },
-        with(newBoard: BoardArray) {
+        with(newBoard: Board) {
             return {
                 ...this,
-                get board(): BoardArray {
+                get board(): Board {
                     return this.history[this.history.length - 1]
                 },
                 history: [...this.history, newBoard],
@@ -134,7 +146,7 @@ export const isCastleQueenSide = (board: BoardArray<ActivePiece>, oldCoordinates
 }
 
 
-export function filterPieceMovesThatPutKingInCheck(board: BoardArray, coordinate: Coordinate, moves: Array<Coordinate>) {
+export function filterPieceMovesThatPutKingInCheck(board: Board, coordinate: Coordinate, moves: Array<Coordinate>) {
     const piece = board.getPiece(coordinate)
 
     if (!piece) {

@@ -1,6 +1,10 @@
 import { filterPieceMovesThatPutKingInCheck } from './GameState'
 import { ActivePiece, Color } from './pieces/ActivePiece'
+import { createBishop } from './pieces/Bishop';
+import { createKnight } from './pieces/Knight';
 import { PieceName } from './pieces/PieceName'
+import { createQueen } from './pieces/Queen';
+import { createRook } from './pieces/Rook';
 
 export type BoardArray<T> = Array<Array<undefined | T>>
 export type Coordinate = { row: number; column: number };
@@ -22,11 +26,54 @@ export type Board = {
     isLegalMove: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => boolean
     isPieceInWay: (startingCoordinate: Coordinate, endCoordinate: Coordinate) => boolean,
     hasLegalMove: (color: Color) => boolean
+    promotePawn: (coordinates: Coordinate, newPiece: PieceName) => Board
 }
 
 export function createBoard(board: BoardArray<ActivePiece>): Board {
     return {
         board: board,
+        promotePawn(coordinates: Coordinate, pieceName: PieceName) {
+            //assumes pawn is in promotion square
+            const newBoard = deepCopyBoard(this.board)
+
+            const pawn = this.getPiece(coordinates)
+
+            if (pawn?.piece.name !== PieceName.Pawn) {
+                return this
+            }
+
+            if (pawn.color === Color.White && coordinates.row !== 8) {
+                return this
+            }
+
+            if (pawn.color === Color.Black && coordinates.row !== 1) {
+                return this
+            }
+
+            let newPiece;
+
+            switch (pieceName) {
+                case PieceName.Queen:
+                    newPiece = { ...createQueen(pawn.color , coordinates), hasMoved: true }
+                    break;
+                case PieceName.Rook:
+                    newPiece = { ...createRook(pawn.color , coordinates), hasMoved: true }
+                    break;
+                case PieceName.Bishop:
+                    newPiece = { ...createBishop(pawn.color , coordinates), hasMoved: true }
+                    break;
+                case PieceName.Knight:
+                    newPiece = { ...createKnight(pawn.color , coordinates), hasMoved: true }
+                    break;
+                default:
+                    console.error("Invalid piece")
+                    return this
+            }
+
+            newBoard[coordinates.row - 1][coordinates.column - 1] = newPiece
+
+            return createBoard(newBoard)
+        },
         copy: () => createBoard(deepCopyBoard(board)),
         copyBoard: () => deepCopyBoard(board),
         move(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
