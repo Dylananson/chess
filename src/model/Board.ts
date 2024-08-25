@@ -278,9 +278,7 @@ function isCheckMate(board: Board, color: Color) {
 }
 
 function isStalemate(board: Board, color: Color) {
-    const checked = board.isCheck(color)
-
-    return !checked && !board.hasLegalMove(color);
+    return !board.isCheck(color) && !board.hasLegalMove(color);
 }
 
 function isLegalMove(board: Board, oldCoordinates: Coordinate, newCoordinates: Coordinate): boolean {
