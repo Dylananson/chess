@@ -49,17 +49,17 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
         board: board,
         captureEnpassant(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
             const piece = this.getPiece(oldCoordinates)
-            if(piece?.piece.name !== PieceName.Pawn){
+            if (piece?.piece.name !== PieceName.Pawn) {
                 return this
             }
 
             const adj = this.getPiece({ row: oldCoordinates.row, column: newCoordinates.column })
 
-            if(!adj || adj.piece.name !== PieceName.Pawn || adj.color === piece.color) {
+            if (!adj || adj.piece.name !== PieceName.Pawn || adj.color === piece.color) {
                 return this
             }
 
-            if(Math.abs(oldCoordinates.row - newCoordinates.row) !== 1 || Math.abs(oldCoordinates.column - newCoordinates.column) !== 1){
+            if (Math.abs(oldCoordinates.row - newCoordinates.row) !== 1 || Math.abs(oldCoordinates.column - newCoordinates.column) !== 1) {
                 return this
             }
 

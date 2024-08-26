@@ -4,6 +4,7 @@ import { createRook, } from '../model/pieces/Rook'
 import { createKing } from '../model/pieces/King'
 import { createBishop } from '../model/pieces/Bishop'
 import { createBoardWithPieces } from '../model/Board'
+import { createGameState } from '../model/GameState'
 
 test('black castle rights king side', () => {
     const king = createKing(Color.Black, { row: 8, column: 5 })
@@ -153,5 +154,32 @@ test('castle kingside', () => {
     expect(newBoard.getPiece({ row: 1, column: 6 })).toEqual(rook.move())
 })
 
+test('full test castle queenside', () => {
+    const king = createKing(Color.White, { row: 1, column: 5 })
+    const rook = createRook(Color.White, { row: 1, column: 1 })
+    const board = createBoardWithPieces(
+        [king, rook]
+    )
 
+    let game = createGameState(board, undefined, Color.White)
+        .move({ row: 1, column: 5 }, { row: 1, column: 3 })
+
+    expect(game.getPiece({ row: 1, column: 3 })).toEqual(king.move())
+    expect(game.getPiece({ row: 1, column: 4 })).toEqual(rook.move())
+})
+
+
+test('full test castle kingside', () => {
+    const king = createKing(Color.White, { row: 1, column: 5 })
+    const rook = createRook(Color.White, { row: 1, column: 8 })
+    const board = createBoardWithPieces(
+        [king, rook]
+    )
+
+    let game = createGameState(board, undefined, Color.White)
+        .move({ row: 1, column: 5 }, { row: 1, column: 7 })
+
+    expect(game.getPiece({ row: 1, column: 7 })).toEqual(king.move())
+    expect(game.getPiece({ row: 1, column: 6 })).toEqual(rook.move())
+})
 

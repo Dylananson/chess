@@ -1,4 +1,4 @@
-import { emptyBoard, filterMovesOntopOfSameColor, getBoardCell, BoardArray, Board, Coordinate, compareCoordinates } from "./Board"
+import { Board, BoardArray, Coordinate, compareCoordinates, emptyBoard, filterMovesOntopOfSameColor, getBoardCell } from "./Board"
 import { ActivePiece, Color } from "./pieces/ActivePiece"
 import { UnfilteredPawnMoves as unfilteredPawnMoves } from "./pieces/Pawn"
 import { PieceName } from "./pieces/PieceName"
@@ -20,6 +20,12 @@ export type GameState = {
     enpassant?: Coordinate
 }
 
+enum SpecialMove {
+    CastleKingSide = "CastleKingSide",
+    CastleQueenSide = "CastleQueenSide",
+    Enpassant = "Enpassant",
+    Promotion = "Promotion"
+}
 
 export type SelectedPiece = {
     piece: ActivePiece,
@@ -70,27 +76,12 @@ export const createGameState = (
                 return this
             }
 
-            if (isCastleKingSide(this.board.board, oldCoordinates, newCoordinates) && this.board.canCastleKingSide(piece.color)) {
-                return this.castleKingSide(piece.color)
+            const specialMove = checkSpecialMove(this, oldCoordinates, newCoordinates, piece)
+
+            if(specialMove) {
+                console.log("Special move", specialMove)
+                return handleSpecialMove(this, specialMove, oldCoordinates, newCoordinates)
             }
-
-            if (isCastleQueenSide(this.board.board, oldCoordinates, newCoordinates) && this.board.canCastleQueenSide(piece.color)) {
-                return this.castleQueenSide(piece.color)
-            }
-
-            console.log("Moving piece")
-
-            if (piece.piece.name === PieceName.Pawn && this.enpassant !== undefined) {
-                console.log("Checking if enpassant is valid")
-                const valid = unfilteredPawnMoves(this.board.board, oldCoordinates).some(move => compareCoordinates(move, this.enpassant!))
-                if (valid) {
-                    console.log("Enpassant is valid")
-                    return this.captureEnpassant(oldCoordinates, newCoordinates)
-                }
-            }
-
-            console.log("Checking if move is legal")
-
 
             const canMove = this.board.isLegalMove(oldCoordinates, newCoordinates)
 
@@ -201,6 +192,15 @@ function selectPiece(gameState: GameState, coordinate: Coordinate): GameState {
         }
     }
 
+
+    if (selectedPiece.piece.name === PieceName.Pawn && gameState.enpassant !== undefined) {
+        const valid = unfilteredPawnMoves(gameState.board.board, coordinate).some(move => compareCoordinates(move, gameState.enpassant!))
+        if (valid) {
+            pieceMoves.push(gameState.enpassant)
+        }
+    }
+
+
     if (gameState?.selectedPiece?.piece.id === gameState.getPiece(coordinate)?.id) {
         console.log("Piece already selected")
         return { ...gameState, selectedPiece: undefined }
@@ -212,5 +212,38 @@ function selectPiece(gameState: GameState, coordinate: Coordinate): GameState {
     })
 
     return { ...gameState, selectedPiece: { coordinates: coordinate, piece: selectedPiece, moves: board } }
+}
+
+
+function checkSpecialMove(gameState: GameState, oldCoordinates: Coordinate, newCoordinates: Coordinate, piece: ActivePiece): SpecialMove | undefined {
+    if (isCastleKingSide(gameState.board.board, oldCoordinates, newCoordinates) && gameState.board.canCastleKingSide(piece.color)) {
+        return SpecialMove.CastleKingSide
+    }
+
+    if (isCastleQueenSide(gameState.board.board, oldCoordinates, newCoordinates) && gameState.board.canCastleQueenSide(piece.color)) {
+        return SpecialMove.CastleQueenSide
+    }
+
+    if (piece.piece.name === PieceName.Pawn && gameState.enpassant !== undefined) {
+        const valid = unfilteredPawnMoves(gameState.board.board, oldCoordinates).some(move => compareCoordinates(move, gameState.enpassant!))
+        if (valid) {
+            return SpecialMove.Enpassant
+        }
+    }
+
+    return undefined
+}
+
+function handleSpecialMove(gameState: GameState, specialMove: SpecialMove | undefined, oldCoordinates: Coordinate, newCoordinates: Coordinate): GameState {
+    switch (specialMove) {
+        case SpecialMove.CastleKingSide:
+            return gameState.castleKingSide(gameState.playerTurn)
+        case SpecialMove.CastleQueenSide:
+            return gameState.castleQueenSide(gameState.playerTurn)
+        case SpecialMove.Enpassant:
+            return gameState.captureEnpassant(oldCoordinates, newCoordinates)
+        default:
+            return gameState
+    }
 }
 
