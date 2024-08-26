@@ -36,7 +36,6 @@ export type Board = {
     castleKingSide: (color: Color) => Board
     castleQueenSide: (color: Color) => Board
     getLegalMoves: (color: Color) => Array<Coordinate>
-    isLegalMove: (oldCoordinates: Coordinate, newCoordinates: Coordinate) => boolean
     isPieceInWay: (startingCoordinate: Coordinate, endCoordinate: Coordinate) => boolean,
     hasLegalMove: (color: Color) => boolean
     promotePawn: (coordinates: Coordinate, newPiece: PieceName) => Board
@@ -171,29 +170,6 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
         },
         getLegalMoves(color: Color) {
             return getLegalMoves(this, color)
-        },
-        isLegalMove(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
-            const piece = this.getPiece(oldCoordinates)
-
-            if (!piece) {
-                console.error("Piece not found")
-                return false
-            }
-
-            const validMove = piece.piece.moves(this.board, oldCoordinates)
-                .some(move => compareCoordinates(move, newCoordinates))
-
-            if (!validMove) {
-                console.error("Invalid move")
-                return false
-            }
-
-            if (this.getPiece(newCoordinates)?.color === piece.color) {
-                console.log("Cannot move piece on top of piece of the same team")
-                return false
-            }
-
-            return !this.move(oldCoordinates, newCoordinates).isCheck(piece.color)
         },
         isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coordinate) {
             return isPieceInWay(startingCoordinate, endCoordinate, this.board)

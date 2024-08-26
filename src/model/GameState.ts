@@ -75,15 +75,7 @@ export const createGameState = (
 
             console.log("Selecting piece")
 
-            const filteredCheckMoves = filterPieceMovesThatPutKingInCheck(this.board, coordinate, selectedPiece.piece.moves(this.board.board, coordinate))
-
-            const pieceMoves = filterMovesOntopOfSameColor(this.board, filteredCheckMoves, selectedPiece.color)
-
-            const specialMoves = getSpecialMoves(this, coordinate, selectedPiece)
-
-            specialMoves.forEach(move => {
-                pieceMoves.push(move)
-            })
+            const pieceMoves = getLegalMoves(this, selectedPiece, coordinate)
 
             const board: BoardArray<boolean> = emptyBoard()
 
@@ -98,6 +90,7 @@ export const createGameState = (
                 return this
             }
             const piece = this.getPiece(oldCoordinates)
+
             if (!piece) {
                 console.log("Cannot move piece if no piece is selected");
                 return this
@@ -114,7 +107,8 @@ export const createGameState = (
                 return handleSpecialMove(this, specialMove, oldCoordinates, newCoordinates)
             }
 
-            const canMove = this.board.isLegalMove(oldCoordinates, newCoordinates)
+            const canMove = getLegalMoves(this, piece, oldCoordinates)
+                .some(move => compareCoordinates(move, newCoordinates))
 
             if (!canMove) {
                 console.log("Cannot move piece")
@@ -152,15 +146,13 @@ export const createGameState = (
     }
 }
 
-export function checkEnpassant(piece: ActivePiece, oldCoordinates: Coordinate, newCoordinates: Coordinate): Coordinate | undefined {
-    if (piece?.piece.name === PieceName.Pawn) {
-        if (Math.abs(oldCoordinates.row - newCoordinates.row) === 2) {
-            //then moved twice
-            return { row: (oldCoordinates.row + newCoordinates.row) / 2, column: oldCoordinates.column }
-        }
-    }
-}
 
+function getLegalMoves(gameState: GameState, piece: ActivePiece, coordinate: Coordinate) {
+    return piece.piece.moves(gameState.board.board, coordinate)
+        .filter(move => !gameState.board.move(coordinate, move).isCheck(piece.color))
+        .filter(move => !gameState.getPiece(move) || gameState.getPiece(move)?.color !== piece.color)
+        .concat(getSpecialMoves(gameState, coordinate, piece))
+}
 
 function deselectPiece(gameState: GameState): GameState {
     return { ...gameState, selectedPiece: undefined }
@@ -266,6 +258,15 @@ function handleSpecialMove(gameState: GameState, specialMove: SpecialMove | unde
             return gameState.captureEnpassant(oldCoordinates, newCoordinates)
         default:
             return gameState
+    }
+}
+
+export function checkEnpassant(piece: ActivePiece, oldCoordinates: Coordinate, newCoordinates: Coordinate): Coordinate | undefined {
+    if (piece?.piece.name === PieceName.Pawn) {
+        if (Math.abs(oldCoordinates.row - newCoordinates.row) === 2) {
+            //then moved twice
+            return { row: (oldCoordinates.row + newCoordinates.row) / 2, column: oldCoordinates.column }
+        }
     }
 }
 
