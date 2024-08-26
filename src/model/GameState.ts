@@ -78,7 +78,7 @@ export const createGameState = (
 
             const specialMove = checkSpecialMove(this, oldCoordinates, newCoordinates, piece)
 
-            if(specialMove) {
+            if (specialMove) {
                 console.log("Special move", specialMove)
                 return handleSpecialMove(this, specialMove, oldCoordinates, newCoordinates)
             }
@@ -111,7 +111,48 @@ export const createGameState = (
             return this.board.getPiece(coordinate)
         },
         selectPiece(coordinate: Coordinate) {
-            return selectPiece(this, coordinate)
+            const selectedPiece = this.getPiece(coordinate)
+
+            if (!selectedPiece) {
+                return { ...this, selectedPiece: undefined }
+            }
+            console.log("Selecting piece")
+
+            const filteredCheckMoves = filterPieceMovesThatPutKingInCheck(this.board, coordinate, selectedPiece.piece.moves(this.board.board, coordinate))
+
+            const pieceMoves = filterMovesOntopOfSameColor(this.board, filteredCheckMoves, selectedPiece.color)
+
+            if (selectedPiece.piece.name === PieceName.King) {
+                if (this.board.canCastleQueenSide(selectedPiece.color)) {
+                    pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 3 })
+                }
+
+                if (this.board.canCastleKingSide(selectedPiece.color)) {
+                    console.log("Can castle king side")
+                    pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 7 })
+                }
+            }
+
+
+            if (selectedPiece.piece.name === PieceName.Pawn && this.enpassant !== undefined) {
+                const valid = unfilteredPawnMoves(this.board.board, coordinate).some(move => compareCoordinates(move, this.enpassant!))
+                if (valid) {
+                    pieceMoves.push(this.enpassant)
+                }
+            }
+
+
+            if (this?.selectedPiece?.piece.id === this.getPiece(coordinate)?.id) {
+                console.log("Piece already selected")
+                return { ...this, selectedPiece: undefined }
+            }
+            const board: BoardArray<boolean> = emptyBoard()
+
+            pieceMoves.forEach((move: Coordinate) => {
+                board[move.row - 1][move.column - 1] = true
+            })
+
+            return { ...this, selectedPiece: { coordinates: coordinate, piece: selectedPiece, moves: board } }
         },
         castleKingSide(color: Color) {
             return this.with(this.board.castleKingSide(color))
@@ -169,50 +210,6 @@ export function filterPieceMovesThatPutKingInCheck(board: Board, coordinate: Coo
     return validMoves
 }
 
-function selectPiece(gameState: GameState, coordinate: Coordinate): GameState {
-    const selectedPiece = gameState.getPiece(coordinate)
-
-    if (!selectedPiece) {
-        return { ...gameState, selectedPiece: undefined }
-    }
-    console.log("Selecting piece")
-
-    const filteredCheckMoves = filterPieceMovesThatPutKingInCheck(gameState.board, coordinate, selectedPiece.piece.moves(gameState.board.board, coordinate))
-
-    const pieceMoves = filterMovesOntopOfSameColor(gameState.board, filteredCheckMoves, selectedPiece.color)
-
-    if (selectedPiece.piece.name === PieceName.King) {
-        if (gameState.board.canCastleQueenSide(selectedPiece.color)) {
-            pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 3 })
-        }
-
-        if (gameState.board.canCastleKingSide(selectedPiece.color)) {
-            console.log("Can castle king side")
-            pieceMoves.push({ row: selectedPiece.startingCoordinate.row, column: 7 })
-        }
-    }
-
-
-    if (selectedPiece.piece.name === PieceName.Pawn && gameState.enpassant !== undefined) {
-        const valid = unfilteredPawnMoves(gameState.board.board, coordinate).some(move => compareCoordinates(move, gameState.enpassant!))
-        if (valid) {
-            pieceMoves.push(gameState.enpassant)
-        }
-    }
-
-
-    if (gameState?.selectedPiece?.piece.id === gameState.getPiece(coordinate)?.id) {
-        console.log("Piece already selected")
-        return { ...gameState, selectedPiece: undefined }
-    }
-    const board: BoardArray<boolean> = emptyBoard()
-
-    pieceMoves.forEach((move: Coordinate) => {
-        board[move.row - 1][move.column - 1] = true
-    })
-
-    return { ...gameState, selectedPiece: { coordinates: coordinate, piece: selectedPiece, moves: board } }
-}
 
 
 function checkSpecialMove(gameState: GameState, oldCoordinates: Coordinate, newCoordinates: Coordinate, piece: ActivePiece): SpecialMove | undefined {
