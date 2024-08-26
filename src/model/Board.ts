@@ -173,7 +173,27 @@ export function createBoard(board: BoardArray<ActivePiece>): Board {
             return getLegalMoves(this, color)
         },
         isLegalMove(oldCoordinates: Coordinate, newCoordinates: Coordinate) {
-            return isLegalMove(this, oldCoordinates, newCoordinates)
+            const piece = this.getPiece(oldCoordinates)
+
+            if (!piece) {
+                console.error("Piece not found")
+                return false
+            }
+
+            const validMove = piece.piece.moves(this.board, oldCoordinates)
+                .some(move => compareCoordinates(move, newCoordinates))
+
+            if (!validMove) {
+                console.error("Invalid move")
+                return false
+            }
+
+            if (this.getPiece(newCoordinates)?.color === piece.color) {
+                console.log("Cannot move piece on top of piece of the same team")
+                return false
+            }
+
+            return !this.move(oldCoordinates, newCoordinates).isCheck(piece.color)
         },
         isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coordinate) {
             return isPieceInWay(startingCoordinate, endCoordinate, this.board)
@@ -289,31 +309,6 @@ function isCheckMate(board: Board, color: Color) {
 function isStalemate(board: Board, color: Color) {
     return !board.isCheck(color) && !board.hasLegalMove(color);
 }
-
-function isLegalMove(board: Board, oldCoordinates: Coordinate, newCoordinates: Coordinate): boolean {
-    const piece = board.getPiece(oldCoordinates)
-
-    if (!piece) {
-        console.error("Piece not found")
-        return false
-    }
-
-    const validMove = piece.piece.moves(board.board, oldCoordinates)
-        .some(move => compareCoordinates(move, newCoordinates))
-
-    if (!validMove) {
-        console.error("Invalid move")
-        return false
-    }
-
-    if (board.getPiece(newCoordinates)?.color === piece.color) {
-        console.log("Cannot move piece on top of piece of the same team")
-        return false
-    }
-
-    return !board.move(oldCoordinates, newCoordinates).isCheck(piece.color)
-}
-
 
 export function isPieceInWay(startingCoordinate: Coordinate, endCoordinate: Coordinate, board: BoardArray<ActivePiece>): boolean {
     const isOccupied = (row: number, column: number) => {
