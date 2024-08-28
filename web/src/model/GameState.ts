@@ -147,7 +147,7 @@ export const createGameState = (
 }
 
 
-function getLegalMoves(gameState: GameState, piece: ActivePiece, coordinate: Coordinate) {
+function getLegalMoves(gameState: GameState, piece: ActivePiece, coordinate: Coordinate) : Array<Coordinate> {
     return piece.piece.moves(gameState.board.board, coordinate)
         .filter(move => !gameState.board.move(coordinate, move).isCheck(piece.color))
         .filter(move => !gameState.getPiece(move) || gameState.getPiece(move)?.color !== piece.color)
