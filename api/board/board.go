@@ -15,7 +15,7 @@ type Cell struct {
 }
 
 type Game struct {
-	board [][]Cell
+	board [8][8]Cell
 }
 
 func newCoordinate(row int, column int) (*Coordinate, error) {
@@ -51,12 +51,17 @@ func newCell(piece Piece, coordinate Coordinate) *Cell {
 	return &c
 }
 
-// func newGame() *Game {
-//
-// 	var board [8][8]Cell
-// 	// for i := 0; i < 8; i++ {
-// 	// 	for j := 0; i < 8; j++ {
-// 	//         board[i][j] = newCell("")
-// 	// }
-//
-// }
+func newGame() (*Game, error) {
+	var board [8][8]Cell
+	for i := 0; i < 8; i++ {
+		for j := 0; j < 8; j++ {
+            coord, err := newCoordinate(i, j)
+            if err != nil {
+               return nil, err
+            }
+			board[i][j] = *newCell("", *coord)
+		}
+	}
+
+	return &Game{board}, nil
+}

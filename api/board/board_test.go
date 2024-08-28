@@ -44,3 +44,14 @@ func TestCoordinateCreation(t *testing.T) {
 
 	}
 }
+
+func TestNewGame(t *testing.T) {
+	g, err := newGame()
+	if err != nil {
+		t.Errorf("unexpected error %v", err)
+	}
+
+	if g == nil {
+		t.Errorf("expected game to be created")
+	}
+}
